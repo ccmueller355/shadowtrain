@@ -226,7 +226,7 @@ interface SetRecord {
 
 ### 5.2 Core Interaction Flow (Happy Path)
 
-1. Home → **New Session** (auto-name "Session · <date>", editable).
+1. Home → **New Session** (auto-name `"Session · <date>"`, editable).
 2. Tap **+ Add Exercise** → Picker (pre-filtered to your selected equipment: Kettlebell, Rings, Bodyweight, Hand Gripper, Skipping Rope, Stretching) → select.
 3. On add, app runs `suggestNext()` and pre-fills sets:
    - **No history** → default weight (`fixedKettlebellWeight` for KB, blank/0 for bodyweight/rings) and `repRange.min` (for step-loading) or `repRange.max` (for linear plate loading), or default `durationSec` (e.g. `60s` for stretching/holds, `180s` for skipping rope).
@@ -392,7 +392,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 
 1. **Phase 1: Foundation & Core Kit Data (`M0` → `M2`) — *Start Here***
    - *Goal*: Bootable app shell, SQLite database online, and personal equipment kit seeded and browsable.
-   - **M0 (Scaffold)**: Port Expo SDK 56 + TypeScript + Jest + VitePress + `src/theme/` from `../shadowlist`; strip grocery logic; wire up **Home**, **Exercises**, **Progress**, **Settings**, and **Session Logger** routes.
+   - **M0 (Scaffold)**: Port Expo SDK 58 + TypeScript + Jest + VitePress + `src/theme/` from `../shadowlist`; strip grocery logic; wire up **Home**, **Exercises**, **Progress**, **Settings**, and **Session Logger** routes.
    - **M1 (SQLite & Profile Store)**: Set up `expo-sqlite` v1 schema, migration runner, and single write queue (`src/db/`); configure `profileStore.ts` defaulting to `['kettlebell', 'rings', 'bodyweight', 'hand_gripper', 'jump_rope', 'stretching']` + `fixedKettlebellWeight`.
    - **M2 (Exercise Seed & Equipment Picker)**: Seed `core-kit-exercises.json` + public dataset; build the **Exercise Picker** pre-filtered by `availableEquipment`.
 2. **Phase 2: Playable Logger & Pavel Engine (`M3` → `M5`)**

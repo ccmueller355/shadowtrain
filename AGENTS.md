@@ -45,8 +45,8 @@ Purely stylistic — zero functional impact. Sprinkle these into conversation na
 ## 1. Project Stack
 
 - **Spec & Architecture**: `docs/spec.md` (single source of truth for MVP milestones M0–M9)
-- **Framework**: React Native + Expo SDK 56 (https://docs.expo.dev/versions/v56.0.0/)
-- **Language**: TypeScript 5.x, strict mode
+- **Framework**: React Native + Expo SDK 58 (https://docs.expo.dev/versions/latest/)
+- **Language**: TypeScript 7.x, strict mode
 - **State**: Zustand (`src/stores/profileStore.ts`, `src/stores/sessionStore.ts`, `src/stores/exerciseStore.ts`)
 - **Persistence**: `expo-sqlite` (`src/db/`) for structured workout data (`exercises`, `sessions`, `entries`, `sets`) via a single write queue; `AsyncStorage` (`zustand/middleware/persist`) for `Profile` & preferences
 - **Progression Engine**: Pure TypeScript deterministic rule engine (`src/engine/suggest.ts`) — Pavel fixed-kettlebell & calisthenics/rings step-loading, timed sets (`duration_sec`), and adjustable plate increments
@@ -88,7 +88,7 @@ Every coding session SHALL be mined into the palace as a separate topic-based ro
 - **Surgical edits**: match existing style, no unsolicited refactors
 - **Zero abstraction excess**: prefer plain React hooks + Zustand over HOCs, render props, or premature abstractions
 - **Assess & consult** on ambiguity or hidden tech debt before digging in
-- **Expo v56**: always consult https://docs.expo.dev/versions/v56.0.0/ before writing SDK-dependent code
+- **Expo SDK**: always consult https://docs.expo.dev/versions/latest/ before writing SDK-dependent code
 - **Milestone discipline**: follow `docs/spec.md` §7 & §8 — implement one milestone at a time, keep diffs ≤ ~400 lines net, and never modify `src/engine/` tests just to make a broken implementation pass
 
 ---
@@ -150,7 +150,7 @@ Git agents: `speckit-git-initialize`, `speckit-git-feature`, `speckit-git-commit
 
 ## 6. Target Environment
 
-- **Install**: `npm install --legacy-peer-deps` (Node ≥18, Expo SDK 56)
+- **Install**: `mise exec -- npm install --legacy-peer-deps` (Node ≥22 via `.mise.toml`, Expo SDK 58)
 - **Start**: `npx expo start`
 - **Type-check**: `npx tsc --noEmit`
 - **Test**: `npm test` / `npm run test:coverage`
