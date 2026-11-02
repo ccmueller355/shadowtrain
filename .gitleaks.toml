@@ -1,0 +1,18 @@
+title = "ShadowTrain — gitleaks secrets scan"
+
+[allowlist]
+description = "Project-wide allowlist: known-safe patterns and test fixtures"
+paths = [
+    '''(?i)tests/''',
+    '''(?i)testdata/''',
+    '''(?i)fake.*secret''',
+    '''(?i)mock.*token''',
+]
+
+stopwords = [
+    "example",
+    "placeholder",
+    "YOUR_API_KEY",
+    "test-token",
+    "00000000-0000-0000-0000-000000000000",
+]
