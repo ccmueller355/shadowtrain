@@ -43,6 +43,5 @@ export const useProfileStore = create<ProfileState>((set) => ({
   profile: DEFAULT_PROFILE,
   theme: 'fixer',
   setTheme: (theme) => set({ theme }),
-  updateProfile: (patch) =>
-    set((state) => ({ profile: { ...state.profile, ...patch } })),
+  updateProfile: (patch) => set((state) => ({ profile: { ...state.profile, ...patch } })),
 }));

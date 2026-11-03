@@ -10,9 +10,7 @@ export default function ProgressScreen() {
   return (
     <View style={[styles.container, ts.bg]} testID="screen-progress">
       <Text style={[styles.title, ts.accent]}>TELEMETRY & PRs</Text>
-      <Text style={[styles.subtitle, ts.textMuted]}>
-        WEEKLY VOLUME // PERSONAL RECORDS
-      </Text>
+      <Text style={[styles.subtitle, ts.textMuted]}>WEEKLY VOLUME // PERSONAL RECORDS</Text>
       <CyberpunkCard>
         <Text style={[styles.bodyText, ts.text]}>
           Weekly volume charts and PR boards unlock in M6.
