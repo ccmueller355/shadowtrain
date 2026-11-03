@@ -60,7 +60,16 @@ jobs:
         run: npm run lint
 
       - name: Check code formatting (Prettier)
-        run: npm run format:check
+        run: |
+          npm run format:check || {
+            echo "::group::Prettier diff (what --write would change)"
+            for f in $(npx prettier --list-different "src/**/*.{ts,tsx}" "app/**/*.{ts,tsx}" App.tsx index.ts "docs/**/*.md" README.md CHANGELOG.md); do
+              echo "--- $f"
+              npx prettier "$f" | diff "$f" - || true
+            done
+            echo "::endgroup::"
+            exit 1
+          }
 
       - name: TypeScript strict check
         run: npx tsc --noEmit

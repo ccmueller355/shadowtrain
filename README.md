@@ -25,16 +25,16 @@ Engineered on the `shadowlist` deck architecture with a deterministic 80/20 prog
 
 | Milestone                   | Status  | Description                                                                             |
 | :-------------------------- | :------ | :-------------------------------------------------------------------------------------- |
-| **M0 — Scaffold**           | Done    | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, VitePress docs, CT & CI     |
-| **M1 — SQLite Layer**       | Next    | `expo-sqlite` v1 schema, migrations scaffold, single write queue, repository helpers    |
-| **M2 — Exercise Seed**      | Planned | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter  |
-| **M3 — Session Logger**     | Planned | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer |
-| **M4 — Last-Done Prefill**  | Planned | Automatic pre-fill from most recent session's working sets per exercise                 |
-| **M5 — Progression Engine** | Planned | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips             |
-| **M6 — Progress View**      | Planned | Weekly volume/time chart + Personal Records (PR) list                                   |
-| **M7 — Settings & Export**  | Planned | Equipment toggles, fixed KB weight, goal/units, and schema v1 JSON export               |
-| **M8 — First Image Batch**  | Planned | 25–30 core-kit start/end cyberpunk WebP illustrations + placeholder fallback            |
-| **M9 — Distribution Build** | Planned | EAS internal Android APK build & session survival across restarts                       |
+| **M0 - Scaffold**           | Done    | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, VitePress docs, CT & CI     |
+| **M1 - SQLite Layer**       | Next    | `expo-sqlite` v1 schema, migrations scaffold, single write queue, repository helpers    |
+| **M2 - Exercise Seed**      | Planned | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter  |
+| **M3 - Session Logger**     | Planned | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer |
+| **M4 - Last-Done Prefill**  | Planned | Automatic pre-fill from most recent session's working sets per exercise                 |
+| **M5 - Progression Engine** | Planned | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips             |
+| **M6 - Progress View**      | Planned | Weekly volume/time chart + Personal Records (PR) list                                   |
+| **M7 - Settings & Export**  | Planned | Equipment toggles, fixed KB weight, goal/units, and schema v1 JSON export               |
+| **M8 - First Image Batch**  | Planned | 25-30 core-kit start/end cyberpunk WebP illustrations + placeholder fallback            |
+| **M9 - Distribution Build** | Planned | EAS internal Android APK build & session survival across restarts                       |
 
 See [`docs/spec.md`](docs/spec.md) for the complete MVP specification and milestone acceptance criteria.
 
@@ -94,16 +94,16 @@ npm run doctor        # Expo SDK health & dependency check (npx expo-doctor)
 
 8 gates enforced locally (`npm run ci`) and in GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
 
-| Stage                | Gate                                                                                                |
-| :------------------- | :-------------------------------------------------------------------------------------------------- |
-| **Secrets**          | `gitleaks detect --source . --verbose --config .gitleaks.toml`                                      |
-| **Lint**             | `npm run lint` (ESLint)                                                                             |
-| **Format**           | `npm run format:check` (Prettier)                                                                   |
-| **Type Check**       | `npx tsc --noEmit` (TypeScript 7 strict mode)                                                       |
-| **Expo Config**      | `npx expo config --type introspect`                                                                 |
-| **Expo Doctor**      | `npx --yes expo-doctor` (20/20 SDK checks)                                                          |
-| **Tests & Coverage** | `npm run test:coverage` (Unit + Component Tests, ≥80% global threshold)                             |
-| **Docs & Pages**     | `npm run docs:build:full` → deployed to [GitHub Pages](https://ccmueller355.github.io/shadowtrain/) |
+| Stage                | Gate                                                                                                 |
+| :------------------- | :--------------------------------------------------------------------------------------------------- |
+| **Secrets**          | `gitleaks detect --source . --verbose --config .gitleaks.toml`                                       |
+| **Lint**             | `npm run lint` (ESLint)                                                                              |
+| **Format**           | `npm run format:check` (Prettier)                                                                    |
+| **Type Check**       | `npx tsc --noEmit` (TypeScript 7 strict mode)                                                        |
+| **Expo Config**      | `npx expo config --type introspect`                                                                  |
+| **Expo Doctor**      | `npx --yes expo-doctor` (20/20 SDK checks)                                                           |
+| **Tests & Coverage** | `npm run test:coverage` (Unit + Component Tests, >=80% global threshold)                             |
+| **Docs & Pages**     | `npm run docs:build:full` to deployed to [GitHub Pages](https://ccmueller355.github.io/shadowtrain/) |
 
 ## Project Structure
 
