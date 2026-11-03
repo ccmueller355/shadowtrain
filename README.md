@@ -3,7 +3,7 @@
 [![CI](https://github.com/ccmueller355/shadowtrain/actions/workflows/ci.yml/badge.svg)](https://github.com/ccmueller355/shadowtrain/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ccmueller355.github.io/shadowtrain/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Version](https://img.shields.io/badge/version-0.1.1-blue)
 
 A Shadowrun-themed, offline-first workout logger for Android and iOS, built with React Native and Expo.
 

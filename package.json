@@ -1,6 +1,6 @@
 {
   "name": "shadowtrain",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "index.ts",
   "private": true,
   "dependencies": {
@@ -71,7 +71,8 @@
     "ci": "bash scripts/ci-local.sh",
     "ci:quick": "bash scripts/ci-local.sh --quick",
     "hooks:install": "git config core.hooksPath .githooks && chmod +x .githooks/pre-commit scripts/ci-local.sh",
-    "prepare": "git config core.hooksPath .githooks || true"
+    "prepare": "git config core.hooksPath .githooks || true",
+    "sync-version": "node -e \"const fs=require('fs'); const v=fs.readFileSync('VERSION','utf8').trim(); const a=JSON.parse(fs.readFileSync('app.json','utf8')); a.expo.version=v; fs.writeFileSync('app.json',JSON.stringify(a,null,2)+'\\n'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.version=v; fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\\n'); console.log('Synced version → '+v);\""
   },
   "jest": {
     "preset": "jest-expo",
