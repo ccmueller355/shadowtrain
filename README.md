@@ -23,18 +23,18 @@ Engineered on the `shadowlist` deck architecture with a deterministic 80/20 prog
 
 ## Implementation Status
 
-| Milestone                   | Status | Description                                                                             |
-| :-------------------------- | :----: | :-------------------------------------------------------------------------------------- |
-| **M0 — Scaffold**           |   ✅   | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, VitePress docs, CT & CI     |
-| **M1 — SQLite Layer**       |   ⏳   | `expo-sqlite` v1 schema, migrations scaffold, single write queue, repository helpers    |
-| **M2 — Exercise Seed**      |   📋   | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter  |
-| **M3 — Session Logger**     |   📋   | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer |
-| **M4 — Last-Done Prefill**  |   📋   | Automatic pre-fill from most recent session's working sets per exercise                 |
-| **M5 — Progression Engine** |   📋   | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips             |
-| **M6 — Progress View**      |   📋   | Weekly volume/time chart + Personal Records (PR) list                                   |
-| **M7 — Settings & Export**  |   📋   | Equipment toggles, fixed KB weight, goal/units, and schema v1 JSON export               |
-| **M8 — First Image Batch**  |   📋   | 25–30 core-kit start/end cyberpunk WebP illustrations + placeholder fallback            |
-| **M9 — Distribution Build** |   📋   | EAS internal Android APK build & session survival across restarts                       |
+| Milestone                   | Status  | Description                                                                             |
+| :-------------------------- | :------ | :-------------------------------------------------------------------------------------- |
+| **M0 — Scaffold**           | Done    | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, VitePress docs, CT & CI     |
+| **M1 — SQLite Layer**       | Next    | `expo-sqlite` v1 schema, migrations scaffold, single write queue, repository helpers    |
+| **M2 — Exercise Seed**      | Planned | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter  |
+| **M3 — Session Logger**     | Planned | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer |
+| **M4 — Last-Done Prefill**  | Planned | Automatic pre-fill from most recent session's working sets per exercise                 |
+| **M5 — Progression Engine** | Planned | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips             |
+| **M6 — Progress View**      | Planned | Weekly volume/time chart + Personal Records (PR) list                                   |
+| **M7 — Settings & Export**  | Planned | Equipment toggles, fixed KB weight, goal/units, and schema v1 JSON export               |
+| **M8 — First Image Batch**  | Planned | 25–30 core-kit start/end cyberpunk WebP illustrations + placeholder fallback            |
+| **M9 — Distribution Build** | Planned | EAS internal Android APK build & session survival across restarts                       |
 
 See [`docs/spec.md`](docs/spec.md) for the complete MVP specification and milestone acceptance criteria.
 
