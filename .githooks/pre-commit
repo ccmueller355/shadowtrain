@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
+# Pre-commit hook for ShadowTrain
+# Activated via: npm run hooks:install (sets git config core.hooksPath .githooks)
+
+set -euo pipefail
+
+export PATH="$HOME/.local/bin:$PATH"
+
+echo "─── [ NEURAL DECK v5.1 // PRE-COMMIT GATE ] ───"
+
+# 1. Staged secrets check via gitleaks
+if command -v gitleaks >/dev/null 2>&1; then
+  echo "▶ [1/6] Scanning staged changes for secrets (gitleaks)..."
+  gitleaks protect --staged --verbose --config .gitleaks.toml
+else
+  echo "⚠ [1/6] gitleaks not found in PATH; skipping staged secret scan (run 'npm run ci' to auto-install)."
+fi
+
+# 2. Verify Neural Deck copyright header on staged .ts / .tsx source files
+echo "▶ [2/6] Verifying Neural Deck header on staged source files..."
+STAGED_TS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(src|app|scripts|App\.tsx|index\.ts).*\.(ts|tsx)$' | grep -v '\.d\.ts$' || true)
+if [[ -n "$STAGED_TS" ]]; then
+  MISSING_HEADER=0
+  for FILE in $STAGED_TS; do
+    if [[ -f "$FILE" ]]; then
+      FIRST_LINE=$(head -n 1 "$FILE")
+      if [[ "$FIRST_LINE" != "// ─── [ NEURAL DECK v5.1 \$ AI::GENERATED ] ───" ]]; then
+        echo "  ✖ Missing Neural Deck header in: $FILE"
+        MISSING_HEADER=1
+      fi
+    fi
+  done
+  if [[ "$MISSING_HEADER" -ne 0 ]]; then
+    echo "✖ Commit aborted: add '// ─── [ NEURAL DECK v5.1 \$ AI::GENERATED ] ───' as line 1."
+    exit 1
+  fi
+fi
+
+# 3. ESLint check
+echo "▶ [3/6] Running ESLint (npm run lint)..."
+npm run lint
+
+# 4. Prettier format check
+echo "▶ [4/6] Checking formatting (npm run format:check)..."
+npm run format:check
+
+# 5. TypeScript strict check
+echo "▶ [5/6] Running TypeScript check (tsc --noEmit)..."
+npx tsc --noEmit
+
+# 6. Run unit & component tests with coverage
+echo "▶ [6/6] Running Jest unit & component tests with coverage..."
+npm run test:coverage
+
+echo "✅ [PRE-COMMIT GREEN] Locking it in."

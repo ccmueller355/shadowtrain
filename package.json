@@ -35,12 +35,17 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
+    "@babel/eslint-parser": "^8.0.7",
+    "@eslint/js": "^10.0.1",
     "@react-native/jest-preset": "^0.88.1",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^30.0.0",
     "@types/react": "~19.3.0",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
     "jest": "^30.5.2",
     "jest-expo": "~58.0.13",
+    "prettier": "^3.9.10",
     "react-test-renderer": "19.3.0",
     "test-renderer": "^1.3.1",
     "typescript": "~7.0.2"
@@ -54,9 +59,19 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "test": "jest",
+    "test:ct": "jest --testPathPatterns=ct\\.test",
     "test:coverage": "jest --coverage",
-    "docs:build:full": "npm run test:coverage && mkdir -p docs/public && cp -r coverage/lcov-report docs/public/coverage && vitepress build docs",
-    "typecheck": "tsc --noEmit"
+    "lint": "eslint src app App.tsx index.ts",
+    "lint:fix": "eslint --fix src app App.tsx index.ts",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"app/**/*.{ts,tsx}\" App.tsx index.ts \"docs/**/*.md\" README.md CHANGELOG.md",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"app/**/*.{ts,tsx}\" App.tsx index.ts \"docs/**/*.md\" README.md CHANGELOG.md",
+    "docs:build:full": "npm run test:coverage && rm -rf docs/public/coverage && mkdir -p docs/public/coverage && cp -r coverage/lcov-report/* docs/public/coverage/ && vitepress build docs",
+    "typecheck": "tsc --noEmit",
+    "doctor": "npx --yes expo-doctor",
+    "ci": "bash scripts/ci-local.sh",
+    "ci:quick": "bash scripts/ci-local.sh --quick",
+    "hooks:install": "git config core.hooksPath .githooks && chmod +x .githooks/pre-commit scripts/ci-local.sh",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "jest": {
     "preset": "jest-expo",
@@ -70,11 +85,27 @@
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 15,
-        "functions": 15,
-        "lines": 15,
-        "statements": 15
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
       }
+    }
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "typescript",
+        "react-native-safe-area-context",
+        "expo",
+        "expo-sharing",
+        "expo-splash-screen",
+        "jest-expo",
+        "jest",
+        "@types/jest",
+        "eslint",
+        "prettier"
+      ]
     }
   }
 }
