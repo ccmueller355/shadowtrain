@@ -1,5 +1,6 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { render, screen, fireEvent, act } from '@testing-library/react-native';
 import App from '../../App';
 import { useProfileStore, DEFAULT_PROFILE } from '../stores/profileStore';
@@ -7,7 +8,7 @@ import { cyberpunkTheme } from '../theme/cyberpunkTheme';
 import { themes } from '../theme/themes';
 
 jest.mock('react-native-safe-area-context', () => ({
-  useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+  useSafeAreaInsets: () => ({ top: 28, right: 0, bottom: 48, left: 0 }),
   SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
@@ -22,6 +23,14 @@ describe('M0 Scaffold — ShadowTrain Shell, Routes & Theme', () => {
   it('exports cyberpunkTheme and all 5 shadow themes', () => {
     expect(cyberpunkTheme.label).toBe("Fixer's Notebook");
     expect(Object.keys(themes)).toEqual(['fixer', 'stuffer', 'decker', 'cyber', 'terminal']);
+  });
+
+  it('applies Android/iOS safe area insets to top container and bottom tab bar', () => {
+    render(<App />);
+    const rootStyle = StyleSheet.flatten(screen.getByTestId('app-navigator-root').props.style);
+    const tabBarStyle = StyleSheet.flatten(screen.getByTestId('app-tab-bar').props.style);
+    expect(rootStyle.paddingTop).toBe(28);
+    expect(tabBarStyle.paddingBottom).toBe(48);
   });
 
   it('renders Home tab by default and navigates across Exercises, Progress, and Settings tabs', () => {

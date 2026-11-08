@@ -1,6 +1,7 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import HomeScreen from '../../app/(tabs)/index';
 import ExercisesScreen from '../../app/(tabs)/exercises';
 import ProgressScreen from '../../app/(tabs)/progress';
@@ -21,20 +22,29 @@ const TABS: { key: TabRoute; label: string }[] = [
 export function AppNavigator() {
   const [activeTab, setActiveTab] = useState<TabRoute>('home');
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const ts = useThemeStyles();
 
+  const safeEdgesStyle = {
+    paddingTop: insets.top,
+    paddingLeft: insets.left,
+    paddingRight: insets.right,
+  };
+
   if (activeSessionId) {
     return (
-      <SessionLoggerScreen
-        sessionId={activeSessionId}
-        onFinishSession={() => setActiveSessionId(null)}
-      />
+      <View style={[styles.root, ts.bg, safeEdgesStyle, { paddingBottom: insets.bottom }]}>
+        <SessionLoggerScreen
+          sessionId={activeSessionId}
+          onFinishSession={() => setActiveSessionId(null)}
+        />
+      </View>
     );
   }
 
   return (
-    <View style={[styles.root, ts.bg]}>
+    <View style={[styles.root, ts.bg, safeEdgesStyle]} testID="app-navigator-root">
       <View style={styles.content}>
         {activeTab === 'home' && <HomeScreen onStartSession={(id) => setActiveSessionId(id)} />}
         {activeTab === 'exercises' && <ExercisesScreen />}
@@ -43,9 +53,14 @@ export function AppNavigator() {
       </View>
 
       <View
+        testID="app-tab-bar"
         style={[
           styles.tabBar,
-          { backgroundColor: theme.colors.headerBg, borderTopColor: theme.colors.border },
+          {
+            backgroundColor: theme.colors.headerBg,
+            borderTopColor: theme.colors.border,
+            paddingBottom: Math.max(insets.bottom, 12),
+          },
         ]}
       >
         {TABS.map((tab) => {
@@ -74,8 +89,8 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     borderTopWidth: 1,
-    paddingVertical: 12,
+    paddingTop: 12,
   },
-  tabItem: { flex: 1, alignItems: 'center' },
+  tabItem: { flex: 1, alignItems: 'center', paddingVertical: 4 },
   tabLabel: { fontSize: 12, fontWeight: 'bold', fontFamily: 'monospace' },
 });
