@@ -217,14 +217,14 @@ interface SetRecord {
 
 ### 5.1 Screens
 
-| Screen               | Purpose                                                                                                | Must-have                                                                                                                    |
-| :------------------- | :----------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| **Home**             | Start session, resume in-progress, list of recent sessions                                             | New session button, resume banner, last 5 sessions                                                                           |
-| **Session (Logger)** | Add exercises, log sets (reps/weight or duration), see last-done prefill, rest timer                   | Per-exercise card with sets, prefill, +set, checkoff, timer                                                                  |
-| **Exercise Picker**  | Search/filter exercises                                                                                | Defaults to `profile.availableEquipment` filter (with quick "Show all" toggle), text search, muscle filter, equipment filter |
-| **Exercise Detail**  | Show images, instructions, history, current suggestion                                                 | Start/end images, "Suggested next" banner                                                                                    |
-| **Progress**         | Volume/week, PR list                                                                                   | Two simple charts + PR table                                                                                                 |
-| **Settings**         | Profile, available equipment selector, fixed KB weight, units, theme, increments override, export data | All of `Profile`, equipment toggles, JSON export                                                                             |
+| Screen               | Purpose                                                                                                     | Must-have                                                                                                                    |
+| :------------------- | :---------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| **Home**             | Start session, resume in-progress, list of recent sessions                                                  | New session button, resume banner, last 5 sessions                                                                           |
+| **Session (Logger)** | Add exercises, log sets (reps/weight or duration), see last-done prefill, rest timer                        | Per-exercise card with sets, prefill, +set, checkoff, timer                                                                  |
+| **Exercise Picker**  | Search/filter exercises                                                                                     | Defaults to `profile.availableEquipment` filter (with quick "Show all" toggle), text search, muscle filter, equipment filter |
+| **Exercise Detail**  | Show images, instructions, history, current suggestion                                                      | Start/end images, "Suggested next" banner                                                                                    |
+| **Progress**         | Volume/week, PR list                                                                                        | Two simple charts + PR table                                                                                                 |
+| **Settings**         | Profile, available equipment selector, fixed KB weight, units, theme, increments override, backup & restore | All of `Profile`, equipment toggles, 1-file JSON export/import (`meta.version`) + CSV session log export                     |
 
 ### 5.2 Core Interaction Flow (Happy Path)
 
@@ -345,10 +345,27 @@ function suggestNext(
 - Fallback: a themed placeholder card with exercise name (so the app is never broken).
 - Regenerating an image never touches the DB — the DB just stores `image_start`/`image_end` keys, and a `useExerciseImage()` hook resolves to asset-or-placeholder.
 
-### 5.6 Data Portability
+### 5.6 Data Portability (1-File JSON Backup/Restore + CSV Session Log)
 
-- **Export**: Settings → "Export data" writes a single JSON (schema v1) to the share sheet.
-- **Import** is post-MVP; the export format is the contract for it.
+- **Single-File Everything Bundle (`.json`)**: Both **Export** and **Import** operate on a single self-contained `.json` file (`shadowtrain-backup-YYYY-MM-DD.json`) containing all user state (`profile` + preferences, custom `exercises`, `sessions` with nested `entries` and `sets`, and gamification/achievement state).
+- **Mandatory `meta` Version Envelope**:
+  ```json
+  {
+    "meta": {
+      "format": "shadowtrain-backup",
+      "version": 1,
+      "dbSchemaVersion": 1,
+      "appVersion": "0.1.1",
+      "exportedAt": "2026-11-08T19:56:00.000Z"
+    },
+    "profile": { ... },
+    "customExercises": [ ... ],
+    "sessions": [ ... ]
+  }
+  ```
+- **JSON Export**: Settings → **"Export Backup (.json)"** serializes the full state with the `meta` header and opens the OS share/save sheet.
+- **JSON Import**: Settings → **"Import Backup (.json)"** selects a `.json` file, validates `meta.format === 'shadowtrain-backup'` and `meta.version` (running any format migration if needed), and restores `profile` + SQLite workout history inside a single serialized transaction.
+- **CSV Session Log Export (`.csv`)**: Settings → **"Export Sessions (.csv)"** exports a flat spreadsheet of all logged sets (`session_id,session_name,started_at,finished_at,exercise_id,exercise_name,category,tier,set_num,weight,reps,duration_sec,is_warmup,completed_at`) for analysis in Excel/LibreOffice/Pandas.
 
 ### 5.7 Gamification: Plan-Aware Streaks & Tiered Achievements (`M10`)
 
@@ -442,7 +459,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 | **M4**  | Last-done prefill                   | Reopening an exercise pre-fills last session's working sets                                                                                      | S    |
 | **M5**  | Progression engine                  | `suggestNext()` implemented (fixed-KB/rings step-loading + timed + plate increments), unit tests green, suggestion chip shown on Logger & Detail | M    |
 | **M6**  | Progress view                       | Volume/week chart + PR list                                                                                                                      | S    |
-| **M7**  | Settings + export                   | Profile edits (equipment toggles, fixed KB weight, goal, units) persist; export JSON produces valid file                                         | S    |
+| **M7**  | Settings + Import/Export            | Profile edits persist; 1-file JSON export & import (`meta.version: 1`) restore full state + CSV session log export                               | S    |
 | **M8**  | First image batch                   | 25–30 core-kit exercises have start/end images; placeholder fallback works                                                                       | M    |
 | **M9**  | Distribution build                  | EAS internal build installs on device; session survives app restart                                                                              | S    |
 | **M10** | Streaks & achievements              | Duolingo-style plan-aware weekly/daily streaks (with rest-day shield) + short/mid/long-term achievement badges on Home & Progress                | M    |
@@ -462,7 +479,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 3. **Phase 3: Analytics, Control Deck & Gamification (`M6` → `M7`, `M10`)**
    - _Goal_: Track weekly volume/PRs, customize equipment/profile on the fly, and reward short/mid/long-term consistency.
    - **M6 (Progress View)**: Weekly volume/time chart + Personal Records (PR) list.
-   - **M7 (Settings & Data Export)**: Equipment toggles, fixed KB weight setting, `kg`/`lb`, goal, theme selector, and full JSON export.
+   - **M7 (Settings & Data Import/Export)**: Equipment toggles, fixed KB weight setting, `kg`/`lb`, goal, theme selector, single-file JSON backup export & import (`meta.version: 1`), and CSV session log export.
    - **M10 (Streaks & Achievements)**: Plan-aware Duolingo-style streak tracker (weekly target + rest-day buffer) and tiered short/mid/long-term achievement badges (`src/engine/achievements.ts`).
 4. **Phase 4: Visual Chrome & Field Deployment (`M8` → `M9`)**
    - _Goal_: Custom cyberpunk start/end pose illustrations for the core kit and standalone installable APK.
@@ -524,7 +541,6 @@ Rules for the agent (paste at top of every task):
 - **Wearable / HealthKit** — needs a dev build; schedule only after M9.
 - **Rust analytics core** — `shadowlink-rust-core`-style extraction of engine for cross-surface reuse. Not before you have two surfaces.
 - **Program templates** (Simple & Sinister, Enter the Kettlebell ROP, 5/3/1, GZCLP, etc.) — layered on top of the existing session model.
-- **Import** — pairs with §5.6 export format.
 
 ---
 

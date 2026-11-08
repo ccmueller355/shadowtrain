@@ -58,7 +58,7 @@ flowchart LR
 | **M4 — Last-Done Prefill**  | ⏳ Next    | Automatic pre-fill from most recent working sets per exercise                   |
 | **M5 — Progression Engine** | 📋 Planned | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips     |
 | **M6 — Progress View**      | 📋 Planned | Weekly volume/time chart + Personal Records (PR) table                          |
-| **M7 — Settings & Export**  | 📋 Planned | Kit toggles, fixed KB weight, goal/units, and schema v1 JSON export             |
+| **M7 — Settings & I/O**     | 📋 Planned | Kit toggles, fixed KB weight, goal/units, 1-file JSON export/import + CSV log   |
 | **M8 — First Image Batch**  | 📋 Planned | 25–30 core-kit start/end cyberpunk WebP illustrations + fallback card           |
 | **M9 — Distribution Build** | 📋 Planned | EAS internal Android APK build & survival across restarts                       |
 | **M10 — Gamification**      | 📋 Planned | Plan-aware weekly streaks (rest-day shield) & short/mid/long-term achievements  |

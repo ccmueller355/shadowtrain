@@ -20,7 +20,7 @@ Engineered on the `shadowlist` deck architecture with a deterministic 80/20 prog
 - **Five Hand-Crafted Shadow Themes** — _Fixer's Notebook_ (dark noir), _Stuffer Shack_ (aged parchment), _Decker's Den_ (synth terminal), _Cyber Blue_ (ocean neon), and _Fiddler's Green_ (CRT phosphor)
 - **Fast Pre-Fill & Rest Timer** — Pre-fills "last done" working sets per exercise with a one-line suggestion chip and auto-starts a haptic countdown timer on set checkoff
 - **100% On-Device Persistence** — `expo-sqlite` (WAL mode + serialized write queue) for structured workout history and `AsyncStorage` (via Zustand `persist`) for operator profile and preferences
-- **Data Portability** — Full schema-versioned JSON export from Settings
+- **Data Portability** — Single-file versioned JSON backup export & import (`meta.version: 1` for Settings + Sessions) plus CSV session log export from Settings
 
 ## Implementation Status
 
@@ -33,7 +33,7 @@ Engineered on the `shadowlist` deck architecture with a deterministic 80/20 prog
 | **M4 - Last-Done Prefill**  | Next    | Automatic pre-fill from most recent session's working sets per exercise                 |
 | **M5 - Progression Engine** | Planned | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips             |
 | **M6 - Progress View**      | Planned | Weekly volume/time chart + Personal Records (PR) list                                   |
-| **M7 - Settings & Export**  | Planned | Equipment toggles, fixed KB weight, goal/units, and schema v1 JSON export               |
+| **M7 - Settings & I/O**     | Planned | Equipment toggles, fixed KB weight, goal/units, 1-file JSON export/import + CSV export  |
 | **M8 - First Image Batch**  | Planned | 25-30 core-kit start/end cyberpunk WebP illustrations + placeholder fallback            |
 | **M9 - Distribution Build** | Planned | EAS internal Android APK build & session survival across restarts                       |
 | **M10 - Gamification**      | Planned | Plan-aware weekly streaks (with rest-day shield) & short/mid/long-term achievements     |
