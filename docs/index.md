@@ -10,6 +10,9 @@ hero:
       text: Read MVP Spec
       link: /spec
     - theme: alt
+      text: 5 Shadow Trainers
+      link: /image-prompts
+    - theme: alt
       text: CI & Testing
       link: /ci-and-testing
     - theme: alt

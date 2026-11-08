@@ -25,6 +25,7 @@ export default withMermaid(
       nav: [
         { text: 'Home', link: '/' },
         { text: 'MVP Spec', link: '/spec' },
+        { text: '5 Shadow Trainers', link: '/image-prompts' },
         { text: 'CI & Testing', link: '/ci-and-testing' },
         { text: 'Coverage', link: '/coverage' },
       ],
@@ -35,7 +36,8 @@ export default withMermaid(
             text: 'ShadowTrain Deck',
             items: [
               { text: 'Overview & Roadmap', link: '/' },
-              { text: 'MVP Plan & Spec (M0–M9)', link: '/spec' },
+              { text: 'MVP Plan & Spec (M0–M10)', link: '/spec' },
+              { text: '5 Shadow Trainers & Art Prompts', link: '/image-prompts' },
               { text: 'CI, Pre-Commit & CT Tests', link: '/ci-and-testing' },
               { text: 'Code Coverage', link: '/coverage' },
             ],
