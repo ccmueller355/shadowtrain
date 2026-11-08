@@ -44,7 +44,7 @@ features:
 
 ```mermaid
 flowchart LR
-  P1["Phase 1: Foundation\nM0 Scaffold (Done)\nM1 SQLite Schema (Done)\nM2 Exercise Seed (Done)"] --> P2["Phase 2: Playable Logger\nM3 Session Logger (Done)\nM4 Last-Done Prefill\nM5 Step-Loading Engine"]
+  P1["Phase 1: Foundation\nM0 Scaffold (Done)\nM1 SQLite Schema (Done)\nM2 Exercise Seed (Done)"] --> P2["Phase 2: Playable Logger\nM3 Session Logger (Done)\nM4 Last-Done Prefill (Done)\nM5 Step-Loading Engine"]
   P2 --> P3["Phase 3: Telemetry & Gamification\nM6 Progress & PRs\nM7 Settings & Export\nM10 Streaks & Achievements"]
   P3 --> P4["Phase 4: Chrome & Deploy\nM8 AI Pose Assets\nM9 EAS Android APK"]
 ```
@@ -55,8 +55,8 @@ flowchart LR
 | **M1 — SQLite Layer**       | ✅ Landed  | `expo-sqlite` v1 schema, migrations, serialized write queue, repo helpers       |
 | **M2 — Exercise Seed**      | ✅ Landed  | `core-kit-exercises.json` + public dataset import & `availableEquipment` filter |
 | **M3 — Session Logger**     | ✅ Landed  | Log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer       |
-| **M4 — Last-Done Prefill**  | ⏳ Next    | Automatic pre-fill from most recent working sets per exercise                   |
-| **M5 — Progression Engine** | 📋 Planned | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips     |
+| **M4 — Last-Done Prefill**  | ✅ Landed  | Automatic pre-fill from most recent working sets per exercise                   |
+| **M5 — Progression Engine** | ⏳ Next    | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips     |
 | **M6 — Progress View**      | 📋 Planned | Weekly volume/time chart + Personal Records (PR) table                          |
 | **M7 — Settings & I/O**     | 📋 Planned | Kit toggles, fixed KB weight, goal/units, 1-file JSON export/import + CSV log   |
 | **M8 — First Image Batch**  | 📋 Planned | 25–30 core-kit start/end cyberpunk WebP illustrations + fallback card           |

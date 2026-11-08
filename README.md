@@ -30,8 +30,8 @@ Engineered on the `shadowlist` deck architecture with a deterministic 80/20 prog
 | **M1 - SQLite Layer**       | Done    | `expo-sqlite` v1 schema, migrations scaffold, single write queue, repository helpers    |
 | **M2 - Exercise Seed**      | Done    | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter  |
 | **M3 - Session Logger**     | Done    | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer |
-| **M4 - Last-Done Prefill**  | Next    | Automatic pre-fill from most recent session's working sets per exercise                 |
-| **M5 - Progression Engine** | Planned | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips             |
+| **M4 - Last-Done Prefill**  | Done    | Automatic pre-fill from most recent session's working sets per exercise                 |
+| **M5 - Progression Engine** | Next    | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips             |
 | **M6 - Progress View**      | Planned | Weekly volume/time chart + Personal Records (PR) list                                   |
 | **M7 - Settings & I/O**     | Planned | Equipment toggles, fixed KB weight, goal/units, 1-file JSON export/import + CSV export  |
 | **M8 - First Image Batch**  | Planned | 25-30 core-kit start/end cyberpunk WebP illustrations + placeholder fallback            |
