@@ -32,7 +32,8 @@
     "plugins": [
       "expo-splash-screen",
       "expo-font",
-      "expo-sharing"
+      "expo-sharing",
+      "expo-sqlite"
     ]
   }
 }

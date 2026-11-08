@@ -12,7 +12,7 @@ if [[ "${1:-}" == "--quick" ]]; then
   QUICK=true
 fi
 
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "  SHADOWTRAIN // NEURAL DECK v5.1 — LOCAL CI PIPELINE"
