@@ -7,7 +7,11 @@ import { useThemeStyles } from '../../src/theme/useThemeStyles';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { useProfileStore } from '../../src/stores/profileStore';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
-import { getDefaultRestSeconds, useSessionStore } from '../../src/stores/sessionStore';
+import {
+  formatLastDoneSummary,
+  getDefaultRestSeconds,
+  useSessionStore,
+} from '../../src/stores/sessionStore';
 import { Exercise } from '../../src/types';
 
 interface SessionLoggerScreenProps {
@@ -31,6 +35,7 @@ export default function SessionLoggerScreen({
   const restTimerRunning = useSessionStore((s) => s.restTimerRunning);
   const startSession = useSessionStore((s) => s.startSession);
   const updateSessionName = useSessionStore((s) => s.updateSessionName);
+  const getLastWorkingSets = useSessionStore((s) => s.getLastWorkingSets);
   const addExerciseEntry = useSessionStore((s) => s.addExerciseEntry);
   const removeExerciseEntry = useSessionStore((s) => s.removeExerciseEntry);
   const addSet = useSessionStore((s) => s.addSet);
@@ -170,6 +175,11 @@ export default function SessionLoggerScreen({
             const exercise = exerciseById.get(entry.exerciseId);
             const isDuration = exercise?.trackingType === 'duration';
             const restDefault = getDefaultRestSeconds(exercise);
+            const lastWorkingSets = getLastWorkingSets(entry.exerciseId);
+            const lastDoneSummary = formatLastDoneSummary(
+              lastWorkingSets,
+              isDuration ? 'duration' : 'reps',
+            );
 
             return (
               <CyberpunkCard key={entry.id} glow={false} style={styles.entryCard}>
@@ -191,6 +201,25 @@ export default function SessionLoggerScreen({
                   >
                     <Text style={[styles.removeText, { color: theme.colors.danger }]}>REMOVE</Text>
                   </TouchableOpacity>
+                </View>
+
+                <View
+                  testID={
+                    lastDoneSummary ? `last-done-chip-${entry.id}` : `first-time-chip-${entry.id}`
+                  }
+                  style={[
+                    styles.prefillChip,
+                    {
+                      borderColor: lastDoneSummary ? theme.colors.primary : theme.colors.border,
+                      backgroundColor: theme.colors.background,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[styles.prefillChipText, lastDoneSummary ? ts.accent : ts.textMuted]}
+                  >
+                    {lastDoneSummary ?? 'FIRST TIME // DEFAULT PREFILL'}
+                  </Text>
                 </View>
 
                 {entry.sets.map((set, idx) => (
@@ -417,6 +446,15 @@ const styles = StyleSheet.create({
   entryTitle: { fontSize: 14, fontWeight: 'bold', fontFamily: 'monospace' },
   entrySub: { fontSize: 10, fontFamily: 'monospace', marginTop: 2 },
   removeText: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
+  prefillChip: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginBottom: 8,
+    alignSelf: 'flex-start',
+  },
+  prefillChipText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   setRow: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -5,6 +5,7 @@ import {
   DatabaseClient,
   getActiveSession,
   getDatabase,
+  getLastWorkingSetsForExercise,
   listRecentSessions,
   saveSession,
 } from '../db';
@@ -16,6 +17,25 @@ export function getDefaultRestSeconds(exercise?: Exercise): number {
     return 60;
   }
   return 90;
+}
+
+export function formatLastDoneSummary(
+  sets: SetRecord[] | null,
+  trackingType: 'reps' | 'duration' = 'reps',
+): string | null {
+  if (!sets || sets.length === 0) return null;
+  const working = sets.filter((s) => !s.isWarmup);
+  if (working.length === 0) return null;
+
+  const first = working[0];
+  if (trackingType === 'duration' || first.durationSec !== undefined) {
+    const sec = first.durationSec ?? 45;
+    return `LAST DONE // ${working.length} × ${sec}s`;
+  }
+
+  const reps = first.reps ?? 8;
+  const weightLabel = first.weight && first.weight > 0 ? `${first.weight}kg` : 'BW';
+  return `LAST DONE // ${working.length} × ${weightLabel} × ${reps}`;
 }
 
 export function buildDefaultSet(
@@ -63,13 +83,23 @@ function tryPersistSessionToDb(session: Session): void {
 export interface SessionState {
   activeSession: Session | null;
   recentSessions: Session[];
+  lastDoneCache: Record<string, SetRecord[]>;
   restTimerSec: number;
   restTimerRunning: boolean;
   startSession: (customId?: string, name?: string) => Session;
   updateSessionName: (name: string) => void;
+  getLastWorkingSets: (exerciseId: string) => SetRecord[] | null;
+  fetchLastWorkingSetsFromDb: (
+    exerciseId: string,
+    db?: DatabaseClient,
+  ) => Promise<SetRecord[] | null>;
   addExerciseEntry: (
     exercise: Exercise,
-    options?: { fixedKettlebellWeight?: number; repMin?: number },
+    options?: {
+      fixedKettlebellWeight?: number;
+      repMin?: number;
+      lastWorkingSets?: SetRecord[] | null;
+    },
   ) => Entry;
   removeExerciseEntry: (entryId: string) => void;
   addSet: (entryId: string, exercise?: Exercise) => void;
@@ -91,9 +121,22 @@ function nextUid(prefix: string): string {
   return uid;
 }
 
+function cloneWorkingSetsForPrefill(workingSets: SetRecord[]): SetRecord[] {
+  return workingSets.map((s) => ({
+    id: nextUid('set'),
+    ...(s.reps !== undefined ? { reps: s.reps } : {}),
+    ...(s.weight !== undefined ? { weight: s.weight } : {}),
+    ...(s.durationSec !== undefined ? { durationSec: s.durationSec } : {}),
+    ...(s.rpe !== undefined ? { rpe: s.rpe } : {}),
+    completed: false,
+    isWarmup: false,
+  }));
+}
+
 export const useSessionStore = create<SessionState>((set, get) => ({
   activeSession: null,
   recentSessions: [],
+  lastDoneCache: {},
   restTimerSec: 0,
   restTimerRunning: false,
 
@@ -125,15 +168,53 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     tryPersistSessionToDb(updated);
   },
 
+  getLastWorkingSets: (exerciseId) => {
+    const { recentSessions, lastDoneCache } = get();
+    for (const session of recentSessions) {
+      if (session.finishedAt === undefined) continue;
+      for (const entry of session.entries) {
+        if (entry.exerciseId !== exerciseId) continue;
+        const working = entry.sets.filter((s) => !s.isWarmup);
+        if (working.length > 0) {
+          return working;
+        }
+      }
+    }
+    return lastDoneCache[exerciseId] ?? null;
+  },
+
+  fetchLastWorkingSetsFromDb: async (exerciseId, db) => {
+    try {
+      const client = db ?? getDatabase();
+      const sets = await getLastWorkingSetsForExercise(client, exerciseId);
+      if (sets && sets.length > 0) {
+        set((state) => ({
+          lastDoneCache: { ...state.lastDoneCache, [exerciseId]: sets },
+        }));
+        return sets;
+      }
+    } catch {
+      // Ignore if DB singleton not initialized
+    }
+    return null;
+  },
+
   addExerciseEntry: (exercise, options) => {
     const current = get().activeSession ?? get().startSession();
     const entryId = nextUid('entry');
     const fixedKb = options?.fixedKettlebellWeight ?? 16;
     const repMin = options?.repMin ?? 8;
 
-    const initialSets: SetRecord[] = [0, 1, 2].map(() =>
-      buildDefaultSet(nextUid('set'), exercise, fixedKb, repMin),
-    );
+    const priorWorkingSets = (
+      options?.lastWorkingSets !== undefined
+        ? options.lastWorkingSets
+        : get().getLastWorkingSets(exercise.id)
+    )?.filter((s) => !s.isWarmup);
+
+    const initialSets: SetRecord[] =
+      priorWorkingSets && priorWorkingSets.length > 0
+        ? cloneWorkingSetsForPrefill(priorWorkingSets)
+        : [0, 1, 2].map(() => buildDefaultSet(nextUid('set'), exercise, fixedKb, repMin));
 
     const newEntry: Entry = {
       id: entryId,
@@ -149,6 +230,26 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
     set({ activeSession: updated });
     tryPersistSessionToDb(updated);
+
+    if (!priorWorkingSets || priorWorkingSets.length === 0) {
+      void get()
+        .fetchLastWorkingSetsFromDb(exercise.id)
+        .then((dbSets) => {
+          if (!dbSets || dbSets.length === 0) return;
+          const active = get().activeSession;
+          if (!active) return;
+          const targetEntry = active.entries.find((e) => e.id === entryId);
+          if (!targetEntry || targetEntry.sets.some((s) => s.completed)) return;
+          const prefilled = cloneWorkingSetsForPrefill(dbSets);
+          const nextActive: Session = {
+            ...active,
+            entries: active.entries.map((e) => (e.id === entryId ? { ...e, sets: prefilled } : e)),
+          };
+          set({ activeSession: nextActive });
+          tryPersistSessionToDb(nextActive);
+        });
+    }
+
     return newEntry;
   },
 
@@ -284,6 +385,14 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       ...(notes !== undefined ? { notes } : {}),
     };
 
+    const nextCache = { ...get().lastDoneCache };
+    for (const entry of finished.entries) {
+      const working = entry.sets.filter((s) => !s.isWarmup);
+      if (working.length > 0) {
+        nextCache[entry.exerciseId] = working;
+      }
+    }
+
     const recentSessions = [
       finished,
       ...get().recentSessions.filter((s) => s.id !== finished.id),
@@ -292,6 +401,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set({
       activeSession: null,
       recentSessions,
+      lastDoneCache: nextCache,
       restTimerSec: 0,
       restTimerRunning: false,
     });
@@ -314,6 +424,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set({
       activeSession: null,
       recentSessions: [],
+      lastDoneCache: {},
       restTimerSec: 0,
       restTimerRunning: false,
     });

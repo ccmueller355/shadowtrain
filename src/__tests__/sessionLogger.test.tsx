@@ -14,7 +14,12 @@ import {
 import { bootstrapLocalDatabase } from '../navigation/AppNavigator';
 import { useExerciseStore } from '../stores/exerciseStore';
 import { DEFAULT_PROFILE, useProfileStore } from '../stores/profileStore';
-import { buildDefaultSet, getDefaultRestSeconds, useSessionStore } from '../stores/sessionStore';
+import {
+  buildDefaultSet,
+  formatLastDoneSummary,
+  getDefaultRestSeconds,
+  useSessionStore,
+} from '../stores/sessionStore';
 
 class LoggerFakeDb implements DatabaseClient {
   public savedSessions = new Map<string, { finished_at: number | null; started_at: number }>();
@@ -70,6 +75,32 @@ class LoggerFakeDb implements DatabaseClient {
           finished_at: 1699903600000,
           name: 'Completed KB Session',
           notes: 'Strong swings',
+        },
+      ] as unknown as T[];
+    }
+    if (source.includes('e.exercise_id = ?')) {
+      return [
+        {
+          id: 'db-set-1',
+          reps: 15,
+          weight: 24,
+          duration_sec: null,
+          rpe: 8,
+          completed: 1,
+          is_warmup: 0,
+          session_id: 'older-session-99',
+          started_at: 1699000000000,
+        },
+        {
+          id: 'db-set-2',
+          reps: 15,
+          weight: 24,
+          duration_sec: null,
+          rpe: 8,
+          completed: 1,
+          is_warmup: 0,
+          session_id: 'older-session-99',
+          started_at: 1699000000000,
         },
       ] as unknown as T[];
     }
@@ -273,6 +304,124 @@ describe('M3 Session Logger, Rest Timer, Home Resume & Session Store', () => {
       useSessionStore.getState().updateSessionName('Updated Name');
       await saveSession(fakeDb, useSessionStore.getState().activeSession!);
       expect(fakeDb.savedSessions.has('hydrated-active')).toBe(true);
+    });
+  });
+
+  describe('M4 Last-Done Working Sets Prefill', () => {
+    it('formats last-done summaries for weighted, bodyweight, and duration sets', () => {
+      expect(formatLastDoneSummary(null)).toBeNull();
+      expect(formatLastDoneSummary([])).toBeNull();
+      expect(
+        formatLastDoneSummary([
+          { id: 'w1', reps: 10, weight: 16, completed: true, isWarmup: true },
+        ]),
+      ).toBeNull();
+
+      expect(
+        formatLastDoneSummary([
+          { id: 's1', reps: 12, weight: 24, completed: true, isWarmup: false },
+          { id: 's2', reps: 12, weight: 24, completed: true, isWarmup: false },
+          { id: 's3', reps: 12, weight: 24, completed: true, isWarmup: false },
+        ]),
+      ).toBe('LAST DONE // 3 × 24kg × 12');
+
+      expect(
+        formatLastDoneSummary([
+          { id: 'bw1', reps: 15, weight: 0, completed: true, isWarmup: false },
+          { id: 'bw2', reps: 15, weight: 0, completed: true, isWarmup: false },
+        ]),
+      ).toBe('LAST DONE // 2 × BW × 15');
+
+      expect(
+        formatLastDoneSummary(
+          [
+            { id: 'd1', durationSec: 75, completed: true, isWarmup: false },
+            { id: 'd2', durationSec: 75, completed: true, isWarmup: false },
+            { id: 'd3', durationSec: 75, completed: true, isWarmup: false },
+          ],
+          'duration',
+        ),
+      ).toBe('LAST DONE // 3 × 75s');
+    });
+
+    it('pre-fills last session working sets (excluding warmups) when reopening an exercise', () => {
+      // Session 1: log Two-Hand Kettlebell Swing with 1 warmup set + 4 working sets at 24kg x 12
+      render(<SessionLoggerScreen sessionId="session-day-1" />);
+      fireEvent.press(screen.getByTestId('open-exercise-picker-btn'));
+      fireEvent.press(screen.getByTestId('exercise-item-kb-swing-two-hand'));
+
+      const entry1 = useSessionStore.getState().activeSession!.entries[0];
+      expect(screen.getByTestId(`first-time-chip-${entry1.id}`)).toBeTruthy();
+
+      // Add 2 more sets (total 5: 1 warmup + 4 working sets)
+      fireEvent.press(screen.getByTestId(`add-set-${entry1.id}`));
+      fireEvent.press(screen.getByTestId(`add-set-${entry1.id}`));
+
+      const setsDay1 = useSessionStore.getState().activeSession!.entries[0].sets;
+      expect(setsDay1).toHaveLength(5);
+
+      // Mark first set as warmup (16kg x 5)
+      fireEvent.press(screen.getByTestId(`toggle-warmup-${setsDay1[0].id}`));
+      fireEvent.changeText(screen.getByTestId(`set-reps-${setsDay1[0].id}`), '5');
+
+      // Set the 4 working sets to 24kg x 12 and check them off
+      for (let i = 1; i < setsDay1.length; i += 1) {
+        fireEvent.changeText(screen.getByTestId(`set-weight-${setsDay1[i].id}`), '24');
+        fireEvent.changeText(screen.getByTestId(`set-reps-${setsDay1[i].id}`), '12');
+        fireEvent.press(screen.getByTestId(`check-set-${setsDay1[i].id}`));
+      }
+
+      // Finish Session 1
+      fireEvent.press(screen.getByTestId('finish-session-btn'));
+      expect(useSessionStore.getState().activeSession).toBeNull();
+
+      // Session 2: start a new session and select Two-Hand Kettlebell Swing again
+      act(() => {
+        useSessionStore.getState().startSession('session-day-2', 'Day 2 Swings');
+      });
+
+      const { unmount } = render(<SessionLoggerScreen sessionId="session-day-2" />);
+      fireEvent.press(screen.getByTestId('open-exercise-picker-btn'));
+      fireEvent.press(screen.getByTestId('exercise-item-kb-swing-two-hand'));
+
+      const entry2 = useSessionStore.getState().activeSession!.entries[0];
+      // Must pre-fill the 4 working sets (warmup excluded!) with 24kg x 12 and completed=false
+      expect(entry2.sets).toHaveLength(4);
+      for (const s of entry2.sets) {
+        expect(s.weight).toBe(24);
+        expect(s.reps).toBe(12);
+        expect(s.isWarmup).toBe(false);
+        expect(s.completed).toBe(false);
+      }
+
+      // Must render the LAST DONE summary chip on the card
+      expect(screen.getByTestId(`last-done-chip-${entry2.id}`)).toBeTruthy();
+      expect(screen.getByText('LAST DONE // 4 × 24kg × 12')).toBeTruthy();
+
+      unmount();
+    });
+
+    it('falls back to SQLite getLastWorkingSetsForExercise when not in memory cache', async () => {
+      const fakeDb = new LoggerFakeDb();
+      await initDatabase('test.db', fakeDb);
+
+      const swing = DEFAULT_SEED_EXERCISES.find((e) => e.id === 'kb-swing-two-hand')!;
+      act(() => {
+        useSessionStore.getState().startSession('session-db-fallback');
+        useSessionStore.getState().addExerciseEntry(swing);
+      });
+
+      // Wait for async SQLite prefill promise to resolve
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      const entry = useSessionStore.getState().activeSession!.entries[0];
+      expect(entry.sets).toHaveLength(2);
+      expect(entry.sets[0].weight).toBe(24);
+      expect(entry.sets[0].reps).toBe(15);
+      expect(entry.sets[0].rpe).toBe(8);
     });
   });
 });
