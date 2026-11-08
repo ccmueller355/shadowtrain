@@ -217,14 +217,14 @@ interface SetRecord {
 
 ### 5.1 Screens
 
-| Screen               | Purpose                                                                                                     | Must-have                                                                                                                    |
-| :------------------- | :---------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| **Home**             | Start session, resume in-progress, list of recent sessions                                                  | New session button, resume banner, last 5 sessions                                                                           |
-| **Session (Logger)** | Add exercises, log sets (reps/weight or duration), see last-done prefill, rest timer                        | Per-exercise card with sets, prefill, +set, checkoff, timer                                                                  |
-| **Exercise Picker**  | Search/filter exercises                                                                                     | Defaults to `profile.availableEquipment` filter (with quick "Show all" toggle), text search, muscle filter, equipment filter |
-| **Exercise Detail**  | Show images, instructions, history, current suggestion                                                      | Start/end images, "Suggested next" banner                                                                                    |
-| **Progress**         | Volume/week, PR list                                                                                        | Two simple charts + PR table                                                                                                 |
-| **Settings**         | Profile, available equipment selector, fixed KB weight, units, theme, increments override, backup & restore | All of `Profile`, equipment toggles, 1-file JSON export/import (`meta.version`) + CSV session log export                     |
+| Screen               | Purpose                                                                                                                                      | Must-have                                                                                                                    |
+| :------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| **Home**             | Start session, resume in-progress, list of recent sessions                                                                                   | New session button, resume banner, last 5 sessions                                                                           |
+| **Session (Logger)** | Add exercises, log sets (reps/weight or duration), see last-done prefill, rest timer                                                         | Per-exercise card with sets, prefill, +set, checkoff, timer                                                                  |
+| **Exercise Picker**  | Search/filter exercises                                                                                                                      | Defaults to `profile.availableEquipment` filter (with quick "Show all" toggle), text search, muscle filter, equipment filter |
+| **Exercise Detail**  | Show images, instructions, history, current suggestion                                                                                       | Start/end images, "Suggested next" banner                                                                                    |
+| **Progress**         | Telemetry & statistics across `Last Workout`, `Week`, `Month` (with `◀/▶` history scrubber), visual intensity heatmap & volume bars, PR list | Window selector (`Last Workout` / `Week` / `Month`), period navigation, intensity heatmap + volume bars, PR table            |
+| **Settings**         | Profile, available equipment selector, fixed KB weight, units, theme, increments override, backup & restore                                  | All of `Profile`, equipment toggles, 1-file JSON export/import (`meta.version`) + CSV session log export                     |
 
 ### 5.2 Core Interaction Flow (Happy Path)
 
@@ -458,7 +458,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 | **M3**  | Logger screen (no suggestions)      | Add exercise, log sets (reps/weight or duration), finish session; session persists & resumes                                                     | M    |
 | **M4**  | Last-done prefill                   | Reopening an exercise pre-fills last session's working sets                                                                                      | S    |
 | **M5**  | Progression engine                  | `suggestNext()` implemented (fixed-KB/rings step-loading + timed + plate increments), unit tests green, suggestion chip shown on Logger & Detail | M    |
-| **M6**  | Progress view                       | Volume/week chart + PR list                                                                                                                      | S    |
+| **M6**  | Progress & Statistics view          | Time-window selector (`Last Workout` / `Week` / `Month`) + `◀/▶` history navigation, visual intensity heatmap & volume chart, PR list            | M    |
 | **M7**  | Settings + Import/Export            | Profile edits persist; 1-file JSON export & import (`meta.version: 1`) restore full state + CSV session log export                               | S    |
 | **M8**  | First image batch                   | 25–30 core-kit exercises have start/end images; placeholder fallback works                                                                       | M    |
 | **M9**  | Distribution build                  | EAS internal build installs on device; session survives app restart                                                                              | S    |
@@ -478,7 +478,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
    - **M5 (Progression Engine)**: Implement `suggestNext()` in `src/engine/suggest.ts` with ~100% test coverage (fixed-KB & rings/bodyweight step-loading, timed `+15s` progression, and standard plate increments) + reason chips on Logger & Detail.
 3. **Phase 3: Analytics, Control Deck & Gamification (`M6` → `M7`, `M10`)**
    - _Goal_: Track weekly volume/PRs, customize equipment/profile on the fly, and reward short/mid/long-term consistency.
-   - **M6 (Progress View)**: Weekly volume/time chart + Personal Records (PR) list.
+   - **M6 (Progress & Statistics View)**: Time-window selector (`Last Workout`, `Week`, `Month`) with `◀ PREV / NEXT ▶` history scrubber, visual intensity heatmap & volume/time bar chart, equipment breakdown, and Personal Records (PR) list.
    - **M7 (Settings & Data Import/Export)**: Equipment toggles, fixed KB weight setting, `kg`/`lb`, goal, theme selector, single-file JSON backup export & import (`meta.version: 1`), and CSV session log export.
    - **M10 (Streaks & Achievements)**: Plan-aware Duolingo-style streak tracker (weekly target + rest-day buffer) and tiered short/mid/long-term achievement badges (`src/engine/achievements.ts`).
 4. **Phase 4: Visual Chrome & Field Deployment (`M8` → `M9`)**

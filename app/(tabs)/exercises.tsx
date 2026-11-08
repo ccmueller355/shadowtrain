@@ -1,10 +1,12 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useAppTheme } from '../../src/theme/useTheme';
 import { useThemeStyles } from '../../src/theme/useThemeStyles';
 import { useProfileStore } from '../../src/stores/profileStore';
 import { filterExercises, useExerciseStore } from '../../src/stores/exerciseStore';
+import { formatLastDoneSummary, useSessionStore } from '../../src/stores/sessionStore';
+import { formatSuggestionChip, suggestNext } from '../../src/engine/suggest';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { Equipment, Exercise } from '../../src/types';
 
@@ -43,7 +45,10 @@ export interface ExercisesScreenProps {
 export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenProps = {}) {
   const theme = useAppTheme();
   const ts = useThemeStyles();
-  const availableEquipment = useProfileStore((s) => s.profile.availableEquipment);
+  const profile = useProfileStore((s) => s.profile);
+  const availableEquipment = profile.availableEquipment;
+  const getLastWorkingSets = useSessionStore((s) => s.getLastWorkingSets);
+  const [detailExercise, setDetailExercise] = useState<Exercise | null>(null);
 
   const exercises = useExerciseStore((s) => s.exercises);
   const searchQuery = useExerciseStore((s) => s.searchQuery);
@@ -64,6 +69,91 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
     selectedMuscle,
     searchQuery,
   });
+
+  if (detailExercise) {
+    const lastSets = getLastWorkingSets(detailExercise.id);
+    const lastSummary = formatLastDoneSummary(lastSets, detailExercise.trackingType);
+    const suggestion = suggestNext(lastSets, profile, detailExercise);
+    const suggestionChip = formatSuggestionChip(suggestion, profile.units);
+    const nextProgression = detailExercise.nextProgressionId
+      ? exercises.find((e) => e.id === detailExercise.nextProgressionId)
+      : undefined;
+
+    return (
+      <View style={[styles.container, ts.bg]} testID="exercise-detail-view">
+        <View style={styles.headerRow}>
+          <View style={styles.headerTextWrap}>
+            <Text style={[styles.title, ts.accent]}>{detailExercise.name}</Text>
+            <Text style={[styles.subtitle, ts.textMuted]}>
+              {detailExercise.equipment.toUpperCase()}
+              {detailExercise.tier ? ` · TIER: ${detailExercise.tier.toUpperCase()}` : ''} ·{' '}
+              {detailExercise.trackingType.toUpperCase()}
+            </Text>
+          </View>
+          <Pressable
+            testID="close-exercise-detail-btn"
+            onPress={() => setDetailExercise(null)}
+            style={[styles.scopeBtn, { borderColor: theme.colors.primary }]}
+          >
+            <Text style={[styles.scopeBtnText, ts.accent]}>BACK</Text>
+          </Pressable>
+        </View>
+
+        <ScrollView style={styles.list}>
+          <CyberpunkCard style={styles.card}>
+            <Text style={[styles.badge, ts.accent]}>SUGGESTED NEXT</Text>
+            <Text
+              testID="exercise-detail-suggestion"
+              style={[styles.detailSuggestionText, ts.text]}
+            >
+              {suggestionChip}
+            </Text>
+            <Text style={[styles.musclesText, ts.textMuted]}>
+              {lastSummary ?? 'NO PRIOR WORKING SETS LOGGED'}
+            </Text>
+          </CyberpunkCard>
+
+          <CyberpunkCard glow={false} style={styles.card}>
+            <Text style={[styles.badge, ts.accent]}>TARGET MUSCLES</Text>
+            <Text style={[styles.musclesText, ts.text]}>
+              PRIMARY: {detailExercise.primaryMuscles.join(', ').toUpperCase()}
+            </Text>
+            {detailExercise.secondaryMuscles && detailExercise.secondaryMuscles.length > 0 && (
+              <Text style={[styles.musclesText, ts.textMuted]}>
+                SECONDARY: {detailExercise.secondaryMuscles.join(', ').toUpperCase()}
+              </Text>
+            )}
+          </CyberpunkCard>
+
+          {nextProgression && (
+            <Pressable
+              testID="exercise-detail-next-tier"
+              onPress={() => setDetailExercise(nextProgression)}
+            >
+              <CyberpunkCard glow={false} style={styles.card}>
+                <Text style={[styles.badge, ts.accent]}>NEXT IN 3-LEVEL PROGRESSION LADDER ↗</Text>
+                <Text style={[styles.exerciseName, ts.text]}>{nextProgression.name}</Text>
+                <Text style={[styles.musclesText, ts.textMuted]}>
+                  TIER: {(nextProgression.tier ?? 'advanced').toUpperCase()} · TAP TO INSPECT
+                </Text>
+              </CyberpunkCard>
+            </Pressable>
+          )}
+
+          {detailExercise.instructions && detailExercise.instructions.length > 0 && (
+            <CyberpunkCard glow={false} style={styles.card}>
+              <Text style={[styles.badge, ts.accent]}>EXECUTION PROTOCOL</Text>
+              {detailExercise.instructions.map((step, idx) => (
+                <Text key={idx} style={[styles.instructionText, ts.text]}>
+                  {idx + 1}. {step}
+                </Text>
+              ))}
+            </CyberpunkCard>
+          )}
+        </ScrollView>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, ts.bg]} testID="screen-exercises">
@@ -216,7 +306,13 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
             <Pressable
               key={exercise.id}
               testID={`exercise-item-${exercise.id}`}
-              onPress={() => onSelectExercise?.(exercise)}
+              onPress={() => {
+                if (onSelectExercise) {
+                  onSelectExercise(exercise);
+                } else {
+                  setDetailExercise(exercise);
+                }
+              }}
             >
               <CyberpunkCard glow={false} style={styles.card}>
                 <View style={styles.cardHeader}>
@@ -291,5 +387,13 @@ const styles = StyleSheet.create({
   exerciseName: { fontSize: 14, fontWeight: 'bold', fontFamily: 'monospace' },
   badge: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   musclesText: { fontSize: 11, fontFamily: 'monospace', marginTop: 4 },
+  detailSuggestionText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    marginTop: 6,
+    marginBottom: 4,
+  },
+  instructionText: { fontSize: 12, fontFamily: 'monospace', marginTop: 6 },
   emptyText: { fontSize: 13, fontFamily: 'monospace' },
 });

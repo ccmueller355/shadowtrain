@@ -9,6 +9,7 @@ import {
   listRecentSessions,
   saveSession,
 } from '../db';
+import { buildSetsFromSuggestion, Suggestion } from '../engine/suggest';
 import { Entry, Exercise, Session, SetRecord } from '../types';
 
 export function getDefaultRestSeconds(exercise?: Exercise): number {
@@ -102,6 +103,7 @@ export interface SessionState {
     },
   ) => Entry;
   removeExerciseEntry: (entryId: string) => void;
+  applySuggestionToEntry: (entryId: string, suggestion: Suggestion) => void;
   addSet: (entryId: string, exercise?: Exercise) => void;
   updateSet: (entryId: string, setId: string, patch: Partial<SetRecord>) => void;
   toggleSetComplete: (entryId: string, setId: string, restSec?: number) => void;
@@ -259,6 +261,23 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     const entries = current.entries
       .filter((e) => e.id !== entryId)
       .map((e, idx) => ({ ...e, position: idx }));
+    const updated: Session = { ...current, entries };
+    set({ activeSession: updated });
+    tryPersistSessionToDb(updated);
+  },
+
+  applySuggestionToEntry: (entryId, suggestion) => {
+    const current = get().activeSession;
+    if (!current) return;
+    const suggestedSets = buildSetsFromSuggestion(suggestion, () => nextUid('set'));
+    const entries = current.entries.map((e) => {
+      if (e.id !== entryId) return e;
+      const warmups = e.sets.filter((s) => s.isWarmup);
+      return {
+        ...e,
+        sets: [...warmups, ...suggestedSets],
+      };
+    });
     const updated: Session = { ...current, entries };
     set({ activeSession: updated });
     tryPersistSessionToDb(updated);
