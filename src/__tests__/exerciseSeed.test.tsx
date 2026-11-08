@@ -208,7 +208,7 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       expect(screen.getByText('SHOWING 45 MOVEMENTS')).toBeTruthy();
       expect(screen.getByText('Barbell Back Squat')).toBeTruthy();
 
-      // Filter to Kettlebell only -> 9 Pavel KB exercises
+      // Filter to Kettlebell only -> 9 KB exercises
       fireEvent.press(screen.getByTestId('equip-filter-kettlebell'));
       expect(screen.getByText('SHOWING 9 MOVEMENTS')).toBeTruthy();
 

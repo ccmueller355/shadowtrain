@@ -1,6 +1,6 @@
 # Shadow Train — MVP Plan & Spec
 
-One-liner: A free, private, offline-first workout logger for one user (then whoever finds it), built on your `shadowlist` architecture, with a deterministic 80/20 progression engine (including Pavel-style fixed-kettlebell and calisthenics/rings step-loading) and a consistent AI-generated visual theme.
+One-liner: A free, private, offline-first workout logger for one user (then whoever finds it), built on your `shadowlist` architecture, with a deterministic 80/20 progression engine (including fixed-kettlebell and calisthenics/rings step-loading), plan-aware streaks & achievements, and a consistent AI-generated visual theme.
 
 ---
 
@@ -32,7 +32,7 @@ One-liner: A free, private, offline-first workout logger for one user (then whoe
 | State             | **Zustand** stores (mirror `shadowlist`)                                                                                                                                                                    |
 | Persistence       | **expo-sqlite** for structured data (sessions/entries/sets/exercises); `AsyncStorage` only for small prefs (theme, units, profile) via `zustand/middleware/persist`                                         |
 | Theming           | Reuse `shadowlist`'s `themes.ts` + `useTheme` + `useThemeStyles`; new shadow-themed palette                                                                                                                 |
-| Exercise data     | Seed from a public dataset (e.g. `wrkout/exercises.json`) + curated `core-kit-exercises.json` (Pavel kettlebell, gymnastic rings, hand-presses, skipping rope, stretching), imported to SQLite at first run |
+| Exercise data     | Seed from a public dataset (e.g. `wrkout/exercises.json`) + curated `core-kit-exercises.json` (fixed kettlebell, gymnastic rings, hand-presses, skipping rope, stretching), imported to SQLite at first run |
 | Progression logic | Deterministic rule engine (pure TS), **not** an LLM, **not** a proprietary algo                                                                                                                             |
 | Images            | AI-generated, anchored prompt template, start/end pose per exercise, bundled as local assets                                                                                                                |
 | Distribution      | EAS Build → internal install (APK / TestFlight) for personal use; optional Expo Go for dev                                                                                                                  |
@@ -49,9 +49,9 @@ One-liner: A free, private, offline-first workout logger for one user (then whoe
 | Decision                           | Locked Default                                                                                                                                                                                                        | Why                                                                                       |
 | :--------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
 | **Units**                          | `kg` primary, `lb` toggle in settings                                                                                                                                                                                 | Most datasets/kettlebells/plates default to kg                                            |
-| **Equipment selection ("My Kit")** | Multi-select in Profile/Settings; defaults to `['kettlebell', 'rings', 'bodyweight', 'hand_gripper', 'jump_rope', 'stretching']` with other equipment (`dumbbell`, `barbell`, `bands`, `cable`, `machine`) toggleable | Tailored to minimalist Pavel-inspired kit out of the box, flexible for any gym            |
-| **Fixed kettlebell mode**          | `fixedKettlebellWeight` setting in Profile (e.g. 16 kg / 24 kg); progressions use Pavel-style rep & set step-loading instead of micro-weight jumps                                                                    | Kettlebells are fixed-weight; progression happens via reps, sets, ladders, and variations |
-| **Split model**                    | Free-form sessions ("Push A", "KB & Rings", "Simple & Sinister", custom name) — no enforced split                                                                                                                     | Simpler than program templates; matches "80/20" ethos                                     |
+| **Equipment selection ("My Kit")** | Multi-select in Profile/Settings; defaults to `['kettlebell', 'rings', 'bodyweight', 'hand_gripper', 'jump_rope', 'stretching']` with other equipment (`dumbbell`, `barbell`, `bands`, `cable`, `machine`) toggleable | Tailored to minimalist core kit out of the box, flexible for any gym                      |
+| **Fixed kettlebell mode**          | `fixedKettlebellWeight` setting in Profile (e.g. 16 kg / 24 kg); progressions use rep & set step-loading instead of micro-weight jumps                                                                                | Kettlebells are fixed-weight; progression happens via reps, sets, ladders, and variations |
+| **Split model**                    | Free-form sessions ("Push A", "KB & Rings", "Full Body", custom name) — no enforced split                                                                                                                             | Simpler than program templates; matches "80/20" ethos                                     |
 | **Rep-range default**              | Strength `3–5`, Hypertrophy `8–12`, Endurance `15–20` (per-profile override)                                                                                                                                          | Covers 90% of use                                                                         |
 | **Increments**                     | Fixed KB / Rings / Bodyweight / Hand Gripper → `+1 rep` then `+1 set` / variation; Timed (`jump_rope`, `stretching`, isometric holds) → `+15s`; Barbell `2.5 kg`, Dumbbell `2 kg`, Machine `5 kg`, Cable `2.5 kg`     | Matches both minimalist fixed-weight training and standard gym reality                    |
 | **Deload trigger**                 | Any working set `< lower bound` of rep range → suggest `−10%` weight (or `−1 set` / reset to `repRange.min` for fixed-weight / bodyweight)                                                                            | Standard novice-safe rule                                                                 |
@@ -162,7 +162,7 @@ interface Profile {
   repRange: { min: number; max: number }; // derived from goal, overridable
   increments: Record<string, number>; // per-equipment override (0 = fixed weight / step-loading)
   availableEquipment: Equipment[]; // defaults to ['kettlebell', 'rings', 'bodyweight', 'hand_gripper', 'jump_rope', 'stretching']
-  fixedKettlebellWeight?: number; // e.g. 16 or 24 kg; triggers Pavel-style rep/set step-loading
+  fixedKettlebellWeight?: number; // e.g. 16 or 24 kg; triggers fixed-weight rep/set step-loading
 }
 
 interface Exercise {
@@ -288,11 +288,11 @@ function suggestNext(
    - If `exercise.equipment === 'stretching'`: `repeat` last `durationSec` (or `+15s` if all sets < 60s and completed).
    - If all working sets completed target duration: `increase` `durationSec` by `+15s` (reason: _"All rounds completed — add 15s"_).
    - Otherwise: `repeat` same duration.
-3. **Pavel / Fixed-Weight & Calisthenics Step-Loading** (`rings`, `bodyweight`, `hand_gripper`, or `kettlebell` with `fixedKettlebellWeight` / `increment === 0`):
+3. **Fixed-Weight & Calisthenics Step-Loading** (`rings`, `bodyweight`, `hand_gripper`, or `kettlebell` with `fixedKettlebellWeight` / `increment === 0`):
    - **Under-logged (<2 working sets)** → `repeat` same sets & reps.
    - **Any working set `reps < repRange.min`** → `deload`: keep weight, reset target reps to `repRange.min` (and drop 1 set if `sets > 3`).
    - **Not all working sets reached `repRange.max`** → `increase` target by **+1 rep** at the same weight (capped at `repRange.max`), reason: _"Step-loading: +1 rep per set toward top of range"_.
-   - **All working sets `reps >= repRange.max` and `workingSets.length < 5`** → `increase` by **+1 working set** at `repRange.min`–`repRange.max` (Pavel volume ladder / step-loading), reason: _"Hit top of rep range across sets — add 1 working set"_.
+   - **All working sets `reps >= repRange.max` and `workingSets.length < 5`** → `increase` by **+1 working set** at `repRange.min`–`repRange.max` (volume ladder / step-loading), reason: _"Hit top of rep range across sets — add 1 working set"_.
    - **All 5 working sets `reps >= repRange.max`** → `increase` variation/tempo chip (keep weight & 5×`repRange.max`), reason: _"5×max mastered — slow eccentric (3-1-3), pause at bottom/lockout, or progress variation"_.
 4. **Standard Adjustable-Weight Progression** (`barbell`, `dumbbell`, `machine`, `cable`, or `kettlebell` with non-zero increment):
    - **<3 working sets logged** → `repeat` with reason _"Under 3 working sets logged last time"_.
@@ -309,7 +309,7 @@ function suggestNext(
 ### 5.4 Exercise Library Ingestion
 
 - `src/db/seed/core-kit-exercises.json` defines the curated core movements for the default personal kit:
-  - **Kettlebell (Pavel staples)**: Two-Hand Kettlebell Swing, One-Arm Kettlebell Swing, Turkish Get-Up, Kettlebell Goblet Squat, Kettlebell Clean & Military Press, Kettlebell Snatch, Kettlebell Halo, One-Arm Kettlebell Row, Kettlebell Front Rack Squat.
+  - **Kettlebell (core staples)**: Two-Hand Kettlebell Swing, One-Arm Kettlebell Swing, Turkish Get-Up, Kettlebell Goblet Squat, Kettlebell Clean & Military Press, Kettlebell Snatch, Kettlebell Halo, One-Arm Kettlebell Row, Kettlebell Front Rack Squat.
   - **Gymnastic Rings**: Ring Support Hold (duration), Ring Row, Ring Push-Up, Ring Dip, Ring Pull-Up / Chin-Up, Ring Face Pull, Ring L-Sit Hold (duration), Ring Rollout / Fallout.
   - **Bodyweight**: Push-Up, Diamond Push-Up, Pike Push-Up, Bodyweight Squat, Pistol Squat (Assisted/Full), Hollow Body Hold (duration), Plank (duration), Hanging / Floor Leg Raise.
   - **Hand-Presses (`hand_gripper`)**: Hand Gripper Crush Rep, Hand Gripper Overcrush / Isometric Hold (duration), Fingertip / Pinch Grip Press.
@@ -340,6 +340,30 @@ function suggestNext(
 
 - **Export**: Settings → "Export data" writes a single JSON (schema v1) to the share sheet.
 - **Import** is post-MVP; the export format is the contract for it.
+
+### 5.7 Gamification: Plan-Aware Streaks & Tiered Achievements (`M10`)
+
+Duolingo-inspired motivation designed for sustainable strength & mobility training — rewarding consistency and progression without punishing needed recovery days:
+
+- **Plan-Aware Streaks (Low-Pressure, Recovery-Safe)**:
+  - **Weekly Target Rhythm**: Users set a realistic weekly target in Profile (e.g., `weeklyTargetDays = 3` or `4` sessions/week). Hitting the weekly target advances the weekly streak and keeps the flame/cyber-link active.
+  - **Active Recovery Counts**: Logging a short `stretching` or `jump_rope` mobility session counts as an active check-in day.
+  - **Rest-Day Shield (Streak Freeze)**: Built-in weekly rest buffer so planned off-days or a single missed window never wipe out hard-earned momentum.
+- **Tiered Achievements (Short / Mid / Long-Term)**:
+  - **Short-Term (First Steps & Momentum)**:
+    - _First Jack-In_: Finish your 1st logged workout session.
+    - _Kit Explorer_: Log movements across 3+ core-kit equipment types.
+    - _First Step-Up_: Complete a suggested progression increase (`+1 rep`, `+1 set`, `+15s`, or weight jump).
+    - _Week One Locked_: Hit your weekly training target for 1 full week.
+  - **Mid-Term (Consistency & Mastery)**:
+    - _4-Week Rhythm_: Hit your weekly target streak for 4 consecutive weeks.
+    - _Quarter-Century Runner_: Complete 25 logged sessions.
+    - _Step-Load Master_: Complete a full `5 × repRange.max` volume ladder on any fixed-weight or calisthenics movement.
+    - _PR Hunter_: Unlock 10 Personal Records across exercises.
+  - **Long-Term (Shadow Legend)**:
+    - _12-Week & 52-Week Iron Link_: Sustain your weekly streak for a full quarter and full year.
+    - _Centurion Deck_: Complete 100 logged sessions.
+    - _Full Armory Mastery_: Reach top-tier progression across all 6 core-kit categories (`kettlebell`, `rings`, `bodyweight`, `hand_gripper`, `jump_rope`, `stretching`).
 
 ---
 
@@ -400,18 +424,19 @@ shadow-train/
 
 Each milestone = **one issue**, one coding-agent session, one PR.
 
-| #      | Milestone                           | Acceptance Criteria                                                                                                                              | Est. |
-| :----- | :---------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :--- |
-| **M0** | Scaffold from `shadowlist`          | Repo builds, tabs render, theme hook works, grocery logic removed                                                                                | S    |
-| **M1** | SQLite layer + schema               | Schema created on first run, migrations scaffold in place, repo helpers tested                                                                   | S    |
-| **M2** | Import exercises & equipment filter | `import-exercises.ts` seeds DB (core kit + public dataset); picker filters by `availableEquipment`                                               | S    |
-| **M3** | Logger screen (no suggestions)      | Add exercise, log sets (reps/weight or duration), finish session; session persists & resumes                                                     | M    |
-| **M4** | Last-done prefill                   | Reopening an exercise pre-fills last session's working sets                                                                                      | S    |
-| **M5** | Progression engine                  | `suggestNext()` implemented (fixed-KB/rings step-loading + timed + plate increments), unit tests green, suggestion chip shown on Logger & Detail | M    |
-| **M6** | Progress view                       | Volume/week chart + PR list                                                                                                                      | S    |
-| **M7** | Settings + export                   | Profile edits (equipment toggles, fixed KB weight, goal, units) persist; export JSON produces valid file                                         | S    |
-| **M8** | First image batch                   | 25–30 core-kit exercises have start/end images; placeholder fallback works                                                                       | M    |
-| **M9** | Distribution build                  | EAS internal build installs on device; session survives app restart                                                                              | S    |
+| #       | Milestone                           | Acceptance Criteria                                                                                                                              | Est. |
+| :------ | :---------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :--- |
+| **M0**  | Scaffold from `shadowlist`          | Repo builds, tabs render, theme hook works, grocery logic removed                                                                                | S    |
+| **M1**  | SQLite layer + schema               | Schema created on first run, migrations scaffold in place, repo helpers tested                                                                   | S    |
+| **M2**  | Import exercises & equipment filter | `import-exercises.ts` seeds DB (core kit + public dataset); picker filters by `availableEquipment`                                               | S    |
+| **M3**  | Logger screen (no suggestions)      | Add exercise, log sets (reps/weight or duration), finish session; session persists & resumes                                                     | M    |
+| **M4**  | Last-done prefill                   | Reopening an exercise pre-fills last session's working sets                                                                                      | S    |
+| **M5**  | Progression engine                  | `suggestNext()` implemented (fixed-KB/rings step-loading + timed + plate increments), unit tests green, suggestion chip shown on Logger & Detail | M    |
+| **M6**  | Progress view                       | Volume/week chart + PR list                                                                                                                      | S    |
+| **M7**  | Settings + export                   | Profile edits (equipment toggles, fixed KB weight, goal, units) persist; export JSON produces valid file                                         | S    |
+| **M8**  | First image batch                   | 25–30 core-kit exercises have start/end images; placeholder fallback works                                                                       | M    |
+| **M9**  | Distribution build                  | EAS internal build installs on device; session survives app restart                                                                              | S    |
+| **M10** | Streaks & achievements              | Duolingo-style plan-aware weekly/daily streaks (with rest-day shield) + short/mid/long-term achievement badges on Home & Progress                | M    |
 
 ### 7.1 Build Phases
 
@@ -420,15 +445,16 @@ Each milestone = **one issue**, one coding-agent session, one PR.
    - **M0 (Scaffold)**: Port Expo SDK 58 + TypeScript + Jest + VitePress + `src/theme/` from `../shadowlist`; strip grocery logic; wire up **Home**, **Exercises**, **Progress**, **Settings**, and **Session Logger** routes.
    - **M1 (SQLite & Profile Store)**: Set up `expo-sqlite` v1 schema, migration runner, and single write queue (`src/db/`); configure `profileStore.ts` defaulting to `['kettlebell', 'rings', 'bodyweight', 'hand_gripper', 'jump_rope', 'stretching']` + `fixedKettlebellWeight`.
    - **M2 (Exercise Seed & Equipment Picker)**: Seed `core-kit-exercises.json` + public dataset; build the **Exercise Picker** pre-filtered by `availableEquipment`.
-2. **Phase 2: Playable Logger & Pavel Engine (`M3` → `M5`)**
+2. **Phase 2: Playable Logger & Step-Loading Engine (`M3` → `M5`)**
    - _Goal_: Log real kettlebell, rings, bodyweight, grip, rope, and stretching sessions with deterministic progression.
    - **M3 (Session Logger & Rest Timer)**: Start/resume session, add exercises, log sets (`reps`/`weight` or `duration_sec`), check off sets, auto-start haptic rest timer, finish session.
    - **M4 ("Last Done" Pre-fill)**: Query last completed session's working sets per exercise and pre-fill logger rows.
-   - **M5 (Progression Engine)**: Implement `suggestNext()` in `src/engine/suggest.ts` with ~100% test coverage (Pavel fixed-KB & rings/bodyweight step-loading, timed `+15s` progression, and standard plate increments) + reason chips on Logger & Detail.
-3. **Phase 3: Analytics & Control Deck (`M6` → `M7`)**
-   - _Goal_: Track weekly volume/PRs and customize equipment/profile on the fly.
+   - **M5 (Progression Engine)**: Implement `suggestNext()` in `src/engine/suggest.ts` with ~100% test coverage (fixed-KB & rings/bodyweight step-loading, timed `+15s` progression, and standard plate increments) + reason chips on Logger & Detail.
+3. **Phase 3: Analytics, Control Deck & Gamification (`M6` → `M7`, `M10`)**
+   - _Goal_: Track weekly volume/PRs, customize equipment/profile on the fly, and reward short/mid/long-term consistency.
    - **M6 (Progress View)**: Weekly volume/time chart + Personal Records (PR) list.
    - **M7 (Settings & Data Export)**: Equipment toggles, fixed KB weight setting, `kg`/`lb`, goal, theme selector, and full JSON export.
+   - **M10 (Streaks & Achievements)**: Plan-aware Duolingo-style streak tracker (weekly target + rest-day buffer) and tiered short/mid/long-term achievement badges (`src/engine/achievements.ts`).
 4. **Phase 4: Visual Chrome & Field Deployment (`M8` → `M9`)**
    - _Goal_: Custom cyberpunk start/end pose illustrations for the core kit and standalone installable APK.
    - **M8 (Core Kit AI Image Batch)**: Draft `docs/image-prompts.md` and bundle WebP `start`/`end` pose images for the 25–30 core-kit exercises + themed placeholder fallback.

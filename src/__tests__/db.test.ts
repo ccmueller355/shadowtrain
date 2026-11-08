@@ -457,10 +457,10 @@ describe('M1 SQLite Layer, Schema, Migrations, WriteQueue & Repositories', () =>
       // Update single exercise
       await upsertExercise(db, {
         ...sampleExercises[0],
-        name: 'Pavel Two-Hand KB Swing',
+        name: 'Heavy Two-Hand KB Swing',
       });
       const updatedSwing = await getExerciseById(db, 'kb-swing-2h');
-      expect(updatedSwing?.name).toBe('Pavel Two-Hand KB Swing');
+      expect(updatedSwing?.name).toBe('Heavy Two-Hand KB Swing');
 
       // Filter by equipment
       const kbAndRings = await listExercises(db, {

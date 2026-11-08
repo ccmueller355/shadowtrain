@@ -49,7 +49,7 @@ Purely stylistic — zero functional impact. Sprinkle these into conversation na
 - **Language**: TypeScript 7.x, strict mode
 - **State**: Zustand (`src/stores/profileStore.ts`, `src/stores/sessionStore.ts`, `src/stores/exerciseStore.ts`)
 - **Persistence**: `expo-sqlite` (`src/db/`) for structured workout data (`exercises`, `sessions`, `entries`, `sets`) via a single write queue; `AsyncStorage` (`zustand/middleware/persist`) for `Profile` & preferences
-- **Progression Engine**: Pure TypeScript deterministic rule engine (`src/engine/suggest.ts`) — Pavel fixed-kettlebell & calisthenics/rings step-loading, timed sets (`duration_sec`), and adjustable plate increments
+- **Progression Engine**: Pure TypeScript deterministic rule engine (`src/engine/suggest.ts`) — fixed-kettlebell & calisthenics/rings step-loading, timed sets (`duration_sec`), and adjustable plate increments
 - **Exercise Seed**: Public dataset merged with curated `src/db/seed/core-kit-exercises.json` (`kettlebell`, `rings`, `bodyweight`, `hand_gripper`, `jump_rope`, `stretching`)
 - **Theme**: Cyberpunk shadow design system (`src/theme/`)
 - **Tests**: Jest + jest-expo (`npm test`, `npm run test:coverage`)

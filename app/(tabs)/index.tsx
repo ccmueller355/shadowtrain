@@ -17,7 +17,7 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
     <View style={[styles.container, ts.bg]} testID="screen-home">
       <Text style={[styles.title, ts.accent]}>SHADOW TRAIN</Text>
       <Text style={[styles.subtitle, ts.textMuted]}>
-        OFFLINE WORKOUT LOGGER // PAVEL & CALISTHENICS DECK
+        OFFLINE WORKOUT LOGGER // KETTLEBELL & CALISTHENICS DECK
       </Text>
 
       <TouchableOpacity
