@@ -1,0 +1,9 @@
+node_modules/
+coverage/
+dist/
+web-build/
+.expo/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+docs/public/
+package-lock.json

@@ -113,12 +113,13 @@ Before marking any task complete, pass these gates:
 ## 4a. Feature Branch & PR Protocol
 
 - **Every feature/milestone gets a branch** (e.g. `m0-scaffold` or `NNN-feature-name`) and a corresponding GitHub Pull Request
-- **Never merge locally** — no `git checkout main && git merge feature`. Always use `gh pr create && gh pr merge`
+- **Never merge locally** — no `git checkout main && git merge feature`. Always use `gh pr create` and `gh pr merge`
+- **Human-in-the-loop PR review (MANDATORY)** — after running `gh pr create`, **STOP and wait for explicit operator review/approval** before running `gh pr merge --squash --delete-branch`. Never auto-merge a PR without the user's explicit go-ahead
 - **PR body** must summarize changes, link to `docs/spec.md`, and note any decisions made
 - **CI must be green** before merging — type-check, tests, coverage, docs build all pass
-- **Squash commits on merge** — `gh pr merge --squash --delete-branch`. One clean commit per feature on `main` keeps history readable and makes reverts easy. The full branch history lives locally.
+- **Squash commits on merge** — `gh pr merge --squash --delete-branch` (only after operator approval). One clean commit per feature on `main` keeps history readable and makes reverts easy. The full branch history lives locally.
 - **After merge**, the remote branch is auto-cleaned by GitHub via `--delete-branch`
-- **Rationale**: traceability — PRs are the permanent record of what landed, when, and why. Local merges leave zero audit trail.
+- **Rationale**: traceability & human-in-the-loop verification — PRs are the permanent record of what landed, when, and why. Local merges leave zero audit trail.
 
 ## 4b. Release Branch (DEPRECATED)
 
