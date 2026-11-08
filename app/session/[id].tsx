@@ -7,6 +7,7 @@ import { useThemeStyles } from '../../src/theme/useThemeStyles';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { useProfileStore } from '../../src/stores/profileStore';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
+import { formatSuggestionChip, suggestNext } from '../../src/engine/suggest';
 import {
   formatLastDoneSummary,
   getDefaultRestSeconds,
@@ -38,6 +39,7 @@ export default function SessionLoggerScreen({
   const getLastWorkingSets = useSessionStore((s) => s.getLastWorkingSets);
   const addExerciseEntry = useSessionStore((s) => s.addExerciseEntry);
   const removeExerciseEntry = useSessionStore((s) => s.removeExerciseEntry);
+  const applySuggestionToEntry = useSessionStore((s) => s.applySuggestionToEntry);
   const addSet = useSessionStore((s) => s.addSet);
   const updateSet = useSessionStore((s) => s.updateSet);
   const toggleSetComplete = useSessionStore((s) => s.toggleSetComplete);
@@ -180,6 +182,15 @@ export default function SessionLoggerScreen({
               lastWorkingSets,
               isDuration ? 'duration' : 'reps',
             );
+            const effectiveExercise: Exercise = exercise ?? {
+              id: entry.exerciseId,
+              name: entry.exerciseId,
+              primaryMuscles: [],
+              equipment: 'kettlebell',
+              trackingType: 'reps',
+            };
+            const suggestion = suggestNext(lastWorkingSets, profile, effectiveExercise);
+            const suggestionLabel = formatSuggestionChip(suggestion, profile.units);
 
             return (
               <CyberpunkCard key={entry.id} glow={false} style={styles.entryCard}>
@@ -220,6 +231,47 @@ export default function SessionLoggerScreen({
                   >
                     {lastDoneSummary ?? 'FIRST TIME // DEFAULT PREFILL'}
                   </Text>
+                </View>
+
+                <View
+                  testID={`suggestion-chip-${entry.id}`}
+                  style={[
+                    styles.suggestionRow,
+                    {
+                      borderColor:
+                        suggestion.action === 'increase'
+                          ? theme.colors.primary
+                          : suggestion.action === 'deload'
+                            ? theme.colors.danger
+                            : theme.colors.secondary,
+                      backgroundColor: theme.colors.background,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.suggestionText,
+                      {
+                        color:
+                          suggestion.action === 'increase'
+                            ? theme.colors.primary
+                            : suggestion.action === 'deload'
+                              ? theme.colors.danger
+                              : theme.colors.textSecondary,
+                      },
+                    ]}
+                  >
+                    {suggestionLabel}
+                  </Text>
+                  {suggestion.action !== 'first_time' && (
+                    <TouchableOpacity
+                      testID={`apply-suggestion-${entry.id}`}
+                      style={[styles.applyBtn, { borderColor: theme.colors.primary }]}
+                      onPress={() => applySuggestionToEntry(entry.id, suggestion)}
+                    >
+                      <Text style={[styles.applyBtnText, ts.accent]}>APPLY</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
 
                 {entry.sets.map((set, idx) => (
@@ -455,6 +507,30 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   prefillChipText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
+  suggestionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    marginBottom: 8,
+  },
+  suggestionText: {
+    flex: 1,
+    fontSize: 10,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    paddingRight: 8,
+  },
+  applyBtn: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  applyBtnText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   setRow: {
     flexDirection: 'row',
     alignItems: 'center',

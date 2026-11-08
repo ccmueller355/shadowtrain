@@ -163,6 +163,9 @@ interface Profile {
   increments: Record<string, number>; // per-equipment override (0 = fixed weight / step-loading)
   availableEquipment: Equipment[]; // defaults to ['kettlebell', 'rings', 'bodyweight', 'hand_gripper', 'jump_rope', 'stretching']
   fixedKettlebellWeight?: number; // e.g. 16 or 24 kg; triggers fixed-weight rep/set step-loading
+  metatype?: 'human' | 'elf' | 'orc'; // Shadowrun runner archetype (Human, Elf, Orc)
+  gender?: 'male' | 'female'; // Avatar variant (guy / girl) -> selects matching avatar & exercise icons
+  activeProgramId?: string; // Selected split/program template (e.g. 'kb-calisthenics-ab', 'kb-essentials', 'convict-rings', 'mobility-reset')
 }
 
 interface Exercise {
@@ -217,14 +220,14 @@ interface SetRecord {
 
 ### 5.1 Screens
 
-| Screen               | Purpose                                                                                                     | Must-have                                                                                                                    |
-| :------------------- | :---------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| **Home**             | Start session, resume in-progress, list of recent sessions                                                  | New session button, resume banner, last 5 sessions                                                                           |
-| **Session (Logger)** | Add exercises, log sets (reps/weight or duration), see last-done prefill, rest timer                        | Per-exercise card with sets, prefill, +set, checkoff, timer                                                                  |
-| **Exercise Picker**  | Search/filter exercises                                                                                     | Defaults to `profile.availableEquipment` filter (with quick "Show all" toggle), text search, muscle filter, equipment filter |
-| **Exercise Detail**  | Show images, instructions, history, current suggestion                                                      | Start/end images, "Suggested next" banner                                                                                    |
-| **Progress**         | Volume/week, PR list                                                                                        | Two simple charts + PR table                                                                                                 |
-| **Settings**         | Profile, available equipment selector, fixed KB weight, units, theme, increments override, backup & restore | All of `Profile`, equipment toggles, 1-file JSON export/import (`meta.version`) + CSV session log export                     |
+| Screen               | Purpose                                                                                                                                                 | Must-have                                                                                                                         |
+| :------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------- |
+| **Home**             | Start session, resume in-progress, list of recent sessions                                                                                              | New session button, resume banner, last 5 sessions                                                                                |
+| **Session (Logger)** | Add exercises, log sets (reps/weight or duration), see last-done prefill, rest timer                                                                    | Per-exercise card with sets, prefill, +set, checkoff, timer                                                                       |
+| **Exercise Picker**  | Search/filter exercises                                                                                                                                 | Defaults to `profile.availableEquipment` filter (with quick "Show all" toggle), text search, muscle filter, equipment filter      |
+| **Exercise Detail**  | Show images, instructions, history, current suggestion                                                                                                  | Start/end images, "Suggested next" banner                                                                                         |
+| **Progress**         | Telemetry & statistics across `Last Workout`, `Week`, `Month` (with `◀/▶` history scrubber), visual intensity heatmap & volume bars, PR list            | Window selector (`Last Workout` / `Week` / `Month`), period navigation, intensity heatmap + volume bars, PR table                 |
+| **Settings**         | Profile, Runner Avatar (`Human`/`Elf`/`Orc` × `Guy`/`Girl`), Program/Split selector, equipment toggles, fixed KB weight, units, theme, backup & restore | All of `Profile`, avatar & split selector, equipment toggles, 1-file JSON export/import (`meta.version`) + CSV session log export |
 
 ### 5.2 Core Interaction Flow (Happy Path)
 
@@ -328,22 +331,28 @@ function suggestNext(
 - Run at app bootstrap **only if** `exercises` table is empty (idempotent).
 - All exercise IDs are stable, so a future re-import is additive, not destructive.
 
-### 5.5 Image Pipeline
+### 5.5 Image Pipeline & Runner Metatype Avatars (`Human` / `Elf` / `Orc`)
 
-- **Anchored template** (kept in `docs/image-prompts.md`):
+- **Runner Metatype & Gender Selector (3 × 2 Choices)**:
+  - Operators choose their Shadowrun runner archetype in Settings / Onboarding:
+    1. **Human (`male` / `female`)** — Cyber-street operative (guy or girl)
+    2. **Elf (`male` / `female`)** — Agile neon-wired athletics specialist (boy or girl)
+    3. **Orc (`male` / `female`)** — Heavy chrome-plated street samurai (guy or girl, continuing the Cyber-Orc Barbell splash screen aesthetic)
+  - The selected archetype drives the **Runner Avatar** on the Home Deck, Settings Profile card, and exercise/category icon badges (`assets/avatars/{human,elf,orc}-{male,female}.webp`).
+- **Anchored Exercise Pose Template** (kept in `docs/image-prompts.md`):
 
   ```
-  Character: <fixed description>, wearing <fixed outfit>
-  Environment: <fixed gym background>, <fixed lighting>
+  Character: <selected metatype & gender: Human (guy/girl) | Elf (boy/girl) | Orc (guy/girl)>, wearing <fixed cyberpunk athletic outfit>
+  Environment: <fixed dark Æ CYBERNETICS gym background>, <cyan & orange neon rim-lighting>
   Pose: <start | end> position of <exercise name>
-  Style: <fixed render style, e.g. "muted cyberpunk, rim-light">
+  Style: <fixed render style, "muted cyberpunk, cyan/orange neon rim-light">
   ```
 
-- Two images per exercise: `start` and `end`.
-- Stored under `assets/exercises/<exercise_id>/{start,end}.webp` (WebP, ≤150 KB each).
-- **MVP batch**: 25–30 exercises covering the entire `core-kit-exercises.json` list above (kettlebell, rings, bodyweight, hand-presses, skipping rope, stretching).
-- Fallback: a themed placeholder card with exercise name (so the app is never broken).
-- Regenerating an image never touches the DB — the DB just stores `image_start`/`image_end` keys, and a `useExerciseImage()` hook resolves to asset-or-placeholder.
+- Two pose images per exercise (`start` and `end`) + compact neon equipment/avatar mini-icons for list rows.
+- Stored under `assets/exercises/<exercise_id>/{start,end}.webp` (WebP, ≤150 KB each) and `assets/avatars/`.
+- **MVP batch (`M8`)**: 6 Runner Avatar portraits (`Human`, `Elf`, `Orc` × `Guy`/`Girl`) + 25–30 core-kit exercise illustrations (`kettlebell`, `rings`, `bodyweight`, `hand_gripper`, `jump_rope`, `stretching`).
+- Fallback: a themed cyberpunk placeholder card with metatype badge and exercise name (so the app is never broken).
+- Regenerating an image never touches the DB — the DB just stores `image_start`/`image_end` keys, and a `useExerciseImage()` hook resolves to asset-or-placeholder according to the active `profile.metatype` and `profile.gender`.
 
 ### 5.6 Data Portability (1-File JSON Backup/Restore + CSV Session Log)
 
@@ -458,9 +467,9 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 | **M3**  | Logger screen (no suggestions)      | Add exercise, log sets (reps/weight or duration), finish session; session persists & resumes                                                     | M    |
 | **M4**  | Last-done prefill                   | Reopening an exercise pre-fills last session's working sets                                                                                      | S    |
 | **M5**  | Progression engine                  | `suggestNext()` implemented (fixed-KB/rings step-loading + timed + plate increments), unit tests green, suggestion chip shown on Logger & Detail | M    |
-| **M6**  | Progress view                       | Volume/week chart + PR list                                                                                                                      | S    |
-| **M7**  | Settings + Import/Export            | Profile edits persist; 1-file JSON export & import (`meta.version: 1`) restore full state + CSV session log export                               | S    |
-| **M8**  | First image batch                   | 25–30 core-kit exercises have start/end images; placeholder fallback works                                                                       | M    |
+| **M6**  | Progress & Statistics view          | Time-window selector (`Last Workout` / `Week` / `Month`) + `◀/▶` history navigation, visual intensity heatmap & volume chart, PR list            | M    |
+| **M7**  | Settings, Splits + Import/Export    | Profile edits, Runner Avatar (`Human`/`Elf`/`Orc` × `Guy`/`Girl`), Program/Split templates, 1-file JSON export/import + CSV session log export   | M    |
+| **M8**  | Avatars & First image batch         | 6 Runner Avatars (`Human`/`Elf`/`Orc` × `Guy`/`Girl`) + 25–30 core-kit start/end images & metatype-aware icons; placeholder fallback works       | M    |
 | **M9**  | Distribution build                  | EAS internal build installs on device; session survives app restart                                                                              | S    |
 | **M10** | Streaks & achievements              | Duolingo-style plan-aware weekly/daily streaks (with rest-day shield) + short/mid/long-term achievement badges on Home & Progress                | M    |
 
@@ -478,12 +487,12 @@ Each milestone = **one issue**, one coding-agent session, one PR.
    - **M5 (Progression Engine)**: Implement `suggestNext()` in `src/engine/suggest.ts` with ~100% test coverage (fixed-KB & rings/bodyweight step-loading, timed `+15s` progression, and standard plate increments) + reason chips on Logger & Detail.
 3. **Phase 3: Analytics, Control Deck & Gamification (`M6` → `M7`, `M10`)**
    - _Goal_: Track weekly volume/PRs, customize equipment/profile on the fly, and reward short/mid/long-term consistency.
-   - **M6 (Progress View)**: Weekly volume/time chart + Personal Records (PR) list.
-   - **M7 (Settings & Data Import/Export)**: Equipment toggles, fixed KB weight setting, `kg`/`lb`, goal, theme selector, single-file JSON backup export & import (`meta.version: 1`), and CSV session log export.
+   - **M6 (Progress & Statistics View)**: Time-window selector (`Last Workout`, `Week`, `Month`) with `◀ PREV / NEXT ▶` history scrubber, visual intensity heatmap & volume/time bar chart, equipment breakdown, and Personal Records (PR) list.
+   - **M7 (Settings, Program Splits & Data Import/Export)**: Runner Avatar selector (`Human` guy/girl, `Elf` boy/girl, `Orc` guy/girl), quick-start Program/Split templates (`KB + Calisthenics A/B`, `KB Essentials`, `Convict Rings/BW`, `Mobility Reset`), equipment toggles, fixed KB weight setting, `kg`/`lb`, goal, theme selector, single-file JSON backup export & import (`meta.version: 1`), and CSV session log export.
    - **M10 (Streaks & Achievements)**: Plan-aware Duolingo-style streak tracker (weekly target + rest-day buffer) and tiered short/mid/long-term achievement badges (`src/engine/achievements.ts`).
 4. **Phase 4: Visual Chrome & Field Deployment (`M8` → `M9`)**
-   - _Goal_: Custom cyberpunk start/end pose illustrations for the core kit and standalone installable APK.
-   - **M8 (Core Kit AI Image Batch)**: Draft `docs/image-prompts.md` and bundle WebP `start`/`end` pose images for the 25–30 core-kit exercises + themed placeholder fallback.
+   - _Goal_: Custom cyberpunk Runner Avatars (`Human`/`Elf`/`Orc`), start/end pose illustrations for the core kit, and standalone installable APK.
+   - **M8 (Runner Avatars & Core Kit AI Image Batch)**: Draft `docs/image-prompts.md`, bundle the 6 Runner Avatar portraits (`Human`/`Elf`/`Orc` × `Guy`/`Girl`), metatype-aware exercise/equipment icons, and WebP `start`/`end` pose images for the 25–30 core-kit exercises + themed placeholder fallback.
    - **M9 (EAS Distribution Build)**: Configure `eas.json` & GitHub Actions release workflow and build the installable Android APK.
 
 **Definition of done (every milestone):**
