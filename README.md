@@ -16,7 +16,7 @@ Engineered on the `shadowlist` deck architecture with a deterministic 80/20 prog
   - **Fixed-Weight & Calisthenics Step-Loading**: `+1 rep` toward the top of your rep range, then `+1 working set` (up to 5×max), then tempo/variation progression
   - **Timed Sets (`duration_sec`)**: Automatic `+15s` progression for skipping rope, isometric holds, and mobility/stretching
   - **Adjustable Weight**: Equipment-aware linear increments (`+2.5 kg` barbell/cable, `+2 kg` dumbbell, `+5 kg` machine) and automatic `−10%` deload suggestions
-- **Plan-Aware Streaks & Tiered Achievements** — Duolingo-inspired weekly consistency streaks (with active recovery check-ins and a built-in rest-day shield) plus short-, mid-, and long-term achievement badges
+- **Plan-Aware Streaks, Creds (`¥`) & 5 Unlockable Shadow Trainers** — Start with **Kaelen "Tusk" Vorga** (Orc Bodybuilder/Merc) and earn **Creds (`¥`) / Gremlin Coins** from daily/weekly missions, streaks, and progression achievements to unlock **Valerie "Glitch" Vance** (Human Decker), **Marcus "Vanguard" Kade** (Human Universal Soldier), **Lyra "Aether" Vael** (Elf Mage), and **Soren "Wraith" Kael** (Elf Wraith Assassin & Rings Acrobat) on the Trainer Dossier page
 - **Five Hand-Crafted Shadow Themes** — _Fixer's Notebook_ (dark noir), _Stuffer Shack_ (aged parchment), _Decker's Den_ (synth terminal), _Cyber Blue_ (ocean neon), and _Fiddler's Green_ (CRT phosphor)
 - **Fast Pre-Fill & Rest Timer** — Pre-fills "last done" working sets per exercise with a one-line suggestion chip and auto-starts a haptic countdown timer on set checkoff
 - **100% On-Device Persistence** — `expo-sqlite` (WAL mode + serialized write queue) for structured workout history and `AsyncStorage` (via Zustand `persist`) for operator profile and preferences
@@ -24,19 +24,19 @@ Engineered on the `shadowlist` deck architecture with a deterministic 80/20 prog
 
 ## Implementation Status
 
-| Milestone                   | Status  | Description                                                                               |
-| :-------------------------- | :------ | :---------------------------------------------------------------------------------------- |
-| **M0 - Scaffold**           | Done    | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, VitePress docs, CT & CI       |
-| **M1 - SQLite Layer**       | Done    | `expo-sqlite` v1 schema, migrations scaffold, single write queue, repository helpers      |
-| **M2 - Exercise Seed**      | Done    | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter    |
-| **M3 - Session Logger**     | Done    | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer   |
-| **M4 - Last-Done Prefill**  | Done    | Automatic pre-fill from most recent session's working sets per exercise                   |
-| **M5 - Progression Engine** | Done    | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips               |
-| **M6 - Progress & Stats**   | Next    | `Last Workout` / `Week` / `Month` + `◀/▶` history scrubber, intensity heatmap & PR list   |
-| **M7 - Settings & Splits**  | Planned | Avatar (`Human`/`Elf`/`Orc`), Program/Split templates, kit toggles, 1-file JSON I/O + CSV |
-| **M8 - Avatars & Images**   | Planned | 6 Runner Avatars (`Human`/`Elf`/`Orc` × M/F) + 25-30 core-kit WebP pose illustrations     |
-| **M9 - Distribution Build** | Planned | EAS internal Android APK build & session survival across restarts                         |
-| **M10 - Gamification**      | Planned | Plan-aware weekly streaks (with rest-day shield) & short/mid/long-term achievements       |
+| Milestone                    | Status  | Description                                                                             |
+| :--------------------------- | :------ | :-------------------------------------------------------------------------------------- |
+| **M0 - Scaffold**            | Done    | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, VitePress docs, CT & CI     |
+| **M1 - SQLite Layer**        | Done    | `expo-sqlite` v1 schema, migrations scaffold, single write queue, repository helpers    |
+| **M2 - Exercise Seed**       | Done    | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter  |
+| **M3 - Session Logger**      | Done    | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer |
+| **M4 - Last-Done Prefill**   | Done    | Automatic pre-fill from most recent session's working sets per exercise                 |
+| **M5 - Progression Engine**  | Done    | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips             |
+| **M6 - Progress & Stats**    | Next    | `Last Workout` / `Week` / `Month` + `◀/▶` history scrubber, intensity heatmap & PR list |
+| **M7 - Settings & Trainers** | Planned | 5-Trainer Dossier & Split selector, kit toggles, 1-file JSON export/import + CSV export |
+| **M8 - Trainer HD & Poses**  | Planned | 5 sharp HD Trainer portraits + 25-30 core-kit specialist WebP pose illustrations        |
+| **M9 - Distribution Build**  | Planned | EAS internal Android APK build & session survival across restarts                       |
+| **M10 - Creds & Streaks**    | Planned | Creds (`¥`) mission economy to unlock all 5 Trainers + weekly streaks & achievements    |
 
 See [`docs/spec.md`](docs/spec.md) for the complete MVP specification and milestone acceptance criteria.
 
