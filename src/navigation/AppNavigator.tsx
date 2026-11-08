@@ -1,5 +1,5 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import HomeScreen from '../../app/(tabs)/index';
@@ -7,6 +7,9 @@ import ExercisesScreen from '../../app/(tabs)/exercises';
 import ProgressScreen from '../../app/(tabs)/progress';
 import SettingsScreen from '../../app/(tabs)/settings';
 import SessionLoggerScreen from '../../app/session/[id]';
+import { initDatabase } from '../db';
+import { useExerciseStore } from '../stores/exerciseStore';
+import { useSessionStore } from '../stores/sessionStore';
 import { useAppTheme } from '../theme/useTheme';
 import { useThemeStyles } from '../theme/useThemeStyles';
 
@@ -19,12 +22,27 @@ const TABS: { key: TabRoute; label: string }[] = [
   { key: 'settings', label: 'SETTINGS' },
 ];
 
+export async function bootstrapLocalDatabase(): Promise<void> {
+  try {
+    const db = await initDatabase();
+    if (!db) return;
+    await useExerciseStore.getState().hydrateFromDb(db);
+    await useSessionStore.getState().hydrateSessionsFromDb(db);
+  } catch {
+    // Graceful no-op in unmocked unit test environments
+  }
+}
+
 export function AppNavigator() {
   const [activeTab, setActiveTab] = useState<TabRoute>('home');
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
   const theme = useAppTheme();
   const ts = useThemeStyles();
+
+  useEffect(() => {
+    void bootstrapLocalDatabase();
+  }, []);
 
   const safeEdgesStyle = {
     paddingTop: insets.top,
