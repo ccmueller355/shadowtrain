@@ -1,0 +1,97 @@
+[
+  {
+    "id": "barbell-back-squat",
+    "name": "Barbell Back Squat",
+    "primaryMuscles": ["quads", "glutes"],
+    "secondaryMuscles": ["hamstrings", "core", "lower_back"],
+    "equipment": "barbell",
+    "category": "strength",
+    "trackingType": "reps",
+    "instructions": ["Brace core with bar across upper traps", "Squat below parallel and drive up"]
+  },
+  {
+    "id": "barbell-bench-press",
+    "name": "Barbell Bench Press",
+    "primaryMuscles": ["chest", "triceps"],
+    "secondaryMuscles": ["shoulders"],
+    "equipment": "barbell",
+    "category": "strength",
+    "trackingType": "reps",
+    "instructions": ["Retract scapulae on bench", "Lower bar to mid-chest and press to lockout"]
+  },
+  {
+    "id": "barbell-deadlift",
+    "name": "Barbell Deadlift",
+    "primaryMuscles": ["hamstrings", "glutes", "lower_back"],
+    "secondaryMuscles": ["lats", "forearms", "quads"],
+    "equipment": "barbell",
+    "category": "strength",
+    "trackingType": "reps",
+    "instructions": [
+      "Pull slack out of bar with neutral spine",
+      "Drive floor away to standing lockout"
+    ]
+  },
+  {
+    "id": "dumbbell-incline-press",
+    "name": "Dumbbell Incline Press",
+    "primaryMuscles": ["chest", "shoulders"],
+    "secondaryMuscles": ["triceps"],
+    "equipment": "dumbbell",
+    "category": "strength",
+    "trackingType": "reps",
+    "instructions": [
+      "Set bench to 30 degrees",
+      "Lower dumbbells with 45-degree elbow tuck and press"
+    ]
+  },
+  {
+    "id": "dumbbell-romanian-deadlift",
+    "name": "Dumbbell Romanian Deadlift",
+    "primaryMuscles": ["hamstrings", "glutes"],
+    "secondaryMuscles": ["lower_back", "forearms"],
+    "equipment": "dumbbell",
+    "category": "strength",
+    "trackingType": "reps",
+    "instructions": [
+      "Push hips back keeping dumbbells grazing thighs",
+      "Snap hips forward once hamstring stretch peaks"
+    ]
+  },
+  {
+    "id": "cable-lat-pulldown",
+    "name": "Cable Lat Pulldown",
+    "primaryMuscles": ["lats", "upper_back"],
+    "secondaryMuscles": ["biceps", "rear_delts"],
+    "equipment": "cable",
+    "category": "strength",
+    "trackingType": "reps",
+    "instructions": ["Drive elbows down toward ribs", "Control eccentric return to full stretch"]
+  },
+  {
+    "id": "machine-leg-press",
+    "name": "Machine Leg Press",
+    "primaryMuscles": ["quads", "glutes"],
+    "secondaryMuscles": ["hamstrings"],
+    "equipment": "machine",
+    "category": "strength",
+    "trackingType": "reps",
+    "instructions": [
+      "Keep lower back pressed against pad",
+      "Lower sled deeply and press through mid-foot"
+    ]
+  },
+  {
+    "id": "bands-pull-apart",
+    "name": "Band Pull-Apart",
+    "primaryMuscles": ["rear_delts", "upper_back"],
+    "secondaryMuscles": ["rotator_cuff"],
+    "equipment": "bands",
+    "category": "strength",
+    "trackingType": "reps",
+    "instructions": [
+      "Hold band at shoulder height with straight arms",
+      "Squeeze shoulder blades together to chest touch"
+    ]
+  }
+]
