@@ -222,7 +222,9 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                 <View style={styles.cardHeader}>
                   <Text style={[styles.exerciseName, ts.text]}>{exercise.name}</Text>
                   <Text style={[styles.badge, ts.accent]}>
-                    {exercise.equipment.toUpperCase()} · {exercise.trackingType.toUpperCase()}
+                    {exercise.equipment.toUpperCase()}
+                    {exercise.tier ? ` · ${exercise.tier.toUpperCase()}` : ''} ·{' '}
+                    {exercise.trackingType.toUpperCase()}
                   </Text>
                 </View>
                 <Text style={[styles.musclesText, ts.textMuted]}>

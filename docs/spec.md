@@ -293,7 +293,7 @@ function suggestNext(
    - **Any working set `reps < repRange.min`** → `deload`: keep weight, reset target reps to `repRange.min` (and drop 1 set if `sets > 3`).
    - **Not all working sets reached `repRange.max`** → `increase` target by **+1 rep** at the same weight (capped at `repRange.max`), reason: _"Step-loading: +1 rep per set toward top of range"_.
    - **All working sets `reps >= repRange.max` and `workingSets.length < 5`** → `increase` by **+1 working set** at `repRange.min`–`repRange.max` (volume ladder / step-loading), reason: _"Hit top of rep range across sets — add 1 working set"_.
-   - **All 5 working sets `reps >= repRange.max`** → `increase` variation/tempo chip (keep weight & 5×`repRange.max`), reason: _"5×max mastered — slow eccentric (3-1-3), pause at bottom/lockout, or progress variation"_.
+   - **All 5 working sets `reps >= repRange.max`** → `increase` variation/tier graduation chip (keep weight & 5×`repRange.max`), reason: _"5×max mastered — advance to next tier variation (`nextProgressionId`) or slow eccentric (3-1-3)"_.
 4. **Standard Adjustable-Weight Progression** (`barbell`, `dumbbell`, `machine`, `cable`, or `kettlebell` with non-zero increment):
    - **<3 working sets logged** → `repeat` with reason _"Under 3 working sets logged last time"_.
    - **All working sets `reps >= repRange.max`** → `increase` `weight` by equipment increment; `reps = repRange.max`.
@@ -306,15 +306,24 @@ function suggestNext(
 - Cable/machine: use declared increment; skip increase if user marked "at max".
 - The UI shows the suggestion as an **editable pre-fill** — never auto-applies without the user's checkoff.
 
-### 5.4 Exercise Library Ingestion
+### 5.4 Exercise Library Ingestion & KISS 3-Level Progression Ladders
 
-- `src/db/seed/core-kit-exercises.json` defines the curated core movements for the default personal kit:
-  - **Kettlebell (core staples)**: Two-Hand Kettlebell Swing, One-Arm Kettlebell Swing, Turkish Get-Up, Kettlebell Goblet Squat, Kettlebell Clean & Military Press, Kettlebell Snatch, Kettlebell Halo, One-Arm Kettlebell Row, Kettlebell Front Rack Squat.
-  - **Gymnastic Rings**: Ring Support Hold (duration), Ring Row, Ring Push-Up, Ring Dip, Ring Pull-Up / Chin-Up, Ring Face Pull, Ring L-Sit Hold (duration), Ring Rollout / Fallout.
-  - **Bodyweight**: Push-Up, Diamond Push-Up, Pike Push-Up, Bodyweight Squat, Pistol Squat (Assisted/Full), Hollow Body Hold (duration), Plank (duration), Hanging / Floor Leg Raise.
-  - **Hand-Presses (`hand_gripper`)**: Hand Gripper Crush Rep, Hand Gripper Overcrush / Isometric Hold (duration), Fingertip / Pinch Grip Press.
-  - **Skipping Rope (`jump_rope`)**: Jump Rope Basic Bounce (duration), Jump Rope Boxer Step (duration), Jump Rope High Knees / Double-Under Practice (duration).
-  - **Stretching (`stretching`)**: Couch Stretch (Hip Flexors), 90/90 Hip Switch & Hold, Cossack Squat Hold, Thoracic Bridge / Dead Hang Decompression, Pike Hamstring Relaxed Stretch, Deep Squat Pry (Goblet/Bodyweight).
+- `src/db/seed/core-kit-exercises.json` defines the curated core movements for the default personal kit, organized into **KISS 3-Level Progression Ladders (`tier: 'beginner' | 'mid' | 'advanced'` + `nextProgressionId`)** inspired by Paul Wade (_Convict Conditioning_) calisthenics progressions and 3-tier kettlebell/rings mastery:
+  - **Bodyweight (Paul Wade 3-Level Progressions)**:
+    - _Push Chain_: `Push-Up` (`beginner`) → `Diamond Push-Up` (`mid`) → `Pike Push-Up` (`advanced`)
+    - _Squat Chain_: `Bodyweight Squat` (`beginner`) → `Pistol Squat (Assisted/Full)` (`advanced`)
+    - _Core / Leg Raise Chain_: `Plank` (`beginner`) → `Hollow Body Hold` (`mid`) → `Hanging / Floor Leg Raise` (`advanced`)
+  - **Kettlebell (3-Level Ladders)**:
+    - _Ballistic Hinge Chain_: `Two-Hand Kettlebell Swing` (`beginner`) → `One-Arm Kettlebell Swing` (`mid`) → `Kettlebell Snatch` (`advanced`)
+    - _Overhead & Grind Chain_: `Kettlebell Halo` (`beginner`) → `Kettlebell Clean & Military Press` (`mid`) → `Turkish Get-Up` (`advanced`)
+    - _Squat & Pull Chain_: `Kettlebell Goblet Squat` (`beginner`) → `Kettlebell Front Rack Squat` (`mid`); `One-Arm Kettlebell Row` (`beginner`)
+  - **Gymnastic Rings (3-Level Ladders)**:
+    - _Push Chain_: `Ring Support Hold` (`beginner`) → `Ring Push-Up` (`mid`) → `Ring Dip` (`advanced`)
+    - _Pull Chain_: `Ring Row` (`beginner`) → `Ring Face Pull` (`mid`) → `Ring Pull-Up / Chin-Up` (`advanced`)
+    - _Core Chain_: `Ring Rollout / Fallout` (`mid`) → `Ring L-Sit Hold` (`advanced`)
+  - **Hand-Presses (`hand_gripper` 3-Level Ladder)**: `Hand Gripper Crush Rep` (`beginner`) → `Fingertip / Pinch Grip Press` (`mid`) → `Hand Gripper Overcrush / Isometric Hold` (`advanced`)
+  - **Skipping Rope (`jump_rope` 3-Level Ladder)**: `Jump Rope Basic Bounce` (`beginner`) → `Jump Rope Boxer Step` (`mid`) → `Jump Rope High Knees / Double-Under Practice` (`advanced`)
+  - **Stretching (`stretching` 3-Level Mobility)**: `Pike Hamstring Relaxed Stretch` / `90/90 Hip Switch & Hold` (`beginner`) → `Deep Squat Pry` / `Couch Stretch` (`mid`) → `Cossack Squat Hold` / `Thoracic Bridge / Dead Hang Decompression` (`advanced`)
 - One-off script `scripts/import-exercises.ts` merges the public JSON dataset with `core-kit-exercises.json`, maps fields to the `exercises` table, and seeds SQLite.
 - Run at app bootstrap **only if** `exercises` table is empty (idempotent).
 - All exercise IDs are stable, so a future re-import is additive, not destructive.
@@ -343,27 +352,27 @@ function suggestNext(
 
 ### 5.7 Gamification: Plan-Aware Streaks & Tiered Achievements (`M10`)
 
-Duolingo-inspired motivation designed for sustainable strength & mobility training — rewarding consistency and progression without punishing needed recovery days:
+Duolingo-inspired motivation designed for sustainable strength & mobility training — rewarding consistency and 3-level progression mastery (`beginner` → `mid` → `advanced`) without punishing needed recovery days:
 
 - **Plan-Aware Streaks (Low-Pressure, Recovery-Safe)**:
   - **Weekly Target Rhythm**: Users set a realistic weekly target in Profile (e.g., `weeklyTargetDays = 3` or `4` sessions/week). Hitting the weekly target advances the weekly streak and keeps the flame/cyber-link active.
   - **Active Recovery Counts**: Logging a short `stretching` or `jump_rope` mobility session counts as an active check-in day.
   - **Rest-Day Shield (Streak Freeze)**: Built-in weekly rest buffer so planned off-days or a single missed window never wipe out hard-earned momentum.
-- **Tiered Achievements (Short / Mid / Long-Term)**:
-  - **Short-Term (First Steps & Momentum)**:
+- **Tiered Achievements (Short / Mid / Long-Term + 3-Level Progression Mastery)**:
+  - **Short-Term (First Steps & Beginner Tier — Level 1)**:
     - _First Jack-In_: Finish your 1st logged workout session.
     - _Kit Explorer_: Log movements across 3+ core-kit equipment types.
-    - _First Step-Up_: Complete a suggested progression increase (`+1 rep`, `+1 set`, `+15s`, or weight jump).
+    - _Tier 1 Graduate (Beginner Mastery)_: Master `5 × repRange.max` on any `beginner`-tier bodyweight, kettlebell, or ring movement and unlock its `mid`-tier variation.
     - _Week One Locked_: Hit your weekly training target for 1 full week.
-  - **Mid-Term (Consistency & Mastery)**:
+  - **Mid-Term (Consistency & Mid Tier — Level 2)**:
     - _4-Week Rhythm_: Hit your weekly target streak for 4 consecutive weeks.
     - _Quarter-Century Runner_: Complete 25 logged sessions.
-    - _Step-Load Master_: Complete a full `5 × repRange.max` volume ladder on any fixed-weight or calisthenics movement.
+    - _Tier 2 Specialist (Mid Mastery)_: Master `5 × repRange.max` on a `mid`-tier movement (e.g. `Diamond Push-Up`, `One-Arm Kettlebell Swing`, `Ring Push-Up`) to unlock `advanced` tier.
     - _PR Hunter_: Unlock 10 Personal Records across exercises.
-  - **Long-Term (Shadow Legend)**:
+  - **Long-Term (Shadow Legend & Advanced Tier — Level 3)**:
     - _12-Week & 52-Week Iron Link_: Sustain your weekly streak for a full quarter and full year.
     - _Centurion Deck_: Complete 100 logged sessions.
-    - _Full Armory Mastery_: Reach top-tier progression across all 6 core-kit categories (`kettlebell`, `rings`, `bodyweight`, `hand_gripper`, `jump_rope`, `stretching`).
+    - _Tier 3 Master (Advanced Mastery)_: Master `5 × repRange.max` (or target hold duration) on an `advanced`-tier movement (`Pistol Squat`, `Pike Push-Up`, `Turkish Get-Up`, `Kettlebell Snatch`, `Ring Dip`, `Ring L-Sit Hold`) across the core kit.
 
 ---
 

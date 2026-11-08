@@ -1,5 +1,5 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
-import { Equipment, Exercise, TrackingType } from '../../types';
+import { DifficultyTier, Equipment, Exercise, TrackingType } from '../../types';
 import { DatabaseClient } from '../migrations';
 import { countExercises, upsertExercises } from '../repositories/exerciseRepo';
 import { defaultWriteQueue, WriteQueue } from '../writeQueue';
@@ -14,6 +14,8 @@ export interface RawSeedExercise {
   equipment: string;
   category?: string;
   trackingType?: string;
+  tier?: string;
+  nextProgressionId?: string;
   imageStart?: string;
   imageEnd?: string;
   instructions?: string[];
@@ -30,6 +32,8 @@ export function normalizeSeedExercise(raw: RawSeedExercise): Exercise {
     equipment: raw.equipment as Equipment,
     ...(raw.category ? { category: raw.category } : {}),
     trackingType: (raw.trackingType as TrackingType) ?? 'reps',
+    ...(raw.tier ? { tier: raw.tier as DifficultyTier } : {}),
+    ...(raw.nextProgressionId ? { nextProgressionId: raw.nextProgressionId } : {}),
     ...(raw.imageStart ? { imageStart: raw.imageStart } : {}),
     ...(raw.imageEnd ? { imageEnd: raw.imageEnd } : {}),
     ...(raw.instructions && raw.instructions.length > 0 ? { instructions: raw.instructions } : {}),

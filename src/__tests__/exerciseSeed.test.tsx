@@ -41,6 +41,8 @@ class SeedFakeDb implements DatabaseClient {
         equipment,
         category,
         tracking_type,
+        tier,
+        next_progression_id,
         image_start,
         image_end,
         instructions,
@@ -53,6 +55,8 @@ class SeedFakeDb implements DatabaseClient {
         equipment: String(equipment),
         category: category !== null ? String(category) : null,
         tracking_type: String(tracking_type),
+        tier: tier !== null ? String(tier) : null,
+        next_progression_id: next_progression_id !== null ? String(next_progression_id) : null,
         image_start: image_start !== null ? String(image_start) : null,
         image_end: image_end !== null ? String(image_end) : null,
         instructions: instructions !== null ? String(instructions) : null,
@@ -109,6 +113,14 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
         'rings',
         'stretching',
       ]);
+
+      const coreById = new Map(CORE_KIT_EXERCISES.map((e) => [e.id, e]));
+      for (const exercise of CORE_KIT_EXERCISES) {
+        expect(['beginner', 'mid', 'advanced']).toContain(exercise.tier);
+        if (exercise.nextProgressionId) {
+          expect(coreById.has(exercise.nextProgressionId)).toBe(true);
+        }
+      }
     });
 
     it('normalizes raw seed entries and gives core-kit priority on ID collision', () => {

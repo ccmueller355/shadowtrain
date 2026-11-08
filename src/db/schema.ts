@@ -9,16 +9,18 @@ PRAGMA foreign_keys = ON;
 
 export const V1_SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS exercises (
-  id                TEXT PRIMARY KEY,
-  name              TEXT NOT NULL,
-  primary_muscles   TEXT NOT NULL,
-  secondary_muscles TEXT,
-  equipment         TEXT NOT NULL,
-  category          TEXT,
-  tracking_type     TEXT NOT NULL DEFAULT 'reps',
-  image_start       TEXT,
-  image_end         TEXT,
-  instructions      TEXT
+  id                  TEXT PRIMARY KEY,
+  name                TEXT NOT NULL,
+  primary_muscles     TEXT NOT NULL,
+  secondary_muscles   TEXT,
+  equipment           TEXT NOT NULL,
+  category            TEXT,
+  tracking_type       TEXT NOT NULL DEFAULT 'reps',
+  tier                TEXT,
+  next_progression_id TEXT,
+  image_start         TEXT,
+  image_end           TEXT,
+  instructions        TEXT
 );
 
 CREATE TABLE IF NOT EXISTS sessions (

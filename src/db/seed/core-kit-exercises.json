@@ -7,6 +7,8 @@
     "equipment": "kettlebell",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "beginner",
+    "nextProgressionId": "kb-swing-one-arm",
     "imageStart": "kb-swing-two-hand/start.webp",
     "imageEnd": "kb-swing-two-hand/end.webp",
     "instructions": ["Hike bell forcefully between hips", "Snap hips to standing plank lockout"]
@@ -19,6 +21,8 @@
     "equipment": "kettlebell",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "mid",
+    "nextProgressionId": "kb-snatch",
     "imageStart": "kb-swing-one-arm/start.webp",
     "imageEnd": "kb-swing-one-arm/end.webp",
     "instructions": ["Pack shoulder into socket", "Drive hips and resist trunk rotation"]
@@ -31,6 +35,7 @@
     "equipment": "kettlebell",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "advanced",
     "imageStart": "kb-turkish-get-up/start.webp",
     "imageEnd": "kb-turkish-get-up/end.webp",
     "instructions": ["Lock wrist and elbow overhead", "Move deliberately through each post"]
@@ -43,6 +48,8 @@
     "equipment": "kettlebell",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "beginner",
+    "nextProgressionId": "kb-front-rack-squat",
     "imageStart": "kb-goblet-squat/start.webp",
     "imageEnd": "kb-goblet-squat/end.webp",
     "instructions": ["Hold bell by horns at chest", "Squat deep with elbows inside knees"]
@@ -55,6 +62,8 @@
     "equipment": "kettlebell",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "mid",
+    "nextProgressionId": "kb-turkish-get-up",
     "imageStart": "kb-clean-and-press/start.webp",
     "imageEnd": "kb-clean-and-press/end.webp",
     "instructions": ["Clean smoothly to rack", "Brace glutes and press overhead to lockout"]
@@ -67,6 +76,7 @@
     "equipment": "kettlebell",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "advanced",
     "imageStart": "kb-snatch/start.webp",
     "imageEnd": "kb-snatch/end.webp",
     "instructions": ["Explode from hip hinge", "Punch hand through handle at overhead lockout"]
@@ -79,6 +89,8 @@
     "equipment": "kettlebell",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "beginner",
+    "nextProgressionId": "kb-clean-and-press",
     "imageStart": "kb-halo/start.webp",
     "imageEnd": "kb-halo/end.webp",
     "instructions": ["Hold bell bottoms-up at chin", "Circle tightly around head keeping ribs down"]
@@ -91,6 +103,7 @@
     "equipment": "kettlebell",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "beginner",
     "imageStart": "kb-row-one-arm/start.webp",
     "imageEnd": "kb-row-one-arm/end.webp",
     "instructions": ["Hinge hips with flat back", "Pull bell toward hip pocket"]
@@ -103,6 +116,7 @@
     "equipment": "kettlebell",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "mid",
     "imageStart": "kb-front-rack-squat/start.webp",
     "imageEnd": "kb-front-rack-squat/end.webp",
     "instructions": ["Rack bell tightly against forearm", "Descend upright and drive through heels"]
@@ -115,6 +129,8 @@
     "equipment": "rings",
     "category": "strength",
     "trackingType": "duration",
+    "tier": "beginner",
+    "nextProgressionId": "ring-push-up",
     "imageStart": "ring-support-hold/start.webp",
     "imageEnd": "ring-support-hold/end.webp",
     "instructions": ["Depress scapulae with straight elbows", "Turn rings out (RTO) at lockout"]
@@ -127,6 +143,8 @@
     "equipment": "rings",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "beginner",
+    "nextProgressionId": "ring-face-pull",
     "imageStart": "ring-row/start.webp",
     "imageEnd": "ring-row/end.webp",
     "instructions": ["Keep body rigid in hollow plank", "Row rings to lower ribs"]
@@ -139,6 +157,8 @@
     "equipment": "rings",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "mid",
+    "nextProgressionId": "ring-dip",
     "imageStart": "ring-push-up/start.webp",
     "imageEnd": "ring-push-up/end.webp",
     "instructions": [
@@ -154,6 +174,7 @@
     "equipment": "rings",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "advanced",
     "imageStart": "ring-dip/start.webp",
     "imageEnd": "ring-dip/end.webp",
     "instructions": ["Descend until shoulders dip below elbows", "Press back to stable support"]
@@ -166,6 +187,7 @@
     "equipment": "rings",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "advanced",
     "imageStart": "ring-pull-up/start.webp",
     "imageEnd": "ring-pull-up/end.webp",
     "instructions": ["Start from dead hang with active shoulders", "Pull chest to rings"]
@@ -178,6 +200,8 @@
     "equipment": "rings",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "mid",
+    "nextProgressionId": "ring-pull-up",
     "imageStart": "ring-face-pull/start.webp",
     "imageEnd": "ring-face-pull/end.webp",
     "instructions": ["Pull rings high toward forehead", "Externally rotate shoulders at peak"]
@@ -190,6 +214,7 @@
     "equipment": "rings",
     "category": "strength",
     "trackingType": "duration",
+    "tier": "advanced",
     "imageStart": "ring-l-sit-hold/start.webp",
     "imageEnd": "ring-l-sit-hold/end.webp",
     "instructions": ["Lock elbows in support", "Hold legs straight and parallel to deck"]
@@ -202,6 +227,8 @@
     "equipment": "rings",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "mid",
+    "nextProgressionId": "ring-l-sit-hold",
     "imageStart": "ring-rollout/start.webp",
     "imageEnd": "ring-rollout/end.webp",
     "instructions": [
@@ -217,6 +244,8 @@
     "equipment": "bodyweight",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "beginner",
+    "nextProgressionId": "bw-diamond-push-up",
     "imageStart": "bw-push-up/start.webp",
     "imageEnd": "bw-push-up/end.webp",
     "instructions": ["Brace glutes and abs", "Lower chest to floor and press to full extension"]
@@ -229,6 +258,8 @@
     "equipment": "bodyweight",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "mid",
+    "nextProgressionId": "bw-pike-push-up",
     "imageStart": "bw-diamond-push-up/start.webp",
     "imageEnd": "bw-diamond-push-up/end.webp",
     "instructions": ["Form diamond with thumbs and index fingers", "Lower sternum to hands"]
@@ -241,6 +272,7 @@
     "equipment": "bodyweight",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "advanced",
     "imageStart": "bw-pike-push-up/start.webp",
     "imageEnd": "bw-pike-push-up/end.webp",
     "instructions": ["Pike hips high in inverted V", "Lower crown of head forward between hands"]
@@ -253,6 +285,8 @@
     "equipment": "bodyweight",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "beginner",
+    "nextProgressionId": "bw-pistol-squat",
     "imageStart": "bw-squat/start.webp",
     "imageEnd": "bw-squat/end.webp",
     "instructions": ["Track knees over toes", "Descend below parallel and stand tall"]
@@ -265,6 +299,7 @@
     "equipment": "bodyweight",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "advanced",
     "imageStart": "bw-pistol-squat/start.webp",
     "imageEnd": "bw-pistol-squat/end.webp",
     "instructions": ["Extend non-working leg forward", "Control single-leg descent and drive up"]
@@ -277,6 +312,8 @@
     "equipment": "bodyweight",
     "category": "strength",
     "trackingType": "duration",
+    "tier": "mid",
+    "nextProgressionId": "bw-leg-raise",
     "imageStart": "bw-hollow-body-hold/start.webp",
     "imageEnd": "bw-hollow-body-hold/end.webp",
     "instructions": ["Press lumbar spine flat into floor", "Hold shoulders and legs off ground"]
@@ -289,6 +326,8 @@
     "equipment": "bodyweight",
     "category": "strength",
     "trackingType": "duration",
+    "tier": "beginner",
+    "nextProgressionId": "bw-hollow-body-hold",
     "imageStart": "bw-plank/start.webp",
     "imageEnd": "bw-plank/end.webp",
     "instructions": ["Stack elbows under shoulders", "Squeeze glutes and quads hard"]
@@ -301,6 +340,7 @@
     "equipment": "bodyweight",
     "category": "strength",
     "trackingType": "reps",
+    "tier": "advanced",
     "imageStart": "bw-leg-raise/start.webp",
     "imageEnd": "bw-leg-raise/end.webp",
     "instructions": ["Control momentum", "Curl pelvis upward at top of range"]
@@ -313,6 +353,8 @@
     "equipment": "hand_gripper",
     "category": "grip",
     "trackingType": "reps",
+    "tier": "beginner",
+    "nextProgressionId": "grip-pinch-press",
     "imageStart": "grip-crush-rep/start.webp",
     "imageEnd": "grip-crush-rep/end.webp",
     "instructions": ["Set gripper handle in palm crease", "Squeeze handles until they touch"]
@@ -325,6 +367,7 @@
     "equipment": "hand_gripper",
     "category": "grip",
     "trackingType": "duration",
+    "tier": "advanced",
     "imageStart": "grip-overcrush-hold/start.webp",
     "imageEnd": "grip-overcrush-hold/end.webp",
     "instructions": ["Close gripper completely", "Maintain maximum crush tension for time"]
@@ -337,6 +380,8 @@
     "equipment": "hand_gripper",
     "category": "grip",
     "trackingType": "reps",
+    "tier": "mid",
+    "nextProgressionId": "grip-overcrush-hold",
     "imageStart": "grip-pinch-press/start.webp",
     "imageEnd": "grip-pinch-press/end.webp",
     "instructions": ["Pinch handle between thumb and fingertips", "Control each squeeze"]
@@ -349,6 +394,8 @@
     "equipment": "jump_rope",
     "category": "cardio",
     "trackingType": "duration",
+    "tier": "beginner",
+    "nextProgressionId": "rope-boxer-step",
     "imageStart": "rope-basic-bounce/start.webp",
     "imageEnd": "rope-basic-bounce/end.webp",
     "instructions": ["Keep elbows close to ribs", "Turn rope from wrists with low hops"]
@@ -361,6 +408,8 @@
     "equipment": "jump_rope",
     "category": "cardio",
     "trackingType": "duration",
+    "tier": "mid",
+    "nextProgressionId": "rope-double-unders",
     "imageStart": "rope-boxer-step/start.webp",
     "imageEnd": "rope-boxer-step/end.webp",
     "instructions": ["Shift weight rhythmically foot to foot", "Stay light on balls of feet"]
@@ -373,6 +422,7 @@
     "equipment": "jump_rope",
     "category": "cardio",
     "trackingType": "duration",
+    "tier": "advanced",
     "imageStart": "rope-double-unders/start.webp",
     "imageEnd": "rope-double-unders/end.webp",
     "instructions": ["Jump vertically with hollow posture", "Flick wrists fast for double pass"]
@@ -385,6 +435,8 @@
     "equipment": "stretching",
     "category": "stretching",
     "trackingType": "duration",
+    "tier": "mid",
+    "nextProgressionId": "stretch-thoracic-hang",
     "imageStart": "stretch-couch/start.webp",
     "imageEnd": "stretch-couch/end.webp",
     "instructions": ["Place rear knee against wall base", "Squeeze rear glute and stay tall"]
@@ -397,6 +449,8 @@
     "equipment": "stretching",
     "category": "stretching",
     "trackingType": "duration",
+    "tier": "beginner",
+    "nextProgressionId": "stretch-couch",
     "imageStart": "stretch-90-90-hip/start.webp",
     "imageEnd": "stretch-90-90-hip/end.webp",
     "instructions": ["Sit with both knees at 90 degrees", "Hinge torso over front shin"]
@@ -409,6 +463,7 @@
     "equipment": "stretching",
     "category": "stretching",
     "trackingType": "duration",
+    "tier": "advanced",
     "imageStart": "stretch-cossack-hold/start.webp",
     "imageEnd": "stretch-cossack-hold/end.webp",
     "instructions": ["Sink deep into one hip with heel flat", "Point opposite toes toward ceiling"]
@@ -421,6 +476,7 @@
     "equipment": "stretching",
     "category": "stretching",
     "trackingType": "duration",
+    "tier": "advanced",
     "imageStart": "stretch-thoracic-hang/start.webp",
     "imageEnd": "stretch-thoracic-hang/end.webp",
     "instructions": ["Relax shoulders into full overhead traction", "Breathe deeply into ribcage"]
@@ -433,6 +489,8 @@
     "equipment": "stretching",
     "category": "stretching",
     "trackingType": "duration",
+    "tier": "beginner",
+    "nextProgressionId": "stretch-deep-squat-pry",
     "imageStart": "stretch-pike-hamstring/start.webp",
     "imageEnd": "stretch-pike-hamstring/end.webp",
     "instructions": ["Hinge from hips with knees soft or locked", "Exhale and relax into fold"]
@@ -445,6 +503,8 @@
     "equipment": "stretching",
     "category": "stretching",
     "trackingType": "duration",
+    "tier": "mid",
+    "nextProgressionId": "stretch-cossack-hold",
     "imageStart": "stretch-deep-squat-pry/start.webp",
     "imageEnd": "stretch-deep-squat-pry/end.webp",
     "instructions": ["Sink into bottom of squat", "Use elbows to gently pry knees apart"]
