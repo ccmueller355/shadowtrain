@@ -24,19 +24,19 @@ Engineered on the `shadowlist` deck architecture with a deterministic 80/20 prog
 
 ## Implementation Status
 
-| Milestone                   | Status  | Description                                                                             |
-| :-------------------------- | :------ | :-------------------------------------------------------------------------------------- |
-| **M0 - Scaffold**           | Done    | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, VitePress docs, CT & CI     |
-| **M1 - SQLite Layer**       | Done    | `expo-sqlite` v1 schema, migrations scaffold, single write queue, repository helpers    |
-| **M2 - Exercise Seed**      | Done    | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter  |
-| **M3 - Session Logger**     | Done    | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer |
-| **M4 - Last-Done Prefill**  | Done    | Automatic pre-fill from most recent session's working sets per exercise                 |
-| **M5 - Progression Engine** | Done    | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips             |
-| **M6 - Progress & Stats**   | Next    | `Last Workout` / `Week` / `Month` + `◀/▶` history scrubber, intensity heatmap & PR list |
-| **M7 - Settings & I/O**     | Planned | Equipment toggles, fixed KB weight, goal/units, 1-file JSON export/import + CSV export  |
-| **M8 - First Image Batch**  | Planned | 25-30 core-kit start/end cyberpunk WebP illustrations + placeholder fallback            |
-| **M9 - Distribution Build** | Planned | EAS internal Android APK build & session survival across restarts                       |
-| **M10 - Gamification**      | Planned | Plan-aware weekly streaks (with rest-day shield) & short/mid/long-term achievements     |
+| Milestone                   | Status  | Description                                                                               |
+| :-------------------------- | :------ | :---------------------------------------------------------------------------------------- |
+| **M0 - Scaffold**           | Done    | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, VitePress docs, CT & CI       |
+| **M1 - SQLite Layer**       | Done    | `expo-sqlite` v1 schema, migrations scaffold, single write queue, repository helpers      |
+| **M2 - Exercise Seed**      | Done    | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter    |
+| **M3 - Session Logger**     | Done    | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer   |
+| **M4 - Last-Done Prefill**  | Done    | Automatic pre-fill from most recent session's working sets per exercise                   |
+| **M5 - Progression Engine** | Done    | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips               |
+| **M6 - Progress & Stats**   | Next    | `Last Workout` / `Week` / `Month` + `◀/▶` history scrubber, intensity heatmap & PR list   |
+| **M7 - Settings & Splits**  | Planned | Avatar (`Human`/`Elf`/`Orc`), Program/Split templates, kit toggles, 1-file JSON I/O + CSV |
+| **M8 - Avatars & Images**   | Planned | 6 Runner Avatars (`Human`/`Elf`/`Orc` × M/F) + 25-30 core-kit WebP pose illustrations     |
+| **M9 - Distribution Build** | Planned | EAS internal Android APK build & session survival across restarts                         |
+| **M10 - Gamification**      | Planned | Plan-aware weekly streaks (with rest-day shield) & short/mid/long-term achievements       |
 
 See [`docs/spec.md`](docs/spec.md) for the complete MVP specification and milestone acceptance criteria.
 

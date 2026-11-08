@@ -49,16 +49,16 @@ flowchart LR
   P3 --> P4["Phase 4: Chrome & Deploy\nM8 AI Pose Assets\nM9 EAS Android APK"]
 ```
 
-| Milestone                   | Status     | Focus                                                                           |
-| :-------------------------- | :--------- | :------------------------------------------------------------------------------ |
-| **M0 — Scaffold**           | ✅ Landed  | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, CT & CI harness     |
-| **M1 — SQLite Layer**       | ✅ Landed  | `expo-sqlite` v1 schema, migrations, serialized write queue, repo helpers       |
-| **M2 — Exercise Seed**      | ✅ Landed  | `core-kit-exercises.json` + public dataset import & `availableEquipment` filter |
-| **M3 — Session Logger**     | ✅ Landed  | Log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer       |
-| **M4 — Last-Done Prefill**  | ✅ Landed  | Automatic pre-fill from most recent working sets per exercise                   |
-| **M5 — Progression Engine** | ✅ Landed  | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips     |
-| **M6 — Progress & Stats**   | ⏳ Next    | `Last Workout`/`Week`/`Month` + `◀/▶` scrubber, intensity heatmap & PR table    |
-| **M7 — Settings & I/O**     | 📋 Planned | Kit toggles, fixed KB weight, goal/units, 1-file JSON export/import + CSV log   |
-| **M8 — First Image Batch**  | 📋 Planned | 25–30 core-kit start/end cyberpunk WebP illustrations + fallback card           |
-| **M9 — Distribution Build** | 📋 Planned | EAS internal Android APK build & survival across restarts                       |
-| **M10 — Gamification**      | 📋 Planned | Plan-aware weekly streaks (rest-day shield) & short/mid/long-term achievements  |
+| Milestone                   | Status     | Focus                                                                              |
+| :-------------------------- | :--------- | :--------------------------------------------------------------------------------- |
+| **M0 — Scaffold**           | ✅ Landed  | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, CT & CI harness        |
+| **M1 — SQLite Layer**       | ✅ Landed  | `expo-sqlite` v1 schema, migrations, serialized write queue, repo helpers          |
+| **M2 — Exercise Seed**      | ✅ Landed  | `core-kit-exercises.json` + public dataset import & `availableEquipment` filter    |
+| **M3 — Session Logger**     | ✅ Landed  | Log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer          |
+| **M4 — Last-Done Prefill**  | ✅ Landed  | Automatic pre-fill from most recent working sets per exercise                      |
+| **M5 — Progression Engine** | ✅ Landed  | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips        |
+| **M6 — Progress & Stats**   | ⏳ Next    | `Last Workout`/`Week`/`Month` + `◀/▶` scrubber, intensity heatmap & PR table       |
+| **M7 — Settings & Splits**  | 📋 Planned | Avatar (`Human`/`Elf`/`Orc`), Program/Split templates, kit toggles, JSON I/O + CSV |
+| **M8 — Avatars & Images**   | 📋 Planned | 6 Runner Avatars (`Human`/`Elf`/`Orc` × M/F) + 25–30 core-kit WebP illustrations   |
+| **M9 — Distribution Build** | 📋 Planned | EAS internal Android APK build & survival across restarts                          |
+| **M10 — Gamification**      | 📋 Planned | Plan-aware weekly streaks (rest-day shield) & short/mid/long-term achievements     |
