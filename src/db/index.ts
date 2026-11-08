@@ -63,3 +63,4 @@ export * from './migrations';
 export * from './writeQueue';
 export * from './repositories/exerciseRepo';
 export * from './repositories/sessionRepo';
+export * from './seed';

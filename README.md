@@ -7,15 +7,16 @@
 
 A Shadowrun-themed, offline-first workout logger for Android and iOS, built with React Native and Expo.
 
-Engineered on the `shadowlist` deck architecture with a deterministic 80/20 progression engine — first-class support for Pavel-style fixed-kettlebell and calisthenics/gymnastic-ring step-loading, timed sets, and standard plate increments. Zero cloud, zero accounts, zero recurring cost.
+Engineered on the `shadowlist` deck architecture with a deterministic 80/20 progression engine — first-class support for fixed-kettlebell and calisthenics/gymnastic-ring step-loading, timed sets, standard plate increments, and Duolingo-inspired plan-aware streaks & achievements. Zero cloud, zero accounts, zero recurring cost.
 
 ## Features
 
 - **Minimalist Personal Kit Out of the Box** — Defaults to **Fixed Kettlebell**, **Gymnastic Rings**, **Bodyweight**, **Hand Grippers**, **Skipping Rope**, and **Stretching**, with standard gym equipment (`dumbbell`, `barbell`, `bands`, `cable`, `machine`) toggleable anytime
 - **Deterministic 80/20 Progression Engine** — Pure TypeScript rule engine (`suggestNext()`):
-  - **Pavel / Calisthenics Step-Loading**: `+1 rep` toward the top of your rep range, then `+1 working set` (up to 5×max), then tempo/variation progression
+  - **Fixed-Weight & Calisthenics Step-Loading**: `+1 rep` toward the top of your rep range, then `+1 working set` (up to 5×max), then tempo/variation progression
   - **Timed Sets (`duration_sec`)**: Automatic `+15s` progression for skipping rope, isometric holds, and mobility/stretching
   - **Adjustable Weight**: Equipment-aware linear increments (`+2.5 kg` barbell/cable, `+2 kg` dumbbell, `+5 kg` machine) and automatic `−10%` deload suggestions
+- **Plan-Aware Streaks & Tiered Achievements** — Duolingo-inspired weekly consistency streaks (with active recovery check-ins and a built-in rest-day shield) plus short-, mid-, and long-term achievement badges
 - **Five Hand-Crafted Shadow Themes** — _Fixer's Notebook_ (dark noir), _Stuffer Shack_ (aged parchment), _Decker's Den_ (synth terminal), _Cyber Blue_ (ocean neon), and _Fiddler's Green_ (CRT phosphor)
 - **Fast Pre-Fill & Rest Timer** — Pre-fills "last done" working sets per exercise with a one-line suggestion chip and auto-starts a haptic countdown timer on set checkoff
 - **100% On-Device Persistence** — `expo-sqlite` (WAL mode + serialized write queue) for structured workout history and `AsyncStorage` (via Zustand `persist`) for operator profile and preferences
@@ -27,14 +28,15 @@ Engineered on the `shadowlist` deck architecture with a deterministic 80/20 prog
 | :-------------------------- | :------ | :-------------------------------------------------------------------------------------- |
 | **M0 - Scaffold**           | Done    | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, VitePress docs, CT & CI     |
 | **M1 - SQLite Layer**       | Done    | `expo-sqlite` v1 schema, migrations scaffold, single write queue, repository helpers    |
-| **M2 - Exercise Seed**      | Next    | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter  |
-| **M3 - Session Logger**     | Planned | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer |
+| **M2 - Exercise Seed**      | Done    | `core-kit-exercises.json` + public dataset import & `availableEquipment` picker filter  |
+| **M3 - Session Logger**     | Next    | Add exercise, log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer |
 | **M4 - Last-Done Prefill**  | Planned | Automatic pre-fill from most recent session's working sets per exercise                 |
 | **M5 - Progression Engine** | Planned | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips             |
 | **M6 - Progress View**      | Planned | Weekly volume/time chart + Personal Records (PR) list                                   |
 | **M7 - Settings & Export**  | Planned | Equipment toggles, fixed KB weight, goal/units, and schema v1 JSON export               |
 | **M8 - First Image Batch**  | Planned | 25-30 core-kit start/end cyberpunk WebP illustrations + placeholder fallback            |
 | **M9 - Distribution Build** | Planned | EAS internal Android APK build & session survival across restarts                       |
+| **M10 - Gamification**      | Planned | Plan-aware weekly streaks (with rest-day shield) & short/mid/long-term achievements     |
 
 See [`docs/spec.md`](docs/spec.md) for the complete MVP specification and milestone acceptance criteria.
 

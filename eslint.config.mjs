@@ -19,7 +19,7 @@ export default [
   },
   js.configs.recommended,
   {
-    files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}', 'App.tsx', 'index.ts'],
+    files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}', 'scripts/**/*.ts', 'App.tsx', 'index.ts'],
     languageOptions: {
       parser: babelParser,
       parserOptions: {

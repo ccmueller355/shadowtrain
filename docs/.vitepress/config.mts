@@ -10,7 +10,7 @@ export default withMermaid(
     base,
     title: 'ShadowTrain',
     description:
-      'Offline-first cyberpunk workout logger — Pavel kettlebell & calisthenics progression engine',
+      'Offline-first cyberpunk workout logger — fixed-kettlebell & calisthenics progression engine',
     lang: 'en-US',
     lastUpdated: true,
     cleanUrls: true,

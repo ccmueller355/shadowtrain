@@ -4,6 +4,7 @@ export type Goal = 'strength' | 'hypertrophy' | 'endurance';
 export type Experience = 'novice' | 'intermediate' | 'advanced';
 export type Units = 'kg' | 'lb';
 export type TrackingType = 'reps' | 'duration';
+export type DifficultyTier = 'beginner' | 'mid' | 'advanced';
 
 export type Equipment =
   | 'kettlebell'
@@ -36,6 +37,8 @@ export interface Exercise {
   equipment: Equipment;
   category?: string;
   trackingType: TrackingType;
+  tier?: DifficultyTier;
+  nextProgressionId?: string;
   imageStart?: string;
   imageEnd?: string;
   instructions?: string[];

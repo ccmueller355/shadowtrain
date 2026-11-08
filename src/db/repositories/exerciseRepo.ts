@@ -1,5 +1,5 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
-import { Equipment, Exercise, TrackingType } from '../../types';
+import { DifficultyTier, Equipment, Exercise, TrackingType } from '../../types';
 import { DatabaseClient, SqlParam } from '../migrations';
 import { defaultWriteQueue, WriteQueue } from '../writeQueue';
 
@@ -11,6 +11,8 @@ export interface ExerciseRow {
   equipment: string;
   category: string | null;
   tracking_type: string;
+  tier?: string | null;
+  next_progression_id?: string | null;
   image_start: string | null;
   image_end: string | null;
   instructions: string | null;
@@ -44,6 +46,8 @@ export function mapRowToExercise(row: ExerciseRow): Exercise {
     equipment: row.equipment as Equipment,
     ...(row.category ? { category: row.category } : {}),
     trackingType: (row.tracking_type as TrackingType) || 'reps',
+    ...(row.tier ? { tier: row.tier as DifficultyTier } : {}),
+    ...(row.next_progression_id ? { nextProgressionId: row.next_progression_id } : {}),
     ...(row.image_start ? { imageStart: row.image_start } : {}),
     ...(row.image_end ? { imageEnd: row.image_end } : {}),
     ...(instructions ? { instructions } : {}),
@@ -53,8 +57,8 @@ export function mapRowToExercise(row: ExerciseRow): Exercise {
 const UPSERT_EXERCISE_SQL = `
 INSERT INTO exercises (
   id, name, primary_muscles, secondary_muscles, equipment,
-  category, tracking_type, image_start, image_end, instructions
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  category, tracking_type, tier, next_progression_id, image_start, image_end, instructions
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON CONFLICT(id) DO UPDATE SET
   name = excluded.name,
   primary_muscles = excluded.primary_muscles,
@@ -62,6 +66,8 @@ ON CONFLICT(id) DO UPDATE SET
   equipment = excluded.equipment,
   category = excluded.category,
   tracking_type = excluded.tracking_type,
+  tier = excluded.tier,
+  next_progression_id = excluded.next_progression_id,
   image_start = excluded.image_start,
   image_end = excluded.image_end,
   instructions = excluded.instructions;
@@ -76,6 +82,8 @@ function toExerciseParams(exercise: Exercise): SqlParam[] {
     exercise.equipment,
     exercise.category ?? null,
     exercise.trackingType,
+    exercise.tier ?? null,
+    exercise.nextProgressionId ?? null,
     exercise.imageStart ?? null,
     exercise.imageEnd ?? null,
     exercise.instructions ? JSON.stringify(exercise.instructions) : null,

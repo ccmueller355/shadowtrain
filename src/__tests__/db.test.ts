@@ -78,6 +78,8 @@ class InMemoryDatabaseClient implements DatabaseClient {
         equipment,
         category,
         tracking_type,
+        tier,
+        next_progression_id,
         image_start,
         image_end,
         instructions,
@@ -90,6 +92,8 @@ class InMemoryDatabaseClient implements DatabaseClient {
         equipment: String(equipment),
         category: category !== null ? String(category) : null,
         tracking_type: String(tracking_type),
+        tier: tier !== null ? String(tier) : null,
+        next_progression_id: next_progression_id !== null ? String(next_progression_id) : null,
         image_start: image_start !== null ? String(image_start) : null,
         image_end: image_end !== null ? String(image_end) : null,
         instructions: instructions !== null ? String(instructions) : null,
@@ -457,10 +461,10 @@ describe('M1 SQLite Layer, Schema, Migrations, WriteQueue & Repositories', () =>
       // Update single exercise
       await upsertExercise(db, {
         ...sampleExercises[0],
-        name: 'Pavel Two-Hand KB Swing',
+        name: 'Heavy Two-Hand KB Swing',
       });
       const updatedSwing = await getExerciseById(db, 'kb-swing-2h');
-      expect(updatedSwing?.name).toBe('Pavel Two-Hand KB Swing');
+      expect(updatedSwing?.name).toBe('Heavy Two-Hand KB Swing');
 
       // Filter by equipment
       const kbAndRings = await listExercises(db, {
