@@ -44,7 +44,7 @@ features:
 
 ```mermaid
 flowchart LR
-  P1["Phase 1: Foundation\nM0 Scaffold (Done)\nM1 SQLite Schema\nM2 Exercise Seed"] --> P2["Phase 2: Playable Logger\nM3 Session Logger\nM4 Last-Done Prefill\nM5 Pavel Engine"]
+  P1["Phase 1: Foundation\nM0 Scaffold (Done)\nM1 SQLite Schema (Done)\nM2 Exercise Seed"] --> P2["Phase 2: Playable Logger\nM3 Session Logger\nM4 Last-Done Prefill\nM5 Pavel Engine"]
   P2 --> P3["Phase 3: Telemetry & Control\nM6 Progress & PRs\nM7 Settings & Export"]
   P3 --> P4["Phase 4: Chrome & Deploy\nM8 AI Pose Assets\nM9 EAS Android APK"]
 ```
@@ -52,8 +52,8 @@ flowchart LR
 | Milestone                   | Status     | Focus                                                                           |
 | :-------------------------- | :--------- | :------------------------------------------------------------------------------ |
 | **M0 — Scaffold**           | ✅ Landed  | Expo SDK 58 app shell, 5 shadow themes, tab/session routes, CT & CI harness     |
-| **M1 — SQLite Layer**       | ⏳ Next    | `expo-sqlite` v1 schema, migrations, serialized write queue, repo helpers       |
-| **M2 — Exercise Seed**      | 📋 Planned | `core-kit-exercises.json` + public dataset import & `availableEquipment` filter |
+| **M1 — SQLite Layer**       | ✅ Landed  | `expo-sqlite` v1 schema, migrations, serialized write queue, repo helpers       |
+| **M2 — Exercise Seed**      | ⏳ Next    | `core-kit-exercises.json` + public dataset import & `availableEquipment` filter |
 | **M3 — Session Logger**     | 📋 Planned | Log sets (`reps`/`weight` or `duration_sec`), checkoff, haptic rest timer       |
 | **M4 — Last-Done Prefill**  | 📋 Planned | Automatic pre-fill from most recent working sets per exercise                   |
 | **M5 — Progression Engine** | 📋 Planned | `suggestNext()` deterministic rules + unit test suite & UI suggestion chips     |
