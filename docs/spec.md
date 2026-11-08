@@ -163,9 +163,10 @@ interface Profile {
   increments: Record<string, number>; // per-equipment override (0 = fixed weight / step-loading)
   availableEquipment: Equipment[]; // defaults to ['kettlebell', 'rings', 'bodyweight', 'hand_gripper', 'jump_rope', 'stretching']
   fixedKettlebellWeight?: number; // e.g. 16 or 24 kg; triggers fixed-weight rep/set step-loading
-  metatype?: 'human' | 'elf' | 'orc'; // Shadowrun runner archetype (Human, Elf, Orc)
-  gender?: 'male' | 'female'; // Avatar variant (guy / girl) -> selects matching avatar & exercise icons
-  activeProgramId?: string; // Selected split/program template (e.g. 'kb-calisthenics-ab', 'kb-essentials', 'convict-rings', 'mobility-reset')
+  activeTrainerId?: 'orc-merc' | 'human-decker' | 'human-soldier' | 'elf-mage' | 'elf-wraith'; // Active Shadow Trainer (starts with 'orc-merc')
+  unlockedTrainerIds?: string[]; // Starts with ['orc-merc']; unlock others with Creds (¥) / Gremlin Coins
+  creds?: number; // Earned from daily/weekly missions, streaks, and progression achievements
+  activeProgramId?: string; // Selected trainer split/program template
 }
 
 interface Exercise {
@@ -220,14 +221,15 @@ interface SetRecord {
 
 ### 5.1 Screens
 
-| Screen               | Purpose                                                                                                                                                 | Must-have                                                                                                                         |
-| :------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------- |
-| **Home**             | Start session, resume in-progress, list of recent sessions                                                                                              | New session button, resume banner, last 5 sessions                                                                                |
-| **Session (Logger)** | Add exercises, log sets (reps/weight or duration), see last-done prefill, rest timer                                                                    | Per-exercise card with sets, prefill, +set, checkoff, timer                                                                       |
-| **Exercise Picker**  | Search/filter exercises                                                                                                                                 | Defaults to `profile.availableEquipment` filter (with quick "Show all" toggle), text search, muscle filter, equipment filter      |
-| **Exercise Detail**  | Show images, instructions, history, current suggestion                                                                                                  | Start/end images, "Suggested next" banner                                                                                         |
-| **Progress**         | Telemetry & statistics across `Last Workout`, `Week`, `Month` (with `◀/▶` history scrubber), visual intensity heatmap & volume bars, PR list            | Window selector (`Last Workout` / `Week` / `Month`), period navigation, intensity heatmap + volume bars, PR table                 |
-| **Settings**         | Profile, Runner Avatar (`Human`/`Elf`/`Orc` × `Guy`/`Girl`), Program/Split selector, equipment toggles, fixed KB weight, units, theme, backup & restore | All of `Profile`, avatar & split selector, equipment toggles, 1-file JSON export/import (`meta.version`) + CSV session log export |
+| Screen               | Purpose                                                                                                                                         | Must-have                                                                                                                          |
+| :------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
+| **Home**             | Start session, resume in-progress, list of recent sessions                                                                                      | New session button, resume banner, last 5 sessions                                                                                 |
+| **Session (Logger)** | Add exercises, log sets (reps/weight or duration), see last-done prefill, rest timer                                                            | Per-exercise card with sets, prefill, +set, checkoff, timer                                                                        |
+| **Exercise Picker**  | Search/filter exercises                                                                                                                         | Defaults to `profile.availableEquipment` filter (with quick "Show all" toggle), text search, muscle filter, equipment filter       |
+| **Exercise Detail**  | Show images, instructions, history, current suggestion                                                                                          | Start/end images, "Suggested next" banner                                                                                          |
+| **Progress**         | Telemetry & statistics across `Last Workout`, `Week`, `Month` (with `◀/▶` history scrubber), visual intensity heatmap & volume bars, PR list    | Window selector (`Last Workout` / `Week` / `Month`), period navigation, intensity heatmap + volume bars, PR table                  |
+| **Trainers**         | Dedicated **Trainer Roster & Dossier Page** for the 5 Shadow Trainers (1 sharp HD render each, lore, skills, signature split, Creds `¥` unlock) | 5 Trainer cards/dossiers (`Orc Merc` starter + 4 Cred-unlockable trainers), active trainer & split selection                       |
+| **Settings**         | Profile, Trainer & Split selector, equipment toggles, fixed KB weight, units, theme, backup & restore                                           | All of `Profile`, trainer & split selector, equipment toggles, 1-file JSON export/import (`meta.version`) + CSV session log export |
 
 ### 5.2 Core Interaction Flow (Happy Path)
 
@@ -331,28 +333,32 @@ function suggestNext(
 - Run at app bootstrap **only if** `exercises` table is empty (idempotent).
 - All exercise IDs are stable, so a future re-import is additive, not destructive.
 
-### 5.5 Image Pipeline & Runner Metatype Avatars (`Human` / `Elf` / `Orc`)
+### 5.5 The 5 Unlockable Shadow Trainers & Image Pipeline
 
-- **Runner Metatype & Gender Selector (3 × 2 Choices)**:
-  - Operators choose their Shadowrun runner archetype in Settings / Onboarding:
-    1. **Human (`male` / `female`)** — Cyber-street operative (guy or girl)
-    2. **Elf (`male` / `female`)** — Agile neon-wired athletics specialist (boy or girl)
-    3. **Orc (`male` / `female`)** — Heavy chrome-plated street samurai (guy or girl, continuing the Cyber-Orc Barbell splash screen aesthetic)
-  - The selected archetype drives the **Runner Avatar** on the Home Deck, Settings Profile card, and exercise/category icon badges (`assets/avatars/{human,elf,orc}-{male,female}.webp`).
-- **Anchored Exercise Pose Template** (kept in `docs/image-prompts.md`):
+Instead of generic avatars or duplicate icon sets, ShadowTrain features **5 distinct Shadowrun Trainers** across the 3 metatypes (`Orc`, `Human`, `Elf`). Every operator starts with the **Orc Heavy Merc (`orc-merc`)** unlocked by default and earns **Creds (`¥`) / Gremlin Coins** from daily/weekly missions, streaks, and 3-level progression achievements (`§5.7`) to unlock the remaining 4 trainers on the **Trainer Dossier Page**:
+
+| ID              | Name & Callsign            | Race / Class                                          | Unlock Cost         | Specialty & Training Style                                                                 | Minimal Lore / Background                                                                                                                                              |
+| :-------------- | :------------------------- | :---------------------------------------------------- | :------------------ | :----------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `orc-merc`      | **Kaelen "Tusk" Vorga**    | **Orc Male** — _Bodybuilder & Heavy Weapons Merc_     | **Starter (`0 ¥`)** | **Heavy Iron & Raw Mass** (`Kettlebell` Power, `Barbell`/`Dumbbell` Hypertrophy, Grip)     | Former corporate heavy-weapons specialist turned underground pit boss. Chrome-plated left arm, orange ballistic visor, zero tolerance for half-reps.                   |
+| `human-decker`  | **Valerie "Glitch" Vance** | **Human Female** — _Attractive Elite Shadow-Decker_   | **`250 ¥` Creds**   | **High-Density Kit & Neural Conditioning** (`Kettlebell` + `Jump Rope` + `Core` Intervals) | 28-year-old rogue matrix architect who treats physical conditioning like overclocking a cyberdeck: high-output intervals, razor-sharp form, and zero wasted cycles.    |
+| `human-soldier` | **Marcus "Vanguard" Kade** | **Human Male** — _Cyber-Modded Universal Soldier_     | **`500 ¥` Creds**   | **Tactical Hybrid Split (`Workout A / B`)** (`Kettlebell` + `Bodyweight` + `Barbell`)      | Augmented black-ops operative with subdermal armor and myomer muscle lacing. Runs relentless, balanced push/pull/hinge/squat tactical splits built for field survival. |
+| `elf-mage`      | **Lyra "Aether" Vael**     | **Elf Female** — _Attractive Hermetic Mage & Adept_   | **`750 ¥` Creds**   | **Mobility Flow, Get-Ups & Isometric Control** (`Stretching`, `Kettlebell` TGU, Holds)     | Neon-lit astral adept who channels mana through structural alignment, deep joint decompression, slow-eccentric control, and active recovery shields.                   |
+| `elf-wraith`    | **Soren "Wraith" Kael**    | **Elf Male** — _Wraith Assassin & Calisthenics/Rings_ | **`1,000 ¥` Creds** | **Convict Calisthenics & Gymnastic Rings Mastery** (`Rings`, `Bodyweight` Lv1–3, `Rope`)   | High-altitude corporate infiltrator and silent assassin. Zero clanking iron — masters pure leverage (`Ring L-Sits`, `Muscle-Ups`, `Pistol Squats`) in dead silence.    |
+
+- **Trainer Dossier Page**:
+  - Dedicated view showcasing **1 sharp HD portrait (`1024×1024` WebP)** per trainer (`assets/trainers/<trainer_id>.webp`), callsign, class, skill ratings (`Strength`, `Conditioning`, `Mobility`, `Calisthenics`, `Tech`), backstory, signature split program, and **Unlock (`¥`) / Set Active** action.
+- **Exercise Showcases & Specialist Pose Mapping (No Duplicate 5× Icon Sets Needed)**:
+  - Each exercise showcase (`assets/exercises/<exercise_id>/{start,end}.webp`) is demonstrated by the **Trainer whose specialty matches that movement** (e.g., _Tusk_ showcases heavy KB Swings, Presses, Goblet Squats, Grippers & Barbell lifts; _Wraith_ showcases Gymnastic Rings & Convict Calisthenics progressions; _Lyra_ showcases Stretching, Mobility & Turkish Get-Ups; _Valerie_ showcases Jump Rope & Core; _Vanguard_ showcases Tactical Hybrid movements).
+- **Anchored Image Prompt Template** (kept in `docs/image-prompts.md`):
 
   ```
-  Character: <selected metatype & gender: Human (guy/girl) | Elf (boy/girl) | Orc (guy/girl)>, wearing <fixed cyberpunk athletic outfit>
-  Environment: <fixed dark Æ CYBERNETICS gym background>, <cyan & orange neon rim-lighting>
-  Pose: <start | end> position of <exercise name>
-  Style: <fixed render style, "muted cyberpunk, cyan/orange neon rim-light">
+  Character: <Trainer HD description: Tusk (Orc Merc) | Valerie (Human Decker) | Vanguard (Human Soldier) | Lyra (Elf Mage) | Wraith (Elf Assassin)>
+  Environment: <dark Æ CYBERNETICS gym / rooftop background>, <cyan (#00f0ff) & orange (#ff8c00) neon rim-lighting>
+  Pose: <portrait | start | end> position of <exercise name>
+  Style: <fixed render style, "sharp HD cyberpunk illustration, matte charcoal #14101c background, cyan/orange neon rim-light">
   ```
 
-- Two pose images per exercise (`start` and `end`) + compact neon equipment/avatar mini-icons for list rows.
-- Stored under `assets/exercises/<exercise_id>/{start,end}.webp` (WebP, ≤150 KB each) and `assets/avatars/`.
-- **MVP batch (`M8`)**: 6 Runner Avatar portraits (`Human`, `Elf`, `Orc` × `Guy`/`Girl`) + 25–30 core-kit exercise illustrations (`kettlebell`, `rings`, `bodyweight`, `hand_gripper`, `jump_rope`, `stretching`).
-- Fallback: a themed cyberpunk placeholder card with metatype badge and exercise name (so the app is never broken).
-- Regenerating an image never touches the DB — the DB just stores `image_start`/`image_end` keys, and a `useExerciseImage()` hook resolves to asset-or-placeholder according to the active `profile.metatype` and `profile.gender`.
+- Fallback: a themed cyberpunk placeholder card with the specialist trainer callsign and exercise name (so the app is never broken).
 
 ### 5.6 Data Portability (1-File JSON Backup/Restore + CSV Session Log)
 
@@ -376,10 +382,18 @@ function suggestNext(
 - **JSON Import**: Settings → **"Import Backup (.json)"** selects a `.json` file, validates `meta.format === 'shadowtrain-backup'` and `meta.version` (running any format migration if needed), and restores `profile` + SQLite workout history inside a single serialized transaction.
 - **CSV Session Log Export (`.csv`)**: Settings → **"Export Sessions (.csv)"** exports a flat spreadsheet of all logged sets (`session_id,session_name,started_at,finished_at,exercise_id,exercise_name,category,tier,set_num,weight,reps,duration_sec,is_warmup,completed_at`) for analysis in Excel/LibreOffice/Pandas.
 
-### 5.7 Gamification: Plan-Aware Streaks & Tiered Achievements (`M10`)
+### 5.7 Gamification: Creds (`¥`), Unlockable Trainers, Streaks & Achievements (`M10`)
 
-Duolingo-inspired motivation designed for sustainable strength & mobility training — rewarding consistency and 3-level progression mastery (`beginner` → `mid` → `advanced`) without punishing needed recovery days:
+Duolingo-inspired motivation combined with a Shadowrun **Creds (`¥`) / Gremlin Coin** progression loop — rewarding daily/weekly missions, streaks, and 3-level progression mastery (`beginner` → `mid` → `advanced`) to unlock all **5 Shadow Trainers** (`§5.5`):
 
+- **Creds (`¥`) / Gremlin Coin Economy & Trainer Unlocks**:
+  - **Starter Trainer**: Operators start with **Kaelen "Tusk" Vorga (`orc-merc`)** unlocked (`0 ¥`).
+  - **Earning Creds (`¥`)**:
+    - **Session Completion**: `+25 ¥` per finished workout session.
+    - **Daily / Weekly Missions**: `+15 ¥` to `+50 ¥` for completing mission contracts (e.g., _"Complete 12+ working sets"_, _"Apply a `suggestNext()` progression"_, _"Log a mobility or jump-rope session"_).
+    - **Weekly Target Streak Bonus**: `+100 ¥` each week you hit your `weeklyTargetDays`.
+    - **Achievement Unlocks**: `+100 ¥` (Short-Term / Level 1), `+250 ¥` (Mid-Term / Level 2), `+500 ¥` (Long-Term / Level 3 Mastery).
+  - **Spending Creds (`¥`)**: Unlock **Valerie "Glitch" Vance (`250 ¥`)**, **Marcus "Vanguard" Kade (`500 ¥`)**, **Lyra "Aether" Vael (`750 ¥`)**, and **Soren "Wraith" Kael (`1,000 ¥`)** — along with their signature training splits and coaching style.
 - **Plan-Aware Streaks (Low-Pressure, Recovery-Safe)**:
   - **Weekly Target Rhythm**: Users set a realistic weekly target in Profile (e.g., `weeklyTargetDays = 3` or `4` sessions/week). Hitting the weekly target advances the weekly streak and keeps the flame/cyber-link active.
   - **Active Recovery Counts**: Logging a short `stretching` or `jump_rope` mobility session counts as an active check-in day.
@@ -468,10 +482,10 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 | **M4**  | Last-done prefill                   | Reopening an exercise pre-fills last session's working sets                                                                                      | S    |
 | **M5**  | Progression engine                  | `suggestNext()` implemented (fixed-KB/rings step-loading + timed + plate increments), unit tests green, suggestion chip shown on Logger & Detail | M    |
 | **M6**  | Progress & Statistics view          | Time-window selector (`Last Workout` / `Week` / `Month`) + `◀/▶` history navigation, visual intensity heatmap & volume chart, PR list            | M    |
-| **M7**  | Settings, Splits + Import/Export    | Profile edits, Runner Avatar (`Human`/`Elf`/`Orc` × `Guy`/`Girl`), Program/Split templates, 1-file JSON export/import + CSV session log export   | M    |
-| **M8**  | Avatars & First image batch         | 6 Runner Avatars (`Human`/`Elf`/`Orc` × `Guy`/`Girl`) + 25–30 core-kit start/end images & metatype-aware icons; placeholder fallback works       | M    |
+| **M7**  | Settings, Trainers & I/O            | Profile edits, 5-Trainer Dossier & Split selector, 1-file JSON export/import (`meta.version: 1`) + CSV session log export                        | M    |
+| **M8**  | Trainer HD renders & exercise batch | 5 sharp HD Trainer portraits (`Orc Merc`, `Decker`, `Soldier`, `Mage`, `Wraith`) + 25–30 core-kit specialist showcase images & fallback          | M    |
 | **M9**  | Distribution build                  | EAS internal build installs on device; session survives app restart                                                                              | S    |
-| **M10** | Streaks & achievements              | Duolingo-style plan-aware weekly/daily streaks (with rest-day shield) + short/mid/long-term achievement badges on Home & Progress                | M    |
+| **M10** | Creds, Streaks & Achievements       | Creds (`¥`) / Gremlin Coin mission economy to unlock all 5 Trainers + Duolingo-style weekly streaks (rest-day shield) & tiered achievements      | M    |
 
 ### 7.1 Build Phases
 
@@ -488,11 +502,11 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 3. **Phase 3: Analytics, Control Deck & Gamification (`M6` → `M7`, `M10`)**
    - _Goal_: Track weekly volume/PRs, customize equipment/profile on the fly, and reward short/mid/long-term consistency.
    - **M6 (Progress & Statistics View)**: Time-window selector (`Last Workout`, `Week`, `Month`) with `◀ PREV / NEXT ▶` history scrubber, visual intensity heatmap & volume/time bar chart, equipment breakdown, and Personal Records (PR) list.
-   - **M7 (Settings, Program Splits & Data Import/Export)**: Runner Avatar selector (`Human` guy/girl, `Elf` boy/girl, `Orc` guy/girl), quick-start Program/Split templates (`KB + Calisthenics A/B`, `KB Essentials`, `Convict Rings/BW`, `Mobility Reset`), equipment toggles, fixed KB weight setting, `kg`/`lb`, goal, theme selector, single-file JSON backup export & import (`meta.version: 1`), and CSV session log export.
-   - **M10 (Streaks & Achievements)**: Plan-aware Duolingo-style streak tracker (weekly target + rest-day buffer) and tiered short/mid/long-term achievement badges (`src/engine/achievements.ts`).
+   - **M7 (Settings, Trainer Dossiers & Data Import/Export)**: 5-Trainer Roster & Dossier page (`Orc Merc` starter + 4 Cred-unlockable trainers with skills, lore & signature splits), equipment toggles, fixed KB weight setting, `kg`/`lb`, goal, theme selector, single-file JSON backup export & import (`meta.version: 1`), and CSV session log export.
+   - **M10 (Creds Economy, Missions, Streaks & Achievements)**: Daily/weekly mission contracts and tiered achievements that award Creds (`¥`) / Gremlin Coins to unlock all 5 Trainers, plus plan-aware Duolingo-style weekly streak tracker (with rest-day shield) (`src/engine/achievements.ts`).
 4. **Phase 4: Visual Chrome & Field Deployment (`M8` → `M9`)**
-   - _Goal_: Custom cyberpunk Runner Avatars (`Human`/`Elf`/`Orc`), start/end pose illustrations for the core kit, and standalone installable APK.
-   - **M8 (Runner Avatars & Core Kit AI Image Batch)**: Draft `docs/image-prompts.md`, bundle the 6 Runner Avatar portraits (`Human`/`Elf`/`Orc` × `Guy`/`Girl`), metatype-aware exercise/equipment icons, and WebP `start`/`end` pose images for the 25–30 core-kit exercises + themed placeholder fallback.
+   - _Goal_: Sharp HD renders for each of the 5 Shadow Trainers, specialist start/end pose illustrations for the core kit, and standalone installable APK.
+   - **M8 (5 Trainer HD Renders & Core Kit Showcase Batch)**: Draft `docs/image-prompts.md`, bundle the 5 sharp `1024×1024` HD Trainer portraits (`Tusk`, `Valerie`, `Vanguard`, `Lyra`, `Wraith`), and bundle WebP `start`/`end` exercise showcase poses demonstrated by each movement's specialist trainer + themed placeholder fallback.
    - **M9 (EAS Distribution Build)**: Configure `eas.json` & GitHub Actions release workflow and build the installable Android APK.
 
 **Definition of done (every milestone):**
