@@ -5,6 +5,7 @@ export type Experience = 'novice' | 'intermediate' | 'advanced';
 export type Units = 'kg' | 'lb';
 export type TrackingType = 'reps' | 'duration';
 export type DifficultyTier = 'beginner' | 'mid' | 'advanced';
+export type TrainerId = 'orc-merc' | 'human-decker' | 'human-soldier' | 'elf-mage' | 'elf-wraith';
 
 export type Equipment =
   | 'kettlebell'
@@ -27,6 +28,11 @@ export interface Profile {
   increments: Record<string, number>;
   availableEquipment: Equipment[];
   fixedKettlebellWeight?: number;
+  activeTrainerId?: TrainerId;
+  unlockedTrainerIds?: TrainerId[];
+  creds?: number;
+  activeProgramId?: string;
+  weeklyTargetDays?: number;
 }
 
 export interface Exercise {
