@@ -86,12 +86,15 @@ describe('Component Tests (CT) — UI Surfaces & Screens', () => {
   });
 
   describe('ProgressScreen', () => {
-    it('renders telemetry header and milestone placeholder card', () => {
+    it('renders telemetry header, window selector chips, and PR board', () => {
       render(<ProgressScreen />);
 
       expect(screen.getByText('TELEMETRY & PRs')).toBeTruthy();
-      expect(screen.getByText('WEEKLY VOLUME // PERSONAL RECORDS')).toBeTruthy();
-      expect(screen.getByText(/Weekly volume charts and PR boards unlock in M6/i)).toBeTruthy();
+      expect(
+        screen.getByText('VOLUME ANALYTICS // INTENSITY HEATMAP // PERSONAL RECORDS'),
+      ).toBeTruthy();
+      expect(screen.getByTestId('window-btn-week')).toBeTruthy();
+      expect(screen.getByTestId('pr-board-empty')).toBeTruthy();
     });
   });
 
