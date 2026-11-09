@@ -69,7 +69,7 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
           </Text>
         </CyberpunkCard>
       ) : (
-        recentSessions.map((session) => {
+        recentSessions.slice(0, 5).map((session) => {
           const completedSets = session.entries.reduce(
             (sum, entry) => sum + entry.sets.filter((s) => s.completed).length,
             0,

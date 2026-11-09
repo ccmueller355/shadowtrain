@@ -415,7 +415,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     const recentSessions = [
       finished,
       ...get().recentSessions.filter((s) => s.id !== finished.id),
-    ].slice(0, 5);
+    ].slice(0, 60);
 
     set({
       activeSession: null,
@@ -431,8 +431,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   hydrateSessionsFromDb: async (db) => {
     const client = db ?? getDatabase();
     const active = await getActiveSession(client);
-    const allRecent = await listRecentSessions(client, 6);
-    const finishedRecent = allRecent.filter((s) => s.finishedAt !== undefined).slice(0, 5);
+    const allRecent = await listRecentSessions(client, 60);
+    const finishedRecent = allRecent.filter((s) => s.finishedAt !== undefined).slice(0, 60);
     set({
       activeSession: active,
       recentSessions: finishedRecent,
