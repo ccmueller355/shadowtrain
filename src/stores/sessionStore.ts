@@ -11,6 +11,7 @@ import {
 } from '../db';
 import { buildSetsFromSuggestion, Suggestion } from '../engine/suggest';
 import { Entry, Exercise, Session, SetRecord } from '../types';
+import { useProfileStore } from './profileStore';
 
 export function getDefaultRestSeconds(exercise?: Exercise): number {
   if (!exercise) return 90;
@@ -112,6 +113,7 @@ export interface SessionState {
   adjustRestTimer: (deltaSec: number) => void;
   stopRestTimer: () => void;
   finishActiveSession: (notes?: string) => Session | null;
+  restoreSessionsFromBackup: (sessions: Session[]) => void;
   hydrateSessionsFromDb: (db?: DatabaseClient) => Promise<void>;
   resetSessionStore: () => void;
 }
@@ -424,8 +426,27 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       restTimerSec: 0,
       restTimerRunning: false,
     });
+    useProfileStore.getState().addCreds(25);
     tryPersistSessionToDb(finished);
     return finished;
+  },
+
+  restoreSessionsFromBackup: (sessions) => {
+    const finished = sessions
+      .filter((s) => s.finishedAt !== undefined)
+      .slice()
+      .sort((a, b) => (b.finishedAt ?? b.startedAt) - (a.finishedAt ?? a.startedAt))
+      .slice(0, 60);
+    const active = sessions.find((s) => s.finishedAt === undefined) ?? null;
+
+    set({
+      activeSession: active,
+      recentSessions: finished,
+    });
+
+    for (const s of sessions) {
+      tryPersistSessionToDb(s);
+    }
   },
 
   hydrateSessionsFromDb: async (db) => {

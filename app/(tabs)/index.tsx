@@ -1,10 +1,12 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { CyberpunkCard } from '../../src/components/CyberpunkCard';
+import { getTrainerById } from '../../src/engine/trainers';
+import { useProfileStore } from '../../src/stores/profileStore';
+import { useSessionStore } from '../../src/stores/sessionStore';
 import { useAppTheme } from '../../src/theme/useTheme';
 import { useThemeStyles } from '../../src/theme/useThemeStyles';
-import { CyberpunkCard } from '../../src/components/CyberpunkCard';
-import { useSessionStore } from '../../src/stores/sessionStore';
 
 interface HomeScreenProps {
   onStartSession?: (sessionId: string) => void;
@@ -16,6 +18,9 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
   const activeSession = useSessionStore((s) => s.activeSession);
   const recentSessions = useSessionStore((s) => s.recentSessions);
   const startSession = useSessionStore((s) => s.startSession);
+  const profile = useProfileStore((s) => s.profile);
+
+  const activeTrainer = getTrainerById(profile.activeTrainerId);
 
   const handleStartNew = () => {
     startSession('session-new');
@@ -30,10 +35,38 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
 
   return (
     <ScrollView style={[styles.container, ts.bg]} testID="screen-home">
-      <Text style={[styles.title, ts.accent]}>SHADOW TRAIN</Text>
-      <Text style={[styles.subtitle, ts.textMuted]}>
-        OFFLINE WORKOUT LOGGER // KETTLEBELL & CALISTHENICS DECK
-      </Text>
+      <View style={styles.headerRow}>
+        <View>
+          <Text style={[styles.title, ts.accent]}>SHADOW TRAIN</Text>
+          <Text style={[styles.subtitle, ts.textMuted]}>
+            OFFLINE WORKOUT LOGGER // KETTLEBELL & CALISTHENICS DECK
+          </Text>
+        </View>
+        <View
+          style={[styles.credsChip, { borderColor: theme.colors.primary }]}
+          testID="home-creds-badge"
+        >
+          <Text style={[styles.credsChipText, ts.accent]}>{profile.creds ?? 0} ¥</Text>
+        </View>
+      </View>
+
+      <CyberpunkCard glow={false} style={styles.trainerBanner}>
+        <View style={styles.trainerBannerRow} testID="home-active-trainer-card">
+          <Image
+            source={activeTrainer.portrait}
+            style={[styles.trainerAvatar, { borderColor: theme.colors.primary }]}
+          />
+          <View style={styles.trainerMetaCol}>
+            <Text style={[styles.trainerLabel, ts.accent]}>
+              ACTIVE TRAINER // {activeTrainer.callsign}
+            </Text>
+            <Text style={[styles.trainerName, ts.text]}>{activeTrainer.name}</Text>
+            <Text style={[styles.trainerSplit, ts.textMuted]} numberOfLines={1}>
+              {activeTrainer.programName}
+            </Text>
+          </View>
+        </View>
+      </CyberpunkCard>
 
       {activeSession && (
         <CyberpunkCard style={styles.resumeCard}>
@@ -92,8 +125,23 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 14,
+  },
   title: { fontSize: 22, fontWeight: 'bold', fontFamily: 'monospace' },
-  subtitle: { fontSize: 12, fontFamily: 'monospace', marginTop: 4, marginBottom: 20 },
+  subtitle: { fontSize: 11, fontFamily: 'monospace', marginTop: 4 },
+  credsChip: { borderWidth: 1, borderRadius: 6, paddingVertical: 4, paddingHorizontal: 10 },
+  credsChipText: { fontSize: 12, fontWeight: 'bold', fontFamily: 'monospace' },
+  trainerBanner: { marginBottom: 14, padding: 10 },
+  trainerBannerRow: { flexDirection: 'row', alignItems: 'center' },
+  trainerAvatar: { width: 52, height: 52, borderRadius: 6, borderWidth: 1, marginRight: 10 },
+  trainerMetaCol: { flex: 1 },
+  trainerLabel: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
+  trainerName: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 2 },
+  trainerSplit: { fontSize: 10, fontFamily: 'monospace', marginTop: 2 },
   resumeCard: { marginBottom: 16, padding: 14 },
   resumeLabel: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
   resumeTitle: {
