@@ -221,19 +221,25 @@ interface SetRecord {
 
 ### 5.1 Screens
 
-| Screen               | Purpose                                                                                                                                         | Must-have                                                                                                                          |
-| :------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
-| **Home**             | Start session, resume in-progress, list of recent sessions                                                                                      | New session button, resume banner, last 5 sessions                                                                                 |
-| **Session (Logger)** | Add exercises, log sets (reps/weight or duration), see last-done prefill, rest timer                                                            | Per-exercise card with sets, prefill, +set, checkoff, timer                                                                        |
-| **Exercise Picker**  | Search/filter exercises                                                                                                                         | Defaults to `profile.availableEquipment` filter (with quick "Show all" toggle), text search, muscle filter, equipment filter       |
-| **Exercise Detail**  | Show images, instructions, history, current suggestion                                                                                          | Start/end images, "Suggested next" banner                                                                                          |
-| **Progress**         | Telemetry & statistics across `Last Workout`, `Week`, `Month` (with `◀/▶` history scrubber), visual intensity heatmap & volume bars, PR list    | Window selector (`Last Workout` / `Week` / `Month`), period navigation, intensity heatmap + volume bars, PR table                  |
-| **Trainers**         | Dedicated **Trainer Roster & Dossier Page** for the 5 Shadow Trainers (1 sharp HD render each, lore, skills, signature split, Creds `¥` unlock) | 5 Trainer cards/dossiers (`Orc Merc` starter + 4 Cred-unlockable trainers), active trainer & split selection                       |
-| **Settings**         | Profile, Trainer & Split selector, equipment toggles, fixed KB weight, units, theme, backup & restore                                           | All of `Profile`, trainer & split selector, equipment toggles, 1-file JSON export/import (`meta.version`) + CSV session log export |
+| Screen               | Purpose                                                                                                                                         | Must-have                                                                                                                           |
+| :------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| **Home**             | Active Trainer & Goal **Workout Plan Blueprint** (`1-Tap Start Planned Workout`), start blank session, resume in-progress, edit/delete recent   | Trainer/Goal Workout Plan card (laid-out exercises + targets), New/Planned session buttons, resume banner, tappable last 5 sessions |
+| **Session (Logger)** | Add exercises, log/edit sets, see last-done prefill, rest timer, **Back / Cancel / Delete Session**                                             | Per-exercise card with sets, prefill, +set, checkoff, timer, **← Back**, **Cancel/Delete Session**, and **Finish/Save** controls    |
+| **Exercise Picker**  | Search/filter exercises                                                                                                                         | Defaults to `profile.availableEquipment` filter (with quick "Show all" toggle), text search, muscle filter, equipment filter        |
+| **Exercise Detail**  | Show images, instructions, history, current suggestion                                                                                          | Start/end images, "Suggested next" banner                                                                                           |
+| **Progress**         | Telemetry & statistics across `Last Workout`, `Week`, `Month` (with `◀/▶` history scrubber), visual intensity heatmap & volume bars, PR list    | Window selector (`Last Workout` / `Week` / `Month`), period navigation, intensity heatmap + volume bars, PR table                   |
+| **Trainers**         | Dedicated **Trainer Roster & Dossier Page** for the 5 Shadow Trainers (1 sharp HD render each, lore, skills, signature split, Creds `¥` unlock) | 5 Trainer cards/dossiers (`Orc Merc` starter + 4 Cred-unlockable trainers), active trainer & split selection                        |
+| **Settings**         | Profile, Trainer & Split selector, equipment toggles, fixed KB weight, units, theme, backup & restore                                           | All of `Profile`, trainer & split selector, equipment toggles, 1-file JSON export/import (`meta.version`) + CSV session log export  |
 
 ### 5.2 Core Interaction Flow (Happy Path)
 
-1. Home → **New Session** (auto-name `"Session · <date>"`, editable).
+1. Home → **Start Planned Workout** (or **New Blank Session**):
+   - **Adaptive Trainer & Goal Workout Plan Blueprint (`src/engine/plan.ts`)**: Home displays the laid-out exercise blueprint tailored to the active **Shadow Trainer** (`Tusk`, `Valerie`, `Vanguard`, `Lyra`, `Wraith`), the operator's **Goal** (`strength` `3–5`, `hypertrophy` `8–12`, `endurance` `15–20`), and **Available Equipment** — showing each planned movement and its next suggested target (`suggestNext()`):
+     - **Refresh / Cycle Next Session (`↻ Refresh / Swap Plan`)**: A 1-tap `↻ REFRESH PLAN` button cycles through alternate workout variants (`Workout A` / `Workout B` / `Conditioning` / `Mobility Recovery`), and operators can freely add/swap/remove exercises once launched.
+     - **Adapts to Previous Sessions**: Rotates movement patterns relative to the last completed session (e.g., alternating push/squat vs. pull/hinge/core) and advances 3-level ladder tiers (`beginner` → `mid` → `advanced`) when `5 × repRange.max` is mastered.
+     - **Adapts to Earlier Intensity & Fatigue**: If the last session within 24–48h was high-intensity (`intensity === 3` / 13+ working sets), automatically proposes a lower-fatigue or active recovery/mobility variant (`"High load logged recently — recovery/balanced split"`).
+     - **Adapts to Missed Sessions (Ramp-Back)**: If `> 5 days` have elapsed since the last workout, scales the planned sets into a **Ramp-Back / Re-Entry Session** (`"X days since last session — ramp-back volume"`) to prevent cold overreaching.
+   - Tapping **Start Planned Workout** launches a session pre-populated with all planned exercises and sets ready to check off; tapping **+ Start Blank Session** starts an empty custom session.
 2. Tap **+ Add Exercise** → Picker (pre-filtered to your selected equipment: Kettlebell, Rings, Bodyweight, Hand Gripper, Skipping Rope, Stretching) → select.
 3. On add, app runs `suggestNext()` and pre-fills sets:
    - **No history** → default weight (`fixedKettlebellWeight` for KB, blank/0 for bodyweight/rings) and `repRange.min` (for step-loading) or `repRange.max` (for linear plate loading), or default `durationSec` (e.g. `60s` for stretching/holds, `180s` for skipping rope).
@@ -241,7 +247,9 @@ interface SetRecord {
 4. User logs sets; each row checkoffs individually.
 5. Rest timer auto-starts on checkoff (default per exercise).
 6. **Finish Session** → writes `finished_at`, returns Home.
-7. If the app closes mid-session, the session is resumable (a session with `finished_at IS NULL`).
+7. **Back & Cancel / Discard**: While in the Session Logger, **← Back** returns to Home (keeping the active session resumable), and **Cancel / Discard Session** deletes the draft session (`deleteSession()`) and returns Home.
+8. **Edit & Delete Past Sessions**: Tapping any completed session on Home opens it in the Session Logger/Editor screen where sets, weights, reps, and session name can be edited and saved (`Save Changes`), or the session can be permanently removed (`Delete Session`).
+9. If the app closes mid-session, the session is resumable (a session with `finished_at IS NULL`).
 
 ### 5.3 Deterministic Progression Engine
 
@@ -473,19 +481,19 @@ shadow-train/
 
 Each milestone = **one issue**, one coding-agent session, one PR.
 
-| #       | Milestone                           | Acceptance Criteria                                                                                                                              | Est. |
-| :------ | :---------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :--- |
-| **M0**  | Scaffold from `shadowlist`          | Repo builds, tabs render, theme hook works, grocery logic removed                                                                                | S    |
-| **M1**  | SQLite layer + schema               | Schema created on first run, migrations scaffold in place, repo helpers tested                                                                   | S    |
-| **M2**  | Import exercises & equipment filter | `import-exercises.ts` seeds DB (core kit + public dataset); picker filters by `availableEquipment`                                               | S    |
-| **M3**  | Logger screen (no suggestions)      | Add exercise, log sets (reps/weight or duration), finish session; session persists & resumes                                                     | M    |
-| **M4**  | Last-done prefill                   | Reopening an exercise pre-fills last session's working sets                                                                                      | S    |
-| **M5**  | Progression engine                  | `suggestNext()` implemented (fixed-KB/rings step-loading + timed + plate increments), unit tests green, suggestion chip shown on Logger & Detail | M    |
-| **M6**  | Progress & Statistics view          | Time-window selector (`Last Workout` / `Week` / `Month`) + `◀/▶` history navigation, visual intensity heatmap & volume chart, PR list            | M    |
-| **M7**  | Settings, Trainers & I/O            | Profile edits, 5-Trainer Dossier & Split selector, 1-file JSON export/import (`meta.version: 1`) + CSV session log export                        | M    |
-| **M8**  | Trainer HD renders & exercise batch | 5 sharp HD Trainer portraits (`Orc Merc`, `Decker`, `Soldier`, `Mage`, `Wraith`) + 25–30 core-kit specialist showcase images & fallback          | M    |
-| **M9**  | Distribution build                  | EAS internal build installs on device; session survives app restart                                                                              | S    |
-| **M10** | Creds, Streaks & Achievements       | Creds (`¥`) / Gremlin Coin mission economy to unlock all 5 Trainers + Duolingo-style weekly streaks (rest-day shield) & tiered achievements      | M    |
+| #       | Milestone                                   | Acceptance Criteria                                                                                                                              | Est. |
+| :------ | :------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------- | :--- |
+| **M0**  | Scaffold from `shadowlist`                  | Repo builds, tabs render, theme hook works, grocery logic removed                                                                                | S    |
+| **M1**  | SQLite layer + schema                       | Schema created on first run, migrations scaffold in place, repo helpers tested                                                                   | S    |
+| **M2**  | Import exercises & equipment filter         | `import-exercises.ts` seeds DB (core kit + public dataset); picker filters by `availableEquipment`                                               | S    |
+| **M3**  | Logger screen (no suggestions)              | Add exercise, log sets (reps/weight or duration), finish session; session persists & resumes                                                     | M    |
+| **M4**  | Last-done prefill                           | Reopening an exercise pre-fills last session's working sets                                                                                      | S    |
+| **M5**  | Progression engine                          | `suggestNext()` implemented (fixed-KB/rings step-loading + timed + plate increments), unit tests green, suggestion chip shown on Logger & Detail | M    |
+| **M6**  | Progress & Statistics view                  | Time-window selector (`Last Workout` / `Week` / `Month`) + `◀/▶` history navigation, visual intensity heatmap & volume chart, PR list            | M    |
+| **M7**  | Settings, Trainers & I/O                    | Profile edits, 5-Trainer Dossier & Split selector, 1-file JSON export/import (`meta.version: 1`) + CSV session log export                        | M    |
+| **M8**  | Trainer HD renders & exercise batch         | 5 sharp HD Trainer portraits (`Orc Merc`, `Decker`, `Soldier`, `Mage`, `Wraith`) + 25–30 core-kit specialist showcase images & fallback          | M    |
+| **M9**  | Distribution build                          | EAS internal build installs on device; session survives app restart                                                                              | S    |
+| **M10** | Trainer Plans, Edit/Delete, Creds & Streaks | Trainer+Goal Workout Plan blueprint (`Start Planned Workout`), edit/delete past sessions + Logger Back/Cancel, Creds (`¥`) missions & streaks    | M    |
 
 ### 7.1 Build Phases
 
@@ -503,7 +511,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
    - _Goal_: Track weekly volume/PRs, customize equipment/profile on the fly, and reward short/mid/long-term consistency.
    - **M6 (Progress & Statistics View)**: Time-window selector (`Last Workout`, `Week`, `Month`) with `◀ PREV / NEXT ▶` history scrubber, visual intensity heatmap & volume/time bar chart, equipment breakdown, and Personal Records (PR) list.
    - **M7 (Settings, Trainer Dossiers & Data Import/Export)**: 5-Trainer Roster & Dossier page (`Orc Merc` starter + 4 Cred-unlockable trainers with skills, lore & signature splits), equipment toggles, fixed KB weight setting, `kg`/`lb`, goal, theme selector, single-file JSON backup export & import (`meta.version: 1`), and CSV session log export.
-   - **M10 (Creds Economy, Missions, Streaks & Achievements)**: Daily/weekly mission contracts and tiered achievements that award Creds (`¥`) / Gremlin Coins to unlock all 5 Trainers, plus plan-aware Duolingo-style weekly streak tracker (with rest-day shield) (`src/engine/achievements.ts`).
+   - **M10 (Adaptive Trainer & Goal Workout Plans + Session Edit/Delete + Creds Economy, Missions & Streaks)**: Adaptive Trainer & Goal Workout Plan engine (`src/engine/plan.ts` — adapts to previous session rotation, recent high intensity/fatigue, and missed-session ramp-back + `↻ Refresh Plan` variant switcher & `Start Planned Workout`), reopen/edit/delete past sessions from Home + `← Back` and `Cancel / Discard` controls on the Session Logger, plus daily/weekly mission contracts, tiered achievements that award Creds (`¥`) / Gremlin Coins to unlock all 5 Trainers, and plan-aware Duolingo-style weekly streak tracker (with rest-day shield) (`src/engine/achievements.ts`).
 4. **Phase 4: Visual Chrome & Field Deployment (`M8` → `M9`)**
    - _Goal_: Sharp HD renders for each of the 5 Shadow Trainers, specialist start/end pose illustrations for the core kit, and standalone installable APK.
    - **M8 (5 Trainer HD Renders & Core Kit Showcase Batch)**: Draft `docs/image-prompts.md`, bundle the 5 sharp `1024×1024` HD Trainer portraits (`Tusk`, `Valerie`, `Vanguard`, `Lyra`, `Wraith`), and bundle WebP `start`/`end` exercise showcase poses demonstrated by each movement's specialist trainer + themed placeholder fallback.

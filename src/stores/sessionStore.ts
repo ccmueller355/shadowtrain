@@ -3,12 +3,14 @@ import { Vibration } from 'react-native';
 import { create } from 'zustand';
 import {
   DatabaseClient,
+  deleteSession,
   getActiveSession,
   getDatabase,
   getLastWorkingSetsForExercise,
   listRecentSessions,
   saveSession,
 } from '../db';
+import { PlannedWorkout } from '../engine/plan';
 import { buildSetsFromSuggestion, Suggestion } from '../engine/suggest';
 import { Entry, Exercise, Session, SetRecord } from '../types';
 import { useProfileStore } from './profileStore';
@@ -82,6 +84,15 @@ function tryPersistSessionToDb(session: Session): void {
   }
 }
 
+function tryDeleteSessionFromDb(sessionId: string): void {
+  try {
+    const db = getDatabase();
+    void deleteSession(db, sessionId);
+  } catch {
+    // Database singleton not yet initialized
+  }
+}
+
 export interface SessionState {
   activeSession: Session | null;
   recentSessions: Session[];
@@ -89,6 +100,9 @@ export interface SessionState {
   restTimerSec: number;
   restTimerRunning: boolean;
   startSession: (customId?: string, name?: string) => Session;
+  startPlannedSession: (plan: PlannedWorkout, customId?: string) => Session;
+  openExistingSession: (sessionId: string) => Session | null;
+  cancelOrDeleteSession: (sessionId?: string) => void;
   updateSessionName: (name: string) => void;
   getLastWorkingSets: (exerciseId: string) => SetRecord[] | null;
   fetchLastWorkingSetsFromDb: (
@@ -162,6 +176,54 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set({ activeSession: session });
     tryPersistSessionToDb(session);
     return session;
+  },
+
+  startPlannedSession: (plan, customId) => {
+    const now = Date.now();
+    const entries: Entry[] = plan.items.map((item, idx) => ({
+      id: nextUid('entry'),
+      exerciseId: item.exercise.id,
+      position: idx,
+      sets: buildSetsFromSuggestion(item.suggestion, () => nextUid('set')),
+    }));
+
+    const session: Session = {
+      id: customId ?? nextUid('session'),
+      startedAt: now,
+      name: plan.title,
+      entries,
+    };
+
+    set({ activeSession: session });
+    tryPersistSessionToDb(session);
+    return session;
+  },
+
+  openExistingSession: (sessionId) => {
+    const active = get().activeSession;
+    if (active && active.id === sessionId) {
+      return active;
+    }
+    const found = get().recentSessions.find((s) => s.id === sessionId);
+    if (!found) return null;
+    set({ activeSession: found });
+    return found;
+  },
+
+  cancelOrDeleteSession: (sessionId) => {
+    const active = get().activeSession;
+    const targetId = sessionId ?? active?.id;
+    if (!targetId) return;
+
+    const nextActive = active && active.id === targetId ? null : active;
+    const nextRecent = get().recentSessions.filter((s) => s.id !== targetId);
+
+    set({
+      activeSession: nextActive,
+      recentSessions: nextRecent,
+      ...(nextActive === null ? { restTimerSec: 0, restTimerRunning: false } : {}),
+    });
+    tryDeleteSessionFromDb(targetId);
   },
 
   updateSessionName: (name) => {
@@ -400,9 +462,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     const current = get().activeSession;
     if (!current) return null;
 
+    const wasAlreadyFinished = current.finishedAt !== undefined;
     const finished: Session = {
       ...current,
-      finishedAt: Date.now(),
+      finishedAt: current.finishedAt ?? Date.now(),
       ...(notes !== undefined ? { notes } : {}),
     };
 
@@ -426,7 +489,9 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       restTimerSec: 0,
       restTimerRunning: false,
     });
-    useProfileStore.getState().addCreds(25);
+    if (!wasAlreadyFinished) {
+      useProfileStore.getState().addCreds(25);
+    }
     tryPersistSessionToDb(finished);
     return finished;
   },
