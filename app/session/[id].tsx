@@ -48,12 +48,18 @@ export default function SessionLoggerScreen({
   const adjustRestTimer = useSessionStore((s) => s.adjustRestTimer);
   const stopRestTimer = useSessionStore((s) => s.stopRestTimer);
   const finishActiveSession = useSessionStore((s) => s.finishActiveSession);
+  const openExistingSession = useSessionStore((s) => s.openExistingSession);
+  const cancelOrDeleteSession = useSessionStore((s) => s.cancelOrDeleteSession);
 
   useEffect(() => {
-    if (!useSessionStore.getState().activeSession) {
-      startSession(sessionId);
+    const current = useSessionStore.getState().activeSession;
+    if (!current || current.id !== sessionId) {
+      const opened = openExistingSession(sessionId);
+      if (!opened) {
+        startSession(sessionId);
+      }
     }
-  }, [sessionId, startSession]);
+  }, [sessionId, openExistingSession, startSession]);
 
   useEffect(() => {
     if (!restTimerRunning) return undefined;
@@ -62,6 +68,15 @@ export default function SessionLoggerScreen({
     }, 1000);
     return () => clearInterval(interval);
   }, [restTimerRunning, tickRestTimer]);
+
+  const handleBack = () => {
+    onFinishSession?.();
+  };
+
+  const handleCancelOrDelete = () => {
+    cancelOrDeleteSession(sessionId);
+    onFinishSession?.();
+  };
 
   const handleFinish = () => {
     finishActiveSession();
@@ -100,14 +115,35 @@ export default function SessionLoggerScreen({
   return (
     <View style={[styles.container, ts.bg]} testID="screen-session-logger">
       <View style={styles.headerRow}>
-        <Text style={[styles.title, ts.accent]}>SESSION LOGGER // {sessionId}</Text>
         <TouchableOpacity
-          testID="finish-session-btn"
-          style={[styles.finishBtn, { borderColor: theme.colors.primary }]}
-          onPress={handleFinish}
+          testID="session-back-btn"
+          style={[styles.finishBtn, { borderColor: theme.colors.border }]}
+          onPress={handleBack}
         >
-          <Text style={[styles.finishText, ts.accent]}>FINISH</Text>
+          <Text style={[styles.finishText, ts.textMuted]}>← BACK</Text>
         </TouchableOpacity>
+
+        <Text style={[styles.title, ts.accent]} numberOfLines={1}>
+          SESSION LOGGER // {sessionId}
+        </Text>
+
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            testID="cancel-session-btn"
+            style={[styles.finishBtn, { borderColor: theme.colors.danger }]}
+            onPress={handleCancelOrDelete}
+          >
+            <Text style={[styles.finishText, { color: theme.colors.danger }]}>CANCEL</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="finish-session-btn"
+            style={[styles.finishBtn, { borderColor: theme.colors.primary }]}
+            onPress={handleFinish}
+          >
+            <Text style={[styles.finishText, ts.accent]}>FINISH</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <TextInput
@@ -440,8 +476,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+    gap: 6,
   },
-  title: { fontSize: 18, fontWeight: 'bold', fontFamily: 'monospace' },
+  headerActions: { flexDirection: 'row', gap: 6 },
+  title: { flex: 1, fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace' },
   finishBtn: {
     borderWidth: 1,
     borderRadius: 6,

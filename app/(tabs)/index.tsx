@@ -1,8 +1,10 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
+import { computeWeeklyStreak, generateAdaptivePlan } from '../../src/engine/plan';
 import { getTrainerById } from '../../src/engine/trainers';
+import { useExerciseStore } from '../../src/stores/exerciseStore';
 import { useProfileStore } from '../../src/stores/profileStore';
 import { useSessionStore } from '../../src/stores/sessionStore';
 import { useAppTheme } from '../../src/theme/useTheme';
@@ -18,13 +20,40 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
   const activeSession = useSessionStore((s) => s.activeSession);
   const recentSessions = useSessionStore((s) => s.recentSessions);
   const startSession = useSessionStore((s) => s.startSession);
+  const startPlannedSession = useSessionStore((s) => s.startPlannedSession);
+  const openExistingSession = useSessionStore((s) => s.openExistingSession);
+  const cancelOrDeleteSession = useSessionStore((s) => s.cancelOrDeleteSession);
   const profile = useProfileStore((s) => s.profile);
+  const exercises = useExerciseStore((s) => s.exercises);
+
+  const [refreshIndex, setRefreshIndex] = useState(0);
 
   const activeTrainer = getTrainerById(profile.activeTrainerId);
+
+  const adaptivePlan = useMemo(
+    () =>
+      generateAdaptivePlan({
+        profile,
+        exercises,
+        recentSessions,
+        refreshIndex,
+      }),
+    [profile, exercises, recentSessions, refreshIndex],
+  );
+
+  const streakSummary = useMemo(
+    () => computeWeeklyStreak(recentSessions, profile.weeklyTargetDays ?? 4),
+    [recentSessions, profile.weeklyTargetDays],
+  );
 
   const handleStartNew = () => {
     startSession('session-new');
     onStartSession?.('session-new');
+  };
+
+  const handleStartPlanned = () => {
+    const created = startPlannedSession(adaptivePlan, 'session-planned');
+    onStartSession?.(created.id);
   };
 
   const handleResume = () => {
@@ -33,10 +62,17 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
     }
   };
 
+  const handleEditPastSession = (sessionId: string) => {
+    const opened = openExistingSession(sessionId);
+    if (opened) {
+      onStartSession?.(opened.id);
+    }
+  };
+
   return (
     <ScrollView style={[styles.container, ts.bg]} testID="screen-home">
       <View style={styles.headerRow}>
-        <View>
+        <View style={styles.headerTitleCol}>
           <Text style={[styles.title, ts.accent]}>SHADOW TRAIN</Text>
           <Text style={[styles.subtitle, ts.textMuted]}>
             OFFLINE WORKOUT LOGGER // KETTLEBELL & CALISTHENICS DECK
@@ -61,8 +97,8 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
               ACTIVE TRAINER // {activeTrainer.callsign}
             </Text>
             <Text style={[styles.trainerName, ts.text]}>{activeTrainer.name}</Text>
-            <Text style={[styles.trainerSplit, ts.textMuted]} numberOfLines={1}>
-              {activeTrainer.programName}
+            <Text style={[styles.trainerSplit, ts.textMuted]} testID="home-streak-badge">
+              {streakSummary.label}
             </Text>
           </View>
         </View>
@@ -74,24 +110,77 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
           <Text style={[styles.resumeTitle, ts.text]}>
             {activeSession.name ?? activeSession.id} · {activeSession.entries.length} EXERCISES
           </Text>
-          <TouchableOpacity
-            testID="resume-session-btn"
-            style={[styles.resumeBtn, { borderColor: theme.colors.primary }]}
-            onPress={handleResume}
-          >
-            <Text style={[styles.resumeBtnText, ts.accent]}>RESUME SESSION →</Text>
-          </TouchableOpacity>
+          <View style={styles.resumeActionRow}>
+            <TouchableOpacity
+              testID="resume-session-btn"
+              style={[styles.resumeBtn, { borderColor: theme.colors.primary }]}
+              onPress={handleResume}
+            >
+              <Text style={[styles.resumeBtnText, ts.accent]}>RESUME SESSION →</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="discard-active-session-btn"
+              style={[styles.discardBtn, { borderColor: theme.colors.danger }]}
+              onPress={() => cancelOrDeleteSession(activeSession.id)}
+            >
+              <Text style={[styles.discardBtnText, { color: theme.colors.danger }]}>DISCARD</Text>
+            </TouchableOpacity>
+          </View>
         </CyberpunkCard>
       )}
 
+      <CyberpunkCard glow={false} style={styles.planCard}>
+        <View testID="home-workout-plan-card">
+          <View style={styles.planHeaderRow}>
+            <Text style={[styles.planTitle, ts.accent]} testID="plan-title">
+              {adaptivePlan.title}
+            </Text>
+            <TouchableOpacity
+              testID="refresh-plan-btn"
+              style={[styles.refreshBtn, { borderColor: theme.colors.primary }]}
+              onPress={() => setRefreshIndex((prev) => prev + 1)}
+            >
+              <Text style={[styles.refreshBtnText, ts.accent]}>↻ REFRESH</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={[styles.planReason, ts.textMuted]} testID="plan-reason-chip">
+            {adaptivePlan.reasonChip}
+          </Text>
+
+          {adaptivePlan.items.map((item) => (
+            <View
+              key={item.exercise.id}
+              testID={`plan-item-${item.exercise.id}`}
+              style={[styles.planItemRow, { borderColor: theme.colors.border }]}
+            >
+              <Text style={[styles.planExName, ts.text]} numberOfLines={1}>
+                {item.exercise.name}
+              </Text>
+              <Text style={[styles.planExTarget, ts.accent]} numberOfLines={1}>
+                {item.targetSummary.replace('SUGGESTED // ', '')}
+              </Text>
+            </View>
+          ))}
+
+          <TouchableOpacity
+            testID="start-planned-session-btn"
+            style={[styles.plannedBtn, { backgroundColor: theme.colors.primary }]}
+            onPress={handleStartPlanned}
+          >
+            <Text style={[styles.primaryBtnText, { color: theme.colors.headerBg }]}>
+              ⚡ START PLANNED WORKOUT ({adaptivePlan.items.length} MOVES)
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </CyberpunkCard>
+
       <TouchableOpacity
         testID="start-session-btn"
-        style={[styles.primaryBtn, { backgroundColor: theme.colors.primary }]}
+        style={[styles.secondaryStartBtn, ts.surface, { borderColor: theme.colors.primary }]}
         onPress={handleStartNew}
       >
-        <Text style={[styles.primaryBtnText, { color: theme.colors.headerBg }]}>
-          + START NEW SESSION
-        </Text>
+        <Text style={[styles.secondaryBtnText, ts.accent]}>+ START NEW SESSION (BLANK)</Text>
       </TouchableOpacity>
 
       <Text style={[styles.sectionTitle, ts.sectionHeader]}>RECENT SESSIONS</Text>
@@ -109,11 +198,31 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
           );
           return (
             <CyberpunkCard key={session.id} glow={false} style={styles.recentCard}>
-              <View testID={`recent-session-${session.id}`}>
-                <Text style={[styles.recentName, ts.text]}>{session.name ?? session.id}</Text>
-                <Text style={[styles.recentMeta, ts.textMuted]}>
-                  {session.entries.length} EXERCISES · {completedSets} SETS COMPLETED
-                </Text>
+              <View testID={`recent-session-${session.id}`} style={styles.recentRow}>
+                <View style={styles.recentInfo}>
+                  <Text style={[styles.recentName, ts.text]}>{session.name ?? session.id}</Text>
+                  <Text style={[styles.recentMeta, ts.textMuted]}>
+                    {session.entries.length} EXERCISES · {completedSets} SETS COMPLETED
+                  </Text>
+                </View>
+                <View style={styles.recentActions}>
+                  <TouchableOpacity
+                    testID={`edit-session-${session.id}`}
+                    style={[styles.smallActionBtn, { borderColor: theme.colors.primary }]}
+                    onPress={() => handleEditPastSession(session.id)}
+                  >
+                    <Text style={[styles.smallActionText, ts.accent]}>EDIT</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    testID={`delete-session-${session.id}`}
+                    style={[styles.smallActionBtn, { borderColor: theme.colors.danger }]}
+                    onPress={() => cancelOrDeleteSession(session.id)}
+                  >
+                    <Text style={[styles.smallActionText, { color: theme.colors.danger }]}>
+                      DEL
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </CyberpunkCard>
           );
@@ -131,9 +240,17 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 14,
   },
+  headerTitleCol: { flex: 1, marginRight: 10 },
   title: { fontSize: 22, fontWeight: 'bold', fontFamily: 'monospace' },
   subtitle: { fontSize: 11, fontFamily: 'monospace', marginTop: 4 },
-  credsChip: { borderWidth: 1, borderRadius: 6, paddingVertical: 4, paddingHorizontal: 10 },
+  credsChip: {
+    flexShrink: 0,
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+  },
   credsChipText: { fontSize: 12, fontWeight: 'bold', fontFamily: 'monospace' },
   trainerBanner: { marginBottom: 14, padding: 10 },
   trainerBannerRow: { flexDirection: 'row', alignItems: 'center' },
@@ -142,7 +259,7 @@ const styles = StyleSheet.create({
   trainerLabel: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   trainerName: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 2 },
   trainerSplit: { fontSize: 10, fontFamily: 'monospace', marginTop: 2 },
-  resumeCard: { marginBottom: 16, padding: 14 },
+  resumeCard: { marginBottom: 14, padding: 14 },
   resumeLabel: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
   resumeTitle: {
     fontSize: 14,
@@ -151,20 +268,63 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 10,
   },
+  resumeActionRow: { flexDirection: 'row', gap: 8 },
   resumeBtn: {
+    flex: 1,
     borderWidth: 1,
     borderRadius: 6,
     paddingVertical: 8,
     alignItems: 'center',
   },
   resumeBtnText: { fontSize: 12, fontWeight: 'bold', fontFamily: 'monospace' },
-  primaryBtn: {
-    paddingVertical: 14,
-    borderRadius: 8,
+  discardBtn: {
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     alignItems: 'center',
-    marginBottom: 24,
   },
-  primaryBtnText: { fontSize: 14, fontWeight: 'bold', fontFamily: 'monospace' },
+  discardBtnText: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
+  planCard: { marginBottom: 12, padding: 12 },
+  planHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  planTitle: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', flex: 1 },
+  refreshBtn: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  refreshBtnText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
+  planReason: { fontSize: 10, fontFamily: 'monospace', marginBottom: 8 },
+  planItemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 5,
+    borderBottomWidth: 1,
+  },
+  planExName: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace', flex: 1 },
+  planExTarget: { fontSize: 10, fontFamily: 'monospace', marginLeft: 8 },
+  plannedBtn: {
+    marginTop: 10,
+    paddingVertical: 11,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  primaryBtnText: { fontSize: 12, fontWeight: 'bold', fontFamily: 'monospace' },
+  secondaryStartBtn: {
+    borderWidth: 1,
+    paddingVertical: 10,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  secondaryBtnText: { fontSize: 12, fontWeight: 'bold', fontFamily: 'monospace' },
   sectionTitle: {
     fontSize: 12,
     fontWeight: 'bold',
@@ -173,6 +333,16 @@ const styles = StyleSheet.create({
   },
   bodyText: { fontSize: 13, fontFamily: 'monospace' },
   recentCard: { marginBottom: 10, padding: 12 },
+  recentRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  recentInfo: { flex: 1, marginRight: 8 },
   recentName: { fontSize: 14, fontWeight: 'bold', fontFamily: 'monospace' },
   recentMeta: { fontSize: 11, fontFamily: 'monospace', marginTop: 4 },
+  recentActions: { flexDirection: 'row', gap: 6 },
+  smallActionBtn: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  smallActionText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
 });
