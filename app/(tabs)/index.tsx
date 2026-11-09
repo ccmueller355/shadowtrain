@@ -72,7 +72,7 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
   return (
     <ScrollView style={[styles.container, ts.bg]} testID="screen-home">
       <View style={styles.headerRow}>
-        <View>
+        <View style={styles.headerTitleCol}>
           <Text style={[styles.title, ts.accent]}>SHADOW TRAIN</Text>
           <Text style={[styles.subtitle, ts.textMuted]}>
             OFFLINE WORKOUT LOGGER // KETTLEBELL & CALISTHENICS DECK
@@ -240,9 +240,17 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 14,
   },
+  headerTitleCol: { flex: 1, marginRight: 10 },
   title: { fontSize: 22, fontWeight: 'bold', fontFamily: 'monospace' },
   subtitle: { fontSize: 11, fontFamily: 'monospace', marginTop: 4 },
-  credsChip: { borderWidth: 1, borderRadius: 6, paddingVertical: 4, paddingHorizontal: 10 },
+  credsChip: {
+    flexShrink: 0,
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+  },
   credsChipText: { fontSize: 12, fontWeight: 'bold', fontFamily: 'monospace' },
   trainerBanner: { marginBottom: 14, padding: 10 },
   trainerBannerRow: { flexDirection: 'row', alignItems: 'center' },
