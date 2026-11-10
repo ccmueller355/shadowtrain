@@ -42,6 +42,7 @@ export const DEFAULT_PROFILE: Profile = {
   creds: 0,
   activeProgramId: 'heavy-iron-pit',
   weeklyTargetDays: 4,
+  claimedRewardIds: [],
 };
 
 interface ProfileState {
@@ -54,6 +55,7 @@ interface ProfileState {
   setFixedKettlebellWeight: (weight: number) => void;
   toggleEquipment: (equipment: Equipment) => void;
   addCreds: (amount: number) => void;
+  claimReward: (claimId: string, amount: number) => boolean;
   unlockAndSelectTrainer: (trainerId: TrainerId) => boolean;
 }
 
@@ -97,6 +99,19 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         creds: Math.max(0, (state.profile.creds ?? 0) + amount),
       },
     })),
+  claimReward: (claimId, amount) => {
+    const { profile } = get();
+    const claimed = profile.claimedRewardIds ?? [];
+    if (claimed.includes(claimId)) return false;
+    set({
+      profile: {
+        ...profile,
+        creds: (profile.creds ?? 0) + amount,
+        claimedRewardIds: [...claimed, claimId],
+      },
+    });
+    return true;
+  },
   unlockAndSelectTrainer: (trainerId) => {
     const { profile } = get();
     const trainer = getTrainerById(trainerId);

@@ -2,6 +2,7 @@
 import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
+import { RewardsPanel } from '../../src/components/RewardsPanel';
 import {
   computePersonalRecords,
   computeProgressSnapshot,
@@ -143,6 +144,8 @@ export default function ProgressScreen() {
           </Text>
         </CyberpunkCard>
       </View>
+
+      <RewardsPanel />
 
       <Text style={[styles.sectionHeader, ts.sectionHeader]}>INTENSITY HEATMAP</Text>
       <CyberpunkCard glow={false} style={styles.sectionCard}>

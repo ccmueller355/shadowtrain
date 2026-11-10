@@ -33,6 +33,7 @@ export interface Profile {
   creds?: number;
   activeProgramId?: string;
   weeklyTargetDays?: number;
+  claimedRewardIds?: string[];
 }
 
 export interface Exercise {
