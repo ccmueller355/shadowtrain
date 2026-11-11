@@ -258,5 +258,17 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       });
       expect(screen.getByText('SHOWING 37 MOVEMENTS')).toBeTruthy();
     });
+
+    it('renders Exercise Detail view with M8 specialist coach card and pose fallback card when no onSelectExercise callback is passed', () => {
+      render(<ExercisesScreen />);
+
+      // Open Exercise Detail -> verify M8 specialist coach card and pose fallback card render
+      fireEvent.press(screen.getByTestId('exercise-item-kb-swing-two-hand'));
+      expect(screen.getByTestId('exercise-detail-view')).toBeTruthy();
+      expect(screen.getByTestId('exercise-specialist-card')).toBeTruthy();
+      expect(screen.getByText('SPECIALIST COACH // TUSK')).toBeTruthy();
+      expect(screen.getByTestId('exercise-pose-fallback-card')).toBeTruthy();
+      expect(screen.getByText('POSE // TUSK · KETTLEBELL')).toBeTruthy();
+    });
   });
 });

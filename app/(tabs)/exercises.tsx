@@ -1,12 +1,13 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Image } from 'react-native';
 import { useAppTheme } from '../../src/theme/useTheme';
 import { useThemeStyles } from '../../src/theme/useThemeStyles';
 import { useProfileStore } from '../../src/stores/profileStore';
 import { filterExercises, useExerciseStore } from '../../src/stores/exerciseStore';
 import { formatLastDoneSummary, useSessionStore } from '../../src/stores/sessionStore';
 import { formatSuggestionChip, suggestNext } from '../../src/engine/suggest';
+import { getSpecialistTrainerForExercise } from '../../src/engine/trainers';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { Equipment, Exercise } from '../../src/types';
 
@@ -75,6 +76,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
     const lastSummary = formatLastDoneSummary(lastSets, detailExercise.trackingType);
     const suggestion = suggestNext(lastSets, profile, detailExercise);
     const suggestionChip = formatSuggestionChip(suggestion, profile.units);
+    const specialist = getSpecialistTrainerForExercise(detailExercise);
     const nextProgression = detailExercise.nextProgressionId
       ? exercises.find((e) => e.id === detailExercise.nextProgressionId)
       : undefined;
@@ -83,7 +85,9 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
       <View style={[styles.container, ts.bg]} testID="exercise-detail-view">
         <View style={styles.headerRow}>
           <View style={styles.headerTextWrap}>
-            <Text style={[styles.title, ts.accent]}>{detailExercise.name}</Text>
+            <Text style={[styles.title, ts.accent]} testID="exercise-detail-title">
+              {detailExercise.name}
+            </Text>
             <Text style={[styles.subtitle, ts.textMuted]}>
               {detailExercise.equipment.toUpperCase()}
               {detailExercise.tier ? ` · TIER: ${detailExercise.tier.toUpperCase()}` : ''} ·{' '}
@@ -100,6 +104,42 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
         </View>
 
         <ScrollView style={styles.list}>
+          {/* M8: Specialist Trainer Showcase Card */}
+          <CyberpunkCard style={styles.card}>
+            <View style={styles.specialistRow} testID="exercise-specialist-card">
+              <Image source={specialist.portrait} style={styles.specialistThumb} />
+              <View style={styles.specialistInfo}>
+                <Text style={[styles.badge, ts.accent]}>
+                  SPECIALIST COACH // {specialist.callsign}
+                </Text>
+                <Text style={[styles.specialistName, ts.text]}>{specialist.name}</Text>
+                <Text style={[styles.specialistSpecialty, ts.textMuted]} numberOfLines={2}>
+                  {specialist.specialty}
+                </Text>
+              </View>
+            </View>
+
+            {/* Visual Showcase Pose Fallback Card */}
+            <View
+              testID="exercise-pose-fallback-card"
+              style={[
+                styles.poseFallback,
+                {
+                  borderColor: theme.colors.primary,
+                  backgroundColor: theme.colors.surface,
+                },
+              ]}
+            >
+              <Text style={[styles.poseCode, ts.accent]}>
+                POSE // {specialist.callsign} · {detailExercise.equipment.toUpperCase()}
+              </Text>
+              <Text style={[styles.poseTitle, ts.text]}>{detailExercise.name}</Text>
+              <Text style={[styles.poseMeta, ts.textMuted]}>
+                HD SPECIALIST SHOWCASE // Æ CYBERNETICS RIG
+              </Text>
+            </View>
+          </CyberpunkCard>
+
           <CyberpunkCard style={styles.card}>
             <Text style={[styles.badge, ts.accent]}>SUGGESTED NEXT</Text>
             <Text
@@ -396,4 +436,19 @@ const styles = StyleSheet.create({
   },
   instructionText: { fontSize: 12, fontFamily: 'monospace', marginTop: 6 },
   emptyText: { fontSize: 13, fontFamily: 'monospace' },
+  specialistRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  specialistThumb: { width: 56, height: 56, borderRadius: 8, borderWidth: 1, marginRight: 12 },
+  specialistInfo: { flex: 1 },
+  specialistName: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 2 },
+  specialistSpecialty: { fontSize: 10, fontFamily: 'monospace', marginTop: 2 },
+  poseFallback: {
+    borderWidth: 1,
+    borderRadius: 6,
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  poseCode: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
+  poseTitle: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginVertical: 4 },
+  poseMeta: { fontSize: 9, fontFamily: 'monospace' },
 });

@@ -455,7 +455,9 @@ describe('M5 Deterministic Progression Engine (suggestNext) & UI Chips', () => {
 
       // Tap next tier card -> navigates from Two-Hand Kettlebell Swing (beginner) to One-Arm Kettlebell Swing (mid)
       fireEvent.press(screen.getByTestId('exercise-detail-next-tier'));
-      expect(screen.getByText('One-Arm Kettlebell Swing')).toBeTruthy();
+      expect(screen.getByTestId('exercise-detail-title').props.children).toBe(
+        'One-Arm Kettlebell Swing',
+      );
 
       // Close detail view -> back to Exercise Armory list
       fireEvent.press(screen.getByTestId('close-exercise-detail-btn'));

@@ -11,6 +11,7 @@ import {
 } from '../engine/portability';
 import {
   canUnlockTrainer,
+  getSpecialistTrainerForExercise,
   getTrainerById,
   isTrainerUnlocked,
   SHADOW_TRAINERS,
@@ -202,6 +203,38 @@ describe('M7 Settings, 5 Shadow Trainers Dossier, Creds & Data Portability', () 
       );
 
       shareSpy.mockRestore();
+    });
+  });
+
+  describe('M8 getSpecialistTrainerForExercise', () => {
+    const pick = (id: string, equipment: string) =>
+      getSpecialistTrainerForExercise({ id, equipment }).id;
+
+    it('prefers signature exercise matches', () => {
+      expect(pick('ring-dip', 'rings')).toBe('elf-wraith');
+      expect(pick('kb-front-rack-squat', 'kettlebell')).toBe('human-soldier');
+    });
+
+    it('maps equipment domains to specialists', () => {
+      expect(pick('x-ring', 'rings')).toBe('elf-wraith');
+      expect(pick('x-rope', 'jump_rope')).toBe('human-decker');
+      expect(pick('x-stretch', 'stretching')).toBe('elf-mage');
+      expect(pick('x-grip', 'hand_gripper')).toBe('orc-merc');
+      expect(pick('x-bar', 'barbell')).toBe('orc-merc');
+    });
+
+    it('maps kettlebell and bodyweight sub-patterns', () => {
+      expect(pick('kb-turkish-x', 'kettlebell')).toBe('elf-mage');
+      expect(pick('kb-halo-x', 'kettlebell')).toBe('elf-mage');
+      expect(pick('kb-one-arm-x', 'kettlebell')).toBe('human-decker');
+      expect(pick('kb-other', 'kettlebell')).toBe('orc-merc');
+      expect(pick('bw-hollow-x', 'bodyweight')).toBe('human-decker');
+      expect(pick('bw-pike-x', 'bodyweight')).toBe('elf-wraith');
+      expect(pick('bw-other', 'bodyweight')).toBe('human-soldier');
+    });
+
+    it('falls back to Vanguard for unknown equipment', () => {
+      expect(pick('x-cable', 'cable')).toBe('human-soldier');
     });
   });
 });

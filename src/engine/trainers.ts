@@ -134,3 +134,52 @@ export function canUnlockTrainer(profile: Profile, trainerId: TrainerId): boolea
   const trainer = getTrainerById(trainerId);
   return (profile.creds ?? 0) >= trainer.unlockCost;
 }
+
+export function getSpecialistTrainerForExercise(exercise: {
+  id: string;
+  equipment: string;
+  category?: string;
+}): TrainerDossier {
+  // 1. Signature exercise match
+  const signatureMatch = SHADOW_TRAINERS.find((t) => t.signatureExerciseIds.includes(exercise.id));
+  if (signatureMatch) return signatureMatch;
+
+  // 2. Equipment / movement domain specialty per spec §5.5
+  if (exercise.equipment === 'rings') {
+    return getTrainerById('elf-wraith');
+  }
+  if (exercise.equipment === 'jump_rope') {
+    return getTrainerById('human-decker');
+  }
+  if (exercise.equipment === 'stretching') {
+    return getTrainerById('elf-mage');
+  }
+  if (exercise.equipment === 'hand_gripper' || exercise.equipment === 'barbell') {
+    return getTrainerById('orc-merc');
+  }
+  if (exercise.equipment === 'kettlebell') {
+    if (exercise.id.includes('turkish') || exercise.id.includes('halo')) {
+      return getTrainerById('elf-mage');
+    }
+    if (exercise.id.includes('one-arm')) {
+      return getTrainerById('human-decker');
+    }
+    return getTrainerById('orc-merc');
+  }
+  if (exercise.equipment === 'bodyweight') {
+    if (
+      exercise.id.includes('hollow') ||
+      exercise.id.includes('plank') ||
+      exercise.id.includes('diamond')
+    ) {
+      return getTrainerById('human-decker');
+    }
+    if (exercise.id.includes('pistol') || exercise.id.includes('pike')) {
+      return getTrainerById('elf-wraith');
+    }
+    return getTrainerById('human-soldier');
+  }
+
+  // Default fallback to Vanguard
+  return getTrainerById('human-soldier');
+}
