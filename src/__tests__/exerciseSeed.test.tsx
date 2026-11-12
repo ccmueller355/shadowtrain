@@ -259,16 +259,33 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       expect(screen.getByText('SHOWING 37 MOVEMENTS')).toBeTruthy();
     });
 
-    it('renders Exercise Detail view with M8 specialist coach card and pose fallback card when no onSelectExercise callback is passed', () => {
+    it('renders Exercise Detail view with specialist coach card and bundled start/end poses', () => {
       render(<ExercisesScreen />);
 
-      // Open Exercise Detail -> verify M8 specialist coach card and pose fallback card render
       fireEvent.press(screen.getByTestId('exercise-item-kb-swing-two-hand'));
       expect(screen.getByTestId('exercise-detail-view')).toBeTruthy();
       expect(screen.getByTestId('exercise-specialist-card')).toBeTruthy();
       expect(screen.getByText('SPECIALIST COACH // TUSK')).toBeTruthy();
+      expect(screen.getByTestId('exercise-pose-start')).toBeTruthy();
+      expect(screen.getByTestId('exercise-pose-end')).toBeTruthy();
+      expect(screen.queryByTestId('exercise-pose-fallback-card')).toBeNull();
+    });
+
+    it('falls back to the themed pose card when no showcase images are bundled', () => {
+      render(<ExercisesScreen />);
+
+      fireEvent.press(screen.getByTestId('exercise-item-kb-snatch'));
       expect(screen.getByTestId('exercise-pose-fallback-card')).toBeTruthy();
-      expect(screen.getByText('POSE // TUSK · KETTLEBELL')).toBeTruthy();
+      expect(screen.queryByTestId('exercise-pose-images')).toBeNull();
+    });
+
+    it('bundles every showcase image referenced for core-kit exercises', () => {
+      const { EXERCISE_SHOWCASES } = require('../engine/exerciseShowcases');
+      const ids = Object.keys(EXERCISE_SHOWCASES);
+      expect(ids.length).toBe(14);
+      ids.forEach((id) => {
+        expect(EXERCISE_SHOWCASES[id].start).toBeTruthy();
+      });
     });
   });
 });

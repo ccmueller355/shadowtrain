@@ -8,6 +8,7 @@ import { filterExercises, useExerciseStore } from '../../src/stores/exerciseStor
 import { formatLastDoneSummary, useSessionStore } from '../../src/stores/sessionStore';
 import { formatSuggestionChip, suggestNext } from '../../src/engine/suggest';
 import { getSpecialistTrainerForExercise } from '../../src/engine/trainers';
+import { getExerciseShowcase } from '../../src/engine/exerciseShowcases';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { Equipment, Exercise } from '../../src/types';
 
@@ -77,6 +78,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
     const suggestion = suggestNext(lastSets, profile, detailExercise);
     const suggestionChip = formatSuggestionChip(suggestion, profile.units);
     const specialist = getSpecialistTrainerForExercise(detailExercise);
+    const showcase = getExerciseShowcase(detailExercise.id);
     const nextProgression = detailExercise.nextProgressionId
       ? exercises.find((e) => e.id === detailExercise.nextProgressionId)
       : undefined;
@@ -119,25 +121,50 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
               </View>
             </View>
 
-            {/* Visual Showcase Pose Fallback Card */}
-            <View
-              testID="exercise-pose-fallback-card"
-              style={[
-                styles.poseFallback,
-                {
-                  borderColor: theme.colors.primary,
-                  backgroundColor: theme.colors.surface,
-                },
-              ]}
-            >
-              <Text style={[styles.poseCode, ts.accent]}>
-                POSE // {specialist.callsign} · {detailExercise.equipment.toUpperCase()}
-              </Text>
-              <Text style={[styles.poseTitle, ts.text]}>{detailExercise.name}</Text>
-              <Text style={[styles.poseMeta, ts.textMuted]}>
-                HD SPECIALIST SHOWCASE // Æ CYBERNETICS RIG
-              </Text>
-            </View>
+            {/* Start/End showcase poses; themed fallback card when none bundled */}
+            {showcase?.start || showcase?.end ? (
+              <View style={styles.poseRow} testID="exercise-pose-images">
+                {showcase.start ? (
+                  <View style={styles.poseCol}>
+                    <Image
+                      source={showcase.start}
+                      style={styles.poseImage}
+                      testID="exercise-pose-start"
+                    />
+                    <Text style={[styles.poseCaption, ts.textMuted]}>START</Text>
+                  </View>
+                ) : null}
+                {showcase.end ? (
+                  <View style={styles.poseCol}>
+                    <Image
+                      source={showcase.end}
+                      style={styles.poseImage}
+                      testID="exercise-pose-end"
+                    />
+                    <Text style={[styles.poseCaption, ts.textMuted]}>END</Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : (
+              <View
+                testID="exercise-pose-fallback-card"
+                style={[
+                  styles.poseFallback,
+                  {
+                    borderColor: theme.colors.primary,
+                    backgroundColor: theme.colors.surface,
+                  },
+                ]}
+              >
+                <Text style={[styles.poseCode, ts.accent]}>
+                  POSE // {specialist.callsign} · {detailExercise.equipment.toUpperCase()}
+                </Text>
+                <Text style={[styles.poseTitle, ts.text]}>{detailExercise.name}</Text>
+                <Text style={[styles.poseMeta, ts.textMuted]}>
+                  HD SPECIALIST SHOWCASE // Æ CYBERNETICS RIG
+                </Text>
+              </View>
+            )}
           </CyberpunkCard>
 
           <CyberpunkCard style={styles.card}>
@@ -448,6 +475,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  poseRow: { flexDirection: 'row', gap: 8 },
+  poseCol: { flex: 1, alignItems: 'center' },
+  poseImage: { width: '100%', aspectRatio: 1, borderRadius: 6 },
+  poseCaption: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 4 },
   poseCode: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   poseTitle: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginVertical: 4 },
   poseMeta: { fontSize: 9, fontFamily: 'monospace' },
