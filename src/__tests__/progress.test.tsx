@@ -130,6 +130,8 @@ function makeSampleSessions(): Session[] {
 
 describe('M6 Telemetry, Progress Snapshot, Personal Records & ProgressScreen', () => {
   beforeEach(() => {
+    // Pin the clock: fixtures are relative to BASE_NOW, ProgressScreen reads Date.now()
+    jest.spyOn(Date, 'now').mockReturnValue(BASE_NOW);
     useProfileStore.setState({
       profile: DEFAULT_PROFILE,
       theme: 'fixer',
@@ -139,6 +141,10 @@ describe('M6 Telemetry, Progress Snapshot, Personal Records & ProgressScreen', (
       hydrated: true,
     });
     useSessionStore.getState().resetSessionStore();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('computeIntensityLevel & computeSetVolume pure helpers', () => {
