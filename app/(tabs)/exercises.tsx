@@ -129,6 +129,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                     <Image
                       source={showcase.start}
                       style={styles.poseImage}
+                      resizeMode="contain"
                       testID="exercise-pose-start"
                     />
                     <Text style={[styles.poseCaption, ts.textMuted]}>START</Text>
@@ -139,6 +140,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                     <Image
                       source={showcase.end}
                       style={styles.poseImage}
+                      resizeMode="contain"
                       testID="exercise-pose-end"
                     />
                     <Text style={[styles.poseCaption, ts.textMuted]}>END</Text>
@@ -475,9 +477,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  poseRow: { flexDirection: 'row', gap: 8 },
-  poseCol: { flex: 1, alignItems: 'center' },
-  poseImage: { width: '100%', aspectRatio: 1, borderRadius: 6 },
+  poseRow: { flexDirection: 'row', gap: 12, justifyContent: 'center', marginVertical: 6 },
+  poseCol: { flex: 1, maxWidth: 170, alignItems: 'center' },
+  poseImage: { width: '100%', height: 160, borderRadius: 8 },
   poseCaption: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 4 },
   poseCode: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   poseTitle: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginVertical: 4 },
