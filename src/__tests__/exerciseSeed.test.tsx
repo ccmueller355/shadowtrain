@@ -269,6 +269,19 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       expect(screen.getByTestId('exercise-pose-start')).toBeTruthy();
       expect(screen.getByTestId('exercise-pose-end')).toBeTruthy();
       expect(screen.queryByTestId('exercise-pose-fallback-card')).toBeNull();
+      // Starter coach Tusk is unlocked by default -> no encryption overlay
+      expect(screen.queryByTestId('coach-encrypted-overlay')).toBeNull();
+    });
+
+    it('renders encrypted dossier watermark and hologram banner when specialist coach is locked', () => {
+      render(<ExercisesScreen />);
+
+      // Ring Dip specialist is Soren Wraith (locked by default, requires 1,000 ¥)
+      fireEvent.press(screen.getByTestId('exercise-item-ring-dip'));
+      expect(screen.getByTestId('coach-locked-badge')).toBeTruthy();
+      expect(screen.getByText('ENCRYPTED // 1000 ¥')).toBeTruthy();
+      expect(screen.getByTestId('coach-encrypted-overlay')).toBeTruthy();
+      expect(screen.getByText('[DOSSIER ENCRYPTED // 1000 ¥]')).toBeTruthy();
     });
 
     it('falls back to the themed pose card when no showcase images are bundled', () => {
