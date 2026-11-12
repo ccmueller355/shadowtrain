@@ -494,6 +494,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 | **M8**  | Trainer HD renders & exercise batch         | 5 sharp HD Trainer portraits (`Orc Merc`, `Decker`, `Soldier`, `Mage`, `Wraith`) + 25–30 core-kit specialist showcase images & fallback          | M    |
 | **M9**  | Distribution build                          | EAS internal build installs on device; session survives app restart                                                                              | S    |
 | **M10** | Trainer Plans, Edit/Delete, Creds & Streaks | Trainer+Goal Workout Plan blueprint (`Start Planned Workout`), edit/delete past sessions + Logger Back/Cancel, Creds (`¥`) missions & streaks    | M    |
+| **M11** | Æ Training Drone & Specialist Unlock Skins  | Generic stock Wireframe Training Drone for base movements; unlocking Trainers dynamically skins exercises with elite Specialist poses & cues     | S    |
 
 ### 7.1 Build Phases
 
@@ -512,10 +513,11 @@ Each milestone = **one issue**, one coding-agent session, one PR.
    - **M6 (Progress & Statistics View)**: Time-window selector (`Last Workout`, `Week`, `Month`) with `◀ PREV / NEXT ▶` history scrubber, visual intensity heatmap & volume/time bar chart, equipment breakdown, and Personal Records (PR) list.
    - **M7 (Settings, Trainer Dossiers & Data Import/Export)**: 5-Trainer Roster & Dossier page (`Orc Merc` starter + 4 Cred-unlockable trainers with skills, lore & signature splits), equipment toggles, fixed KB weight setting, `kg`/`lb`, goal, theme selector, single-file JSON backup export & import (`meta.version: 1`), and CSV session log export.
    - **M10 (Adaptive Trainer & Goal Workout Plans + Session Edit/Delete + Creds Economy, Missions & Streaks)**: Adaptive Trainer & Goal Workout Plan engine (`src/engine/plan.ts` — adapts to previous session rotation, recent high intensity/fatigue, and missed-session ramp-back + `↻ Refresh Plan` variant switcher & `Start Planned Workout`), reopen/edit/delete past sessions from Home + `← Back` and `Cancel / Discard` controls on the Session Logger, plus daily/weekly mission contracts, tiered achievements that award Creds (`¥`) / Gremlin Coins to unlock all 5 Trainers, and plan-aware Duolingo-style weekly streak tracker (with rest-day shield) (`src/engine/achievements.ts`).
-4. **Phase 4: Visual Chrome & Field Deployment (`M8` → `M9`)**
-   - _Goal_: Sharp HD renders for each of the 5 Shadow Trainers, specialist start/end pose illustrations for the core kit, and standalone installable APK.
+4. **Phase 4: Visual Chrome & Field Deployment (`M8` → `M9`, `M11`)**
+   - _Goal_: Sharp HD renders for each of the 5 Shadow Trainers, specialist start/end pose illustrations for the core kit, stock training drone skins, and standalone installable APK.
    - **M8 (5 Trainer HD Renders & Core Kit Showcase Batch)**: Draft `docs/image-prompts.md`, bundle the 5 sharp `1024×1024` HD Trainer portraits (`Tusk`, `Valerie`, `Vanguard`, `Lyra`, `Wraith`), and bundle WebP `start`/`end` exercise showcase poses demonstrated by each movement's specialist trainer + themed placeholder fallback.
    - **M9 (EAS Distribution Build)**: Configure `eas.json` & GitHub Actions release workflow and build the installable Android APK.
+   - **M11 (Æ CYBERNETICS Training Drone & Specialist Skins)**: Add the generic stock Wireframe Training Drone for base movements. Unlocking Shadow Trainers with Creds (¥) dynamically upgrades exercises from stock drone to elite Specialist trainer showcase skins and voice cues.
 
 **Definition of done (every milestone):**
 
