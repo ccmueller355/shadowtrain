@@ -23,8 +23,8 @@
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
 
 <div style="border: 1px solid #00f0ff44; padding: 1rem; border-radius: 8px; background: #14101c;">
-  <a href="/trainers/lyra-fullbody-portrait.jpg" target="_blank" title="Click to view full-resolution render">
-    <img src="/trainers/lyra-fullbody-portrait.jpg" alt="Lyra Aether Vael" style="border-radius: 6px; width: 100%; height: 380px; object-fit: contain; background: #0c0914; padding: 4px;" />
+  <a href="/trainers/lyra-fullbody-cutout.jpg" target="_blank" title="Click to view full-resolution render">
+    <img src="/trainers/lyra-fullbody-cutout.jpg" alt="Lyra Aether Vael" style="border-radius: 6px; width: 100%; height: 380px; object-fit: contain; background: #0c0914; padding: 4px;" />
   </a>
   <h4 style="color: #00f0ff; margin: 0.75rem 0 0.25rem 0;">01 // LYRA "AETHER" VAEL</h4>
   <p style="font-size: 0.85rem; color: #888; margin: 0 0 0.75rem 0;">High-Elf Combat Mage · Flow & Mobility</p>

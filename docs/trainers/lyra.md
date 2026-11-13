@@ -31,17 +31,27 @@ Lyra channels mana through structural alignment, deep joint decompression, slow-
 
 > 🔍 _Click any editorial plate or exercise frame below to inspect the full uncompressed render._
 
-### Plate 01: Primary Editorial Portrait
+### Plate 01: Architectural Cutout Stance (Primary Editorial Portrait)
 
-[![Lyra Fullbody Portrait](/trainers/lyra-fullbody-portrait.jpg)](/trainers/lyra-fullbody-portrait.jpg)
+[![Lyra Fullbody Cutout](/trainers/lyra-fullbody-cutout.jpg)](/trainers/lyra-fullbody-cutout.jpg)
 
 - **Lens Spec**: 50mm f/1.8 · Volumetric Cyan & Violet Rim Lighting
+- **Canvas**: 3:4 Vertical Studio Portrait
+- **Description**: Sculpted athletic form in architectural cutouts and matte carbon-fiber bodysuit, traced with amber and cyan arcane circuitry beside a mana-inlaid kettlebell.
+
+---
+
+### Plate 02: Full-Mesh Obsidian Stance (Archive Mesh Variant)
+
+[![Lyra Fullbody Mesh](/trainers/lyra-fullbody-portrait.jpg)](/trainers/lyra-fullbody-portrait.jpg)
+
+- **Lens Spec**: 50mm f/1.8 · Volumetric Cyan & Violet Rim
 - **Canvas**: 3:4 Vertical Studio Portrait
 - **Description**: Full-coverage translucent micro-mesh and carbon-fiber study paired with dual 32kg cyan mana-circuit kettlebells.
 
 ---
 
-### Plate 02: Architectural Cutout Stance
+### Plate 03: Cyber-Dojo Wide Cutout Stance
 
 [![Lyra Cutout Stance](/trainers/lyra-stance-cutout.jpg)](/trainers/lyra-stance-cutout.jpg)
 
@@ -50,7 +60,7 @@ Lyra channels mana through structural alignment, deep joint decompression, slow-
 
 ---
 
-### Plate 03: Visage & Chrome Cyber-Cuffs Study
+### Plate 04: Visage & Chrome Cyber-Cuffs Study
 
 [![Lyra Visage Study](/trainers/lyra-closeup-visage.jpg)](/trainers/lyra-closeup-visage.jpg)
 
@@ -59,7 +69,7 @@ Lyra channels mana through structural alignment, deep joint decompression, slow-
 
 ---
 
-### Plate 04: Arcane Kettlebell Conduit Detail
+### Plate 05: Arcane Kettlebell Conduit Detail
 
 [![Lyra Kettlebell Detail](/trainers/lyra-kettlebell-detail.jpg)](/trainers/lyra-kettlebell-detail.jpg)
 
