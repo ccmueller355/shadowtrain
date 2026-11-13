@@ -5,6 +5,7 @@ export type Experience = 'novice' | 'intermediate' | 'advanced';
 export type Units = 'kg' | 'lb';
 export type TrackingType = 'reps' | 'duration';
 export type DifficultyTier = 'beginner' | 'mid' | 'advanced';
+export type SessionDuration = 'express' | 'standard' | 'beast';
 export type TrainerId =
   'orc-merc' | 'human-decker' | 'human-soldier' | 'elf-mage' | 'elf-wraith' | 'drone-unit-0';
 
@@ -34,6 +35,7 @@ export interface Profile {
   creds?: number;
   activeProgramId?: string;
   weeklyTargetDays?: number;
+  targetDuration?: SessionDuration;
   claimedRewardIds?: string[];
 }
 

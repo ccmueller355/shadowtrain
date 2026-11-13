@@ -1,7 +1,7 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
 import { create } from 'zustand';
 import { getTrainerById, isTrainerUnlocked } from '../engine/trainers';
-import { Equipment, Goal, Profile, ThemeName, TrainerId, Units } from '../types';
+import { Equipment, Goal, Profile, SessionDuration, ThemeName, TrainerId, Units } from '../types';
 
 export const DEFAULT_EQUIPMENT: Equipment[] = [
   'kettlebell',
@@ -42,6 +42,7 @@ export const DEFAULT_PROFILE: Profile = {
   creds: 0,
   activeProgramId: 'heavy-iron-pit',
   weeklyTargetDays: 4,
+  targetDuration: 'standard',
   claimedRewardIds: [],
 };
 
@@ -53,6 +54,8 @@ interface ProfileState {
   setGoal: (goal: Goal) => void;
   setUnits: (units: Units) => void;
   setFixedKettlebellWeight: (weight: number) => void;
+  setWeeklyTargetDays: (days: number) => void;
+  setTargetDuration: (duration: SessionDuration) => void;
   toggleEquipment: (equipment: Equipment) => void;
   addCreds: (amount: number) => void;
   claimReward: (claimId: string, amount: number) => boolean;
@@ -79,6 +82,14 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   setFixedKettlebellWeight: (weight) =>
     set((state) => ({
       profile: { ...state.profile, fixedKettlebellWeight: weight },
+    })),
+  setWeeklyTargetDays: (days) =>
+    set((state) => ({
+      profile: { ...state.profile, weeklyTargetDays: Math.min(7, Math.max(1, days)) },
+    })),
+  setTargetDuration: (targetDuration) =>
+    set((state) => ({
+      profile: { ...state.profile, targetDuration },
     })),
   toggleEquipment: (equipment) =>
     set((state) => {

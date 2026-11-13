@@ -26,6 +26,7 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
   const openExistingSession = useSessionStore((s) => s.openExistingSession);
   const cancelOrDeleteSession = useSessionStore((s) => s.cancelOrDeleteSession);
   const profile = useProfileStore((s) => s.profile);
+  const setTargetDuration = useProfileStore((s) => s.setTargetDuration);
   const exercises = useExerciseStore((s) => s.exercises);
 
   const [refreshIndex, setRefreshIndex] = useState(0);
@@ -160,6 +161,36 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
           <Text style={[styles.planReason, ts.textMuted]} testID="plan-reason-chip">
             {adaptivePlan.reasonChip}
           </Text>
+
+          <View style={styles.planDurationRow} testID="plan-duration-selector">
+            {(
+              [
+                { id: 'express', label: '⚡ EXPRESS ~20m' },
+                { id: 'standard', label: '🛡️ STANDARD ~40m' },
+                { id: 'beast', label: '🔥 BEAST ~60m' },
+              ] as const
+            ).map((dur) => {
+              const active = (profile.targetDuration ?? 'standard') === dur.id;
+              return (
+                <TouchableOpacity
+                  key={dur.id}
+                  testID={`plan-duration-${dur.id}`}
+                  style={[
+                    styles.planDurationChip,
+                    {
+                      borderColor: active ? theme.colors.primary : theme.colors.border,
+                      backgroundColor: active ? theme.colors.surface : 'transparent',
+                    },
+                  ]}
+                  onPress={() => setTargetDuration(dur.id)}
+                >
+                  <Text style={[styles.planDurationChipText, active ? ts.accent : ts.textMuted]}>
+                    {dur.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
 
           {adaptivePlan.items.map((item) => (
             <View
@@ -417,6 +448,19 @@ const styles = StyleSheet.create({
   },
   refreshBtnText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   planReason: { fontSize: 10, fontFamily: 'monospace', marginBottom: 8 },
+  planDurationRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 10,
+    flexWrap: 'wrap',
+  },
+  planDurationChip: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  planDurationChipText: { fontSize: 9, fontWeight: 'bold', fontFamily: 'monospace' },
   planItemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

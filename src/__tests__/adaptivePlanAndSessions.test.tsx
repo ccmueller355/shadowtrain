@@ -266,5 +266,73 @@ describe('M10 Adaptive Workout Plan, Weekly Streaks, Session Edit/Delete & Logge
 
       logger.unmount();
     });
+
+    it('dynamically adapts plan exercises, volume, and steppers based on session duration & frequency (M12)', () => {
+      // 1. Pure engine test: Express vs Beast
+      const expressPlan = generateAdaptivePlan({
+        profile: DEFAULT_PROFILE,
+        exercises: DEFAULT_SEED_EXERCISES,
+        recentSessions: [],
+        targetDuration: 'express',
+        weeklyTargetDays: 3,
+        nowMs: NOW_MS,
+      });
+      expect(expressPlan.items).toHaveLength(2);
+      expect(expressPlan.reasonChip).toContain('EXPRESS');
+      expect(expressPlan.items[0].suggestion.sets).toBeLessThanOrEqual(2);
+
+      const beastPlan = generateAdaptivePlan({
+        profile: DEFAULT_PROFILE,
+        exercises: DEFAULT_SEED_EXERCISES,
+        recentSessions: [],
+        targetDuration: 'beast',
+        weeklyTargetDays: 5,
+        nowMs: NOW_MS,
+      });
+      expect(beastPlan.items.length).toBeGreaterThanOrEqual(4);
+      expect(beastPlan.reasonChip).toContain('BEAST');
+      expect(beastPlan.items[0].suggestion.sets).toBeGreaterThanOrEqual(4);
+
+      // 2. HomeScreen duration selector UI
+      const onStartSession = jest.fn();
+      const home = render(<HomeScreen onStartSession={onStartSession} />);
+
+      fireEvent.press(screen.getByTestId('plan-duration-express'));
+      expect(useProfileStore.getState().profile.targetDuration).toBe('express');
+
+      fireEvent.press(screen.getByTestId('plan-duration-beast'));
+      expect(useProfileStore.getState().profile.targetDuration).toBe('beast');
+      home.unmount();
+
+      // 3. SessionLogger interval timer steppers
+      useSessionStore.getState().startIntervalTimer({
+        mode: 'emom',
+        rounds: 10,
+        workSec: 60,
+        restSec: 0,
+      });
+
+      const onFinish = jest.fn();
+      const logger = render(
+        <SessionLoggerScreen sessionId="session-stepper-test" onFinishSession={onFinish} />,
+      );
+
+      expect(useSessionStore.getState().intervalTimer.totalRounds).toBe(10);
+      expect(useSessionStore.getState().intervalTimer.workSec).toBe(60);
+
+      fireEvent.press(screen.getByTestId('interval-rounds-plus'));
+      expect(useSessionStore.getState().intervalTimer.totalRounds).toBe(15);
+
+      fireEvent.press(screen.getByTestId('interval-rounds-minus'));
+      expect(useSessionStore.getState().intervalTimer.totalRounds).toBe(10);
+
+      fireEvent.press(screen.getByTestId('interval-work-minus'));
+      expect(useSessionStore.getState().intervalTimer.workSec).toBe(45);
+
+      fireEvent.press(screen.getByTestId('interval-work-plus'));
+      expect(useSessionStore.getState().intervalTimer.workSec).toBe(60);
+
+      logger.unmount();
+    });
   });
 });

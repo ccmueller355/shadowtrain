@@ -141,6 +141,8 @@ export interface SessionState {
   toggleIntervalTimerRunning: () => void;
   resetIntervalTimer: () => void;
   stopIntervalTimer: () => void;
+  adjustIntervalRounds: (delta: number) => void;
+  adjustIntervalWorkSec: (deltaSec: number) => void;
   tickIntervalTimerStep: () => void;
   finishActiveSession: (notes?: string) => Session | null;
   restoreSessionsFromBackup: (sessions: Session[]) => void;
@@ -546,6 +548,33 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
   stopIntervalTimer: () => {
     set({ intervalTimer: INITIAL_INTERVAL_STATE });
+  },
+
+  adjustIntervalRounds: (delta) => {
+    const current = get().intervalTimer;
+    const nextRounds = Math.max(1, current.totalRounds + delta);
+    set({
+      intervalTimer: {
+        ...current,
+        totalRounds: nextRounds,
+      },
+    });
+  },
+
+  adjustIntervalWorkSec: (deltaSec) => {
+    const current = get().intervalTimer;
+    const nextWork = Math.max(5, current.workSec + deltaSec);
+    const nextRemaining =
+      current.phase === 'work'
+        ? Math.max(1, current.remainingSec + deltaSec)
+        : current.remainingSec;
+    set({
+      intervalTimer: {
+        ...current,
+        workSec: nextWork,
+        remainingSec: nextRemaining,
+      },
+    });
   },
 
   tickIntervalTimerStep: () => {

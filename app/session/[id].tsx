@@ -53,6 +53,8 @@ export default function SessionLoggerScreen({
   const toggleIntervalTimerRunning = useSessionStore((s) => s.toggleIntervalTimerRunning);
   const resetIntervalTimer = useSessionStore((s) => s.resetIntervalTimer);
   const stopIntervalTimer = useSessionStore((s) => s.stopIntervalTimer);
+  const adjustIntervalRounds = useSessionStore((s) => s.adjustIntervalRounds);
+  const adjustIntervalWorkSec = useSessionStore((s) => s.adjustIntervalWorkSec);
   const tickIntervalTimerStep = useSessionStore((s) => s.tickIntervalTimerStep);
   const finishActiveSession = useSessionStore((s) => s.finishActiveSession);
   const openExistingSession = useSessionStore((s) => s.openExistingSession);
@@ -290,6 +292,37 @@ export default function SessionLoggerScreen({
               onPress={stopIntervalTimer}
             >
               <Text style={[styles.intervalBtnText, { color: theme.colors.danger }]}>✕ STOP</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.intervalStepperRow}>
+            <TouchableOpacity
+              testID="interval-rounds-minus"
+              style={[styles.stepperBtn, { borderColor: theme.colors.border }]}
+              onPress={() => adjustIntervalRounds(-5)}
+            >
+              <Text style={[styles.stepperBtnText, ts.textMuted]}>-5 RNDS</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="interval-rounds-plus"
+              style={[styles.stepperBtn, { borderColor: theme.colors.border }]}
+              onPress={() => adjustIntervalRounds(5)}
+            >
+              <Text style={[styles.stepperBtnText, ts.textMuted]}>+5 RNDS</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="interval-work-minus"
+              style={[styles.stepperBtn, { borderColor: theme.colors.border }]}
+              onPress={() => adjustIntervalWorkSec(-15)}
+            >
+              <Text style={[styles.stepperBtnText, ts.textMuted]}>-15s</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="interval-work-plus"
+              style={[styles.stepperBtn, { borderColor: theme.colors.border }]}
+              onPress={() => adjustIntervalWorkSec(15)}
+            >
+              <Text style={[styles.stepperBtnText, ts.textMuted]}>+15s</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -674,6 +707,20 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
   },
+  intervalStepperRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 8,
+    width: '100%',
+    justifyContent: 'center',
+  },
+  stepperBtn: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+  },
+  stepperBtnText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   intervalBtn: {
     borderWidth: 1,
     borderRadius: 4,
