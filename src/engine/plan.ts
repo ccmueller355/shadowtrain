@@ -55,6 +55,11 @@ const TRAINER_VARIANTS: Record<TrainerId, string[][]> = {
     ['ring-push-up', 'ring-row', 'ring-rollout', 'bw-pike-push-up'],
     ['ring-support-hold', 'bw-squat', 'rope-boxer-step', 'stretch-cossack-squat'],
   ],
+  'drone-unit-0': [
+    ['bw-push-up', 'bw-squat', 'bw-plank', 'stretch-deep-squat-pry'],
+    ['kb-swing-two-hand', 'kb-goblet-squat', 'rope-basic-bounce', 'stretch-couch'],
+    ['ring-row', 'ring-support-hold', 'bw-hollow-body-hold', 'stretch-90-90-hip'],
+  ],
 };
 
 const VARIANT_LABELS = ['SPLIT A // PRIMARY', 'SPLIT B // ALTERNATE', 'RECOVERY & MOBILITY'];

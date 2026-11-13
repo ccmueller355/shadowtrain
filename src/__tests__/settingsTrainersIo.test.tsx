@@ -11,10 +11,13 @@ import {
 } from '../engine/portability';
 import {
   canUnlockTrainer,
+  getCoachDisplayForExercise,
   getSpecialistTrainerForExercise,
   getTrainerById,
+  getTrainerCoachingCue,
   isTrainerUnlocked,
   SHADOW_TRAINERS,
+  TRAINING_DRONE,
 } from '../engine/trainers';
 import { useExerciseStore } from '../stores/exerciseStore';
 import { DEFAULT_PROFILE, useProfileStore } from '../stores/profileStore';
@@ -235,6 +238,56 @@ describe('M7 Settings, 5 Shadow Trainers Dossier, Creds & Data Portability', () 
 
     it('falls back to Vanguard for unknown equipment', () => {
       expect(pick('x-cable', 'cable')).toBe('human-soldier');
+    });
+  });
+
+  describe('M11 Training Drone & Dynamic Specialist Skin Display', () => {
+    it('retrieves UNIT-0 Training Drone by id', () => {
+      const drone = getTrainerById('drone-unit-0');
+      expect(drone.id).toBe('drone-unit-0');
+      expect(drone.callsign).toBe('UNIT-0');
+      expect(drone.portrait).toBe(TRAINING_DRONE.portrait);
+      expect(isTrainerUnlocked(DEFAULT_PROFILE, 'drone-unit-0')).toBe(true);
+    });
+
+    it('returns stock Training Drone when specialist coach is locked', () => {
+      const lockedProfile = { ...DEFAULT_PROFILE, unlockedTrainerIds: ['orc-merc'] as const };
+      const display = getCoachDisplayForExercise(
+        { id: 'ring-dip', equipment: 'rings' },
+        lockedProfile,
+      );
+
+      expect(display.isSpecialist).toBe(false);
+      expect(display.isUnlocked).toBe(false);
+      expect(display.coach.id).toBe('drone-unit-0');
+      expect(display.specialist.id).toBe('elf-wraith');
+      expect(display.coachingCue).toContain('NEUTRAL SPINE');
+    });
+
+    it('returns Specialist Coach with custom coaching cue when unlocked', () => {
+      const unlockedProfile = {
+        ...DEFAULT_PROFILE,
+        unlockedTrainerIds: ['orc-merc', 'elf-wraith'] as any,
+      };
+      const display = getCoachDisplayForExercise(
+        { id: 'ring-dip', equipment: 'rings' },
+        unlockedProfile,
+      );
+
+      expect(display.isSpecialist).toBe(true);
+      expect(display.isUnlocked).toBe(true);
+      expect(display.coach.id).toBe('elf-wraith');
+      expect(display.specialist.id).toBe('elf-wraith');
+      expect(display.coachingCue).toContain('LEVERAGE OVER RAW MASS');
+    });
+
+    it('provides distinct coaching cues for all trainers', () => {
+      expect(getTrainerCoachingCue('orc-merc')).toContain('TUSK');
+      expect(getTrainerCoachingCue('human-decker')).toContain('VALERIE');
+      expect(getTrainerCoachingCue('human-soldier')).toContain('VANGUARD');
+      expect(getTrainerCoachingCue('elf-mage')).toContain('LYRA');
+      expect(getTrainerCoachingCue('elf-wraith')).toContain('WRAITH');
+      expect(getTrainerCoachingCue('drone-unit-0')).toContain('UNIT-0');
     });
   });
 });
