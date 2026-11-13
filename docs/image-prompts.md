@@ -82,3 +82,16 @@ Instead of generating 5 duplicate icon sets for every exercise, each movement in
 | **Lyra "Aether" Vael (`elf-mage`)**          | All `Stretching` & Mobility movements (`90/90 Hip`, `Couch Stretch`, `Deep Squat Pry`, `Cossack`, `Thoracic Bridge`) + `Turkish Get-Up` |
 | **Valerie "Glitch" Vance (`human-decker`)**  | All `Skipping Rope` (`Basic Bounce`, `Boxer Step`, `High Knees / Double-Unders`) + `Kettlebell Halo` & Core Holds                       |
 | **Marcus "Vanguard" Kade (`human-soldier`)** | Tactical Hybrid / Compound Gym & Split movements (`Dumbbell`, `Cable`, `Loaded Carries`, `Pull-Ups`)                                    |
+
+---
+
+## 4. Showcase Bundle Status
+
+14 core-kit exercises are bundled under `assets/exercises/<exercise_id>/{start,end}.webp` (768×768), mapped in `src/engine/exerciseShowcases.ts`. Exercises without images (or with a missing pose) fall back to the themed placeholder card.
+
+**Pending poses** (image quota exhausted during M8; follow-up batch):
+
+- `bw-hollow-body-hold` — `end`
+- `stretch-90-90-hip` — `end`
+
+**Needs a re-roll for pose accuracy**: `ring-dip` `start` (should be arms-locked support), `bw-pistol-squat` `start` (should be standing on one leg), `bw-push-up` `start` (should be high plank).

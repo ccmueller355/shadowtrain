@@ -1,12 +1,14 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Image } from 'react-native';
 import { useAppTheme } from '../../src/theme/useTheme';
 import { useThemeStyles } from '../../src/theme/useThemeStyles';
 import { useProfileStore } from '../../src/stores/profileStore';
 import { filterExercises, useExerciseStore } from '../../src/stores/exerciseStore';
 import { formatLastDoneSummary, useSessionStore } from '../../src/stores/sessionStore';
 import { formatSuggestionChip, suggestNext } from '../../src/engine/suggest';
+import { getSpecialistTrainerForExercise, isTrainerUnlocked } from '../../src/engine/trainers';
+import { getExerciseShowcase } from '../../src/engine/exerciseShowcases';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { Equipment, Exercise } from '../../src/types';
 
@@ -75,6 +77,9 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
     const lastSummary = formatLastDoneSummary(lastSets, detailExercise.trackingType);
     const suggestion = suggestNext(lastSets, profile, detailExercise);
     const suggestionChip = formatSuggestionChip(suggestion, profile.units);
+    const specialist = getSpecialistTrainerForExercise(detailExercise);
+    const isSpecialistUnlocked = isTrainerUnlocked(profile, specialist.id);
+    const showcase = getExerciseShowcase(detailExercise.id);
     const nextProgression = detailExercise.nextProgressionId
       ? exercises.find((e) => e.id === detailExercise.nextProgressionId)
       : undefined;
@@ -83,7 +88,9 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
       <View style={[styles.container, ts.bg]} testID="exercise-detail-view">
         <View style={styles.headerRow}>
           <View style={styles.headerTextWrap}>
-            <Text style={[styles.title, ts.accent]}>{detailExercise.name}</Text>
+            <Text style={[styles.title, ts.accent]} testID="exercise-detail-title">
+              {detailExercise.name}
+            </Text>
             <Text style={[styles.subtitle, ts.textMuted]}>
               {detailExercise.equipment.toUpperCase()}
               {detailExercise.tier ? ` · TIER: ${detailExercise.tier.toUpperCase()}` : ''} ·{' '}
@@ -100,6 +107,106 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
         </View>
 
         <ScrollView style={styles.list}>
+          {/* M8: Specialist Trainer Showcase Card */}
+          <CyberpunkCard style={styles.card}>
+            <View style={styles.specialistRow} testID="exercise-specialist-card">
+              <Image source={specialist.portrait} style={styles.specialistThumb} />
+              <View style={styles.specialistInfo}>
+                <View style={styles.specialistBadgeRow}>
+                  <Text style={[styles.badge, ts.accent]}>
+                    SPECIALIST COACH // {specialist.callsign}
+                  </Text>
+                  {!isSpecialistUnlocked && (
+                    <Text
+                      style={[styles.lockedCoachTag, { borderColor: theme.colors.secondary }]}
+                      testID="coach-locked-badge"
+                    >
+                      ENCRYPTED // {specialist.unlockCost} ¥
+                    </Text>
+                  )}
+                </View>
+                <Text style={[styles.specialistName, ts.text]}>{specialist.name}</Text>
+                <Text style={[styles.specialistSpecialty, ts.textMuted]} numberOfLines={2}>
+                  {specialist.specialty}
+                </Text>
+              </View>
+            </View>
+
+            {/* Start/End showcase poses; themed fallback card when none bundled */}
+            {showcase?.start || showcase?.end ? (
+              <View style={styles.poseRowContainer}>
+                <View
+                  style={[styles.poseRow, !isSpecialistUnlocked && styles.poseRowEncrypted]}
+                  testID="exercise-pose-images"
+                >
+                  {showcase.start ? (
+                    <View style={styles.poseCol}>
+                      <Image
+                        source={showcase.start}
+                        style={[styles.poseImage, !isSpecialistUnlocked && styles.poseImageLocked]}
+                        resizeMode="contain"
+                        testID="exercise-pose-start"
+                      />
+                      <Text style={[styles.poseCaption, ts.textMuted]}>START</Text>
+                    </View>
+                  ) : null}
+                  {showcase.end ? (
+                    <View style={styles.poseCol}>
+                      <Image
+                        source={showcase.end}
+                        style={[styles.poseImage, !isSpecialistUnlocked && styles.poseImageLocked]}
+                        resizeMode="contain"
+                        testID="exercise-pose-end"
+                      />
+                      <Text style={[styles.poseCaption, ts.textMuted]}>END</Text>
+                    </View>
+                  ) : null}
+                </View>
+
+                {/* Cyberpunk Hologram Encryption Overlay if trainer is locked */}
+                {!isSpecialistUnlocked && (
+                  <View
+                    style={[
+                      styles.encryptedHoloBanner,
+                      {
+                        backgroundColor: 'rgba(20, 16, 28, 0.88)',
+                        borderColor: theme.colors.secondary,
+                      },
+                    ]}
+                    testID="coach-encrypted-overlay"
+                  >
+                    <Text style={[styles.encryptedBannerTitle, { color: theme.colors.secondary }]}>
+                      [DOSSIER ENCRYPTED // {specialist.unlockCost} ¥]
+                    </Text>
+                    <Text style={[styles.encryptedBannerSub, ts.textMuted]}>
+                      Unlock {specialist.callsign} in Settings with Creds to decrypt full coach
+                      telemetry & breakdown
+                    </Text>
+                  </View>
+                )}
+              </View>
+            ) : (
+              <View
+                testID="exercise-pose-fallback-card"
+                style={[
+                  styles.poseFallback,
+                  {
+                    borderColor: theme.colors.primary,
+                    backgroundColor: theme.colors.surface,
+                  },
+                ]}
+              >
+                <Text style={[styles.poseCode, ts.accent]}>
+                  POSE // {specialist.callsign} · {detailExercise.equipment.toUpperCase()}
+                </Text>
+                <Text style={[styles.poseTitle, ts.text]}>{detailExercise.name}</Text>
+                <Text style={[styles.poseMeta, ts.textMuted]}>
+                  HD SPECIALIST SHOWCASE // Æ CYBERNETICS RIG
+                </Text>
+              </View>
+            )}
+          </CyberpunkCard>
+
           <CyberpunkCard style={styles.card}>
             <Text style={[styles.badge, ts.accent]}>SUGGESTED NEXT</Text>
             <Text
@@ -396,4 +503,66 @@ const styles = StyleSheet.create({
   },
   instructionText: { fontSize: 12, fontFamily: 'monospace', marginTop: 6 },
   emptyText: { fontSize: 13, fontFamily: 'monospace' },
+  specialistRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  specialistThumb: { width: 56, height: 56, borderRadius: 8, borderWidth: 1, marginRight: 12 },
+  specialistInfo: { flex: 1 },
+  specialistName: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 2 },
+  specialistSpecialty: { fontSize: 10, fontFamily: 'monospace', marginTop: 2 },
+  poseFallback: {
+    borderWidth: 1,
+    borderRadius: 6,
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  poseRow: { flexDirection: 'row', gap: 12, justifyContent: 'center', marginVertical: 6 },
+  poseRowContainer: { position: 'relative' },
+  poseRowEncrypted: { opacity: 0.35 },
+  poseImageLocked: { opacity: 0.6 },
+  poseCol: { flex: 1, maxWidth: 170, alignItems: 'center' },
+  poseImage: { width: '100%', height: 160, borderRadius: 8 },
+  poseCaption: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 4 },
+  specialistBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+  },
+  lockedCoachTag: {
+    fontSize: 9,
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    color: '#ffaa00',
+  },
+  encryptedHoloBanner: {
+    position: 'absolute',
+    left: 8,
+    right: 8,
+    top: '25%',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  encryptedBannerTitle: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  encryptedBannerSub: {
+    fontSize: 9,
+    fontFamily: 'monospace',
+    textAlign: 'center',
+    lineHeight: 12,
+  },
+  poseCode: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
+  poseTitle: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginVertical: 4 },
+  poseMeta: { fontSize: 9, fontFamily: 'monospace' },
 });
