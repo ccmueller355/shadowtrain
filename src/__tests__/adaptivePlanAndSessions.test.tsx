@@ -221,5 +221,50 @@ describe('M10 Adaptive Workout Plan, Weekly Streaks, Session Edit/Delete & Logge
       fireEvent.press(screen.getByTestId('delete-session-session-planned'));
       expect(useSessionStore.getState().recentSessions).toHaveLength(0);
     });
+
+    it('launches cult programs from HomeScreen and controls the interval timer in SessionLoggerScreen (M12)', () => {
+      const onStartSession = jest.fn();
+      const onFinish = jest.fn();
+
+      // Render HomeScreen
+      const home = render(<HomeScreen onStartSession={onStartSession} />);
+      expect(screen.getByTestId('cult-programs-card')).toBeTruthy();
+
+      // Select Rite of Passage program
+      fireEvent.press(screen.getByTestId('select-program-rite-of-passage'));
+
+      // Launch Cult Workout
+      fireEvent.press(screen.getByTestId('launch-cult-program-btn'));
+      expect(onStartSession).toHaveBeenCalledWith('session-rite-of-passage');
+
+      const activeSession = useSessionStore.getState().activeSession;
+      expect(activeSession?.name).toContain('RITE OF PASSAGE');
+      expect(activeSession?.entries.length).toBeGreaterThanOrEqual(2);
+      home.unmount();
+
+      // Mount SessionLoggerScreen with launched session
+      const logger = render(
+        <SessionLoggerScreen sessionId="session-rite-of-passage" onFinishSession={onFinish} />,
+      );
+
+      // Verify preset bar or interval timer banner is present
+      const intervalBanner = screen.queryByTestId('interval-timer-banner');
+      if (!intervalBanner) {
+        fireEvent.press(screen.getByTestId('interval-preset-tabata'));
+      }
+      expect(screen.getByTestId('interval-timer-banner')).toBeTruthy();
+      expect(screen.getByTestId('interval-timer-countdown')).toBeTruthy();
+
+      // Toggle pause/play
+      fireEvent.press(screen.getByTestId('interval-timer-toggle'));
+      // Reset timer
+      fireEvent.press(screen.getByTestId('interval-timer-reset'));
+      // Stop timer
+      fireEvent.press(screen.getByTestId('interval-timer-close'));
+      expect(screen.queryByTestId('interval-timer-banner')).toBeNull();
+      expect(screen.getByTestId('interval-preset-bar')).toBeTruthy();
+
+      logger.unmount();
+    });
   });
 });

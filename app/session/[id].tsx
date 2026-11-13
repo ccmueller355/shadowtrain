@@ -8,6 +8,7 @@ import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { useProfileStore } from '../../src/stores/profileStore';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
 import { formatSuggestionChip, suggestNext } from '../../src/engine/suggest';
+import { formatIntervalTime } from '../../src/engine/intervalTimer';
 import {
   formatLastDoneSummary,
   getDefaultRestSeconds,
@@ -47,6 +48,12 @@ export default function SessionLoggerScreen({
   const tickRestTimer = useSessionStore((s) => s.tickRestTimer);
   const adjustRestTimer = useSessionStore((s) => s.adjustRestTimer);
   const stopRestTimer = useSessionStore((s) => s.stopRestTimer);
+  const intervalTimer = useSessionStore((s) => s.intervalTimer);
+  const startIntervalTimer = useSessionStore((s) => s.startIntervalTimer);
+  const toggleIntervalTimerRunning = useSessionStore((s) => s.toggleIntervalTimerRunning);
+  const resetIntervalTimer = useSessionStore((s) => s.resetIntervalTimer);
+  const stopIntervalTimer = useSessionStore((s) => s.stopIntervalTimer);
+  const tickIntervalTimerStep = useSessionStore((s) => s.tickIntervalTimerStep);
   const finishActiveSession = useSessionStore((s) => s.finishActiveSession);
   const openExistingSession = useSessionStore((s) => s.openExistingSession);
   const cancelOrDeleteSession = useSessionStore((s) => s.cancelOrDeleteSession);
@@ -68,6 +75,14 @@ export default function SessionLoggerScreen({
     }, 1000);
     return () => clearInterval(interval);
   }, [restTimerRunning, tickRestTimer]);
+
+  useEffect(() => {
+    if (!intervalTimer.running) return undefined;
+    const interval = setInterval(() => {
+      tickIntervalTimerStep();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [intervalTimer.running, tickIntervalTimerStep]);
 
   const handleBack = () => {
     onFinishSession?.();
@@ -190,6 +205,118 @@ export default function SessionLoggerScreen({
               <Text style={[styles.timerBtnText, { color: theme.colors.danger }]}>SKIP</Text>
             </TouchableOpacity>
           </View>
+        </View>
+      )}
+
+      {intervalTimer.mode !== 'off' ? (
+        <View
+          testID="interval-timer-banner"
+          style={[
+            styles.intervalBanner,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor:
+                intervalTimer.phase === 'work'
+                  ? theme.colors.primary
+                  : intervalTimer.phase === 'prep'
+                    ? theme.colors.secondary
+                    : theme.colors.border,
+            },
+          ]}
+        >
+          <View style={styles.intervalHeader}>
+            <View style={styles.intervalBadgeRow}>
+              <Text style={[styles.intervalModeBadge, ts.accent]}>
+                [{intervalTimer.mode.toUpperCase()}]
+              </Text>
+              <Text style={[styles.intervalRoundText, ts.text]}>
+                ROUND {intervalTimer.currentRound}/{intervalTimer.totalRounds}
+              </Text>
+            </View>
+            <Text
+              style={[
+                styles.intervalPhaseBadge,
+                {
+                  color:
+                    intervalTimer.phase === 'work'
+                      ? theme.colors.primary
+                      : intervalTimer.phase === 'prep'
+                        ? theme.colors.secondary
+                        : theme.colors.textSecondary,
+                },
+              ]}
+            >
+              ● {intervalTimer.phase.toUpperCase()}
+            </Text>
+          </View>
+
+          <Text style={[styles.intervalCountdown, ts.accent]} testID="interval-timer-countdown">
+            {formatIntervalTime(intervalTimer.remainingSec)}
+          </Text>
+
+          <View style={styles.intervalActionRow}>
+            <TouchableOpacity
+              testID="interval-timer-toggle"
+              style={[
+                styles.intervalBtn,
+                {
+                  backgroundColor: intervalTimer.running ? 'transparent' : theme.colors.primary,
+                  borderColor: theme.colors.primary,
+                },
+              ]}
+              onPress={toggleIntervalTimerRunning}
+            >
+              <Text
+                style={[
+                  styles.intervalBtnText,
+                  {
+                    color: intervalTimer.running ? theme.colors.primary : theme.colors.headerBg,
+                  },
+                ]}
+              >
+                {intervalTimer.running ? '❚❚ PAUSE' : '▶ START'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="interval-timer-reset"
+              style={[styles.intervalBtn, { borderColor: theme.colors.border }]}
+              onPress={resetIntervalTimer}
+            >
+              <Text style={[styles.intervalBtnText, ts.textMuted]}>↻ RESET</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="interval-timer-close"
+              style={[styles.intervalBtn, { borderColor: theme.colors.danger }]}
+              onPress={stopIntervalTimer}
+            >
+              <Text style={[styles.intervalBtnText, { color: theme.colors.danger }]}>✕ STOP</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
+        <View style={styles.presetBar} testID="interval-preset-bar">
+          <Text style={[styles.presetBarLabel, ts.textMuted]}>ROUND TIMER:</Text>
+          <TouchableOpacity
+            testID="interval-preset-emom"
+            style={[styles.presetChip, { borderColor: theme.colors.primary }]}
+            onPress={() => startIntervalTimer('emom-10')}
+          >
+            <Text style={[styles.presetChipText, ts.accent]}>EMOM 10×60s</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            testID="interval-preset-tabata"
+            style={[styles.presetChip, { borderColor: theme.colors.primary }]}
+            onPress={() => startIntervalTimer('tabata-standard')}
+          >
+            <Text style={[styles.presetChipText, ts.accent]}>TABATA 20/10</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            testID="interval-preset-combat"
+            style={[styles.presetChip, { borderColor: theme.colors.primary }]}
+            onPress={() => startIntervalTimer('combat-rounds')}
+          >
+            <Text style={[styles.presetChipText, ts.accent]}>COMBAT 3m</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -515,6 +642,60 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   timerBtnText: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
+  intervalBanner: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  intervalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 6,
+  },
+  intervalBadgeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  intervalModeBadge: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
+  intervalRoundText: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
+  intervalPhaseBadge: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
+  intervalCountdown: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    letterSpacing: 2,
+    marginVertical: 4,
+  },
+  intervalActionRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+    width: '100%',
+    justifyContent: 'center',
+  },
+  intervalBtn: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  intervalBtnText: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
+  presetBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 10,
+  },
+  presetBarLabel: { fontSize: 10, fontFamily: 'monospace', fontWeight: 'bold' },
+  presetChip: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  presetChipText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   addExerciseBtn: {
     borderWidth: 1,
     borderRadius: 6,

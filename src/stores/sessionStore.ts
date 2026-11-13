@@ -11,6 +11,15 @@ import {
   saveSession,
 } from '../db';
 import { PlannedWorkout } from '../engine/plan';
+import {
+  createIntervalTimer,
+  INITIAL_INTERVAL_STATE,
+  INTERVAL_PRESETS,
+  IntervalTimerConfig,
+  IntervalTimerState,
+  tickIntervalTimer,
+} from '../engine/intervalTimer';
+import { buildEntriesFromCultWorkout, CultProgram, ProgramWorkout } from '../engine/programs';
 import { buildSetsFromSuggestion, Suggestion } from '../engine/suggest';
 import { Entry, Exercise, Session, SetRecord } from '../types';
 import { useProfileStore } from './profileStore';
@@ -99,8 +108,10 @@ export interface SessionState {
   lastDoneCache: Record<string, SetRecord[]>;
   restTimerSec: number;
   restTimerRunning: boolean;
+  intervalTimer: IntervalTimerState;
   startSession: (customId?: string, name?: string) => Session;
   startPlannedSession: (plan: PlannedWorkout, customId?: string) => Session;
+  startProgramSession: (program: CultProgram, workoutIndex?: number, customId?: string) => Session;
   openExistingSession: (sessionId: string) => Session | null;
   cancelOrDeleteSession: (sessionId?: string) => void;
   updateSessionName: (name: string) => void;
@@ -126,6 +137,11 @@ export interface SessionState {
   tickRestTimer: () => void;
   adjustRestTimer: (deltaSec: number) => void;
   stopRestTimer: () => void;
+  startIntervalTimer: (configOrPreset: string | Partial<IntervalTimerConfig>) => void;
+  toggleIntervalTimerRunning: () => void;
+  resetIntervalTimer: () => void;
+  stopIntervalTimer: () => void;
+  tickIntervalTimerStep: () => void;
   finishActiveSession: (notes?: string) => Session | null;
   restoreSessionsFromBackup: (sessions: Session[]) => void;
   hydrateSessionsFromDb: (db?: DatabaseClient) => Promise<void>;
@@ -157,6 +173,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   lastDoneCache: {},
   restTimerSec: 0,
   restTimerRunning: false,
+  intervalTimer: INITIAL_INTERVAL_STATE,
 
   startSession: (customId, name) => {
     const existing = get().activeSession;
@@ -195,6 +212,34 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     };
 
     set({ activeSession: session });
+    tryPersistSessionToDb(session);
+    return session;
+  },
+
+  startProgramSession: (program, workoutIndex = 0, customId) => {
+    const profile = useProfileStore.getState().profile;
+    const workout = program.workouts[workoutIndex] ?? program.workouts[0];
+    const now = Date.now();
+    const entries = buildEntriesFromCultWorkout(workout, profile, (prefix) => nextUid(prefix));
+
+    const session: Session = {
+      id: customId ?? nextUid('session'),
+      startedAt: now,
+      name: `${program.name} · ${workout.title}`,
+      entries,
+    };
+
+    let nextInterval = get().intervalTimer;
+    if (workout.timerConfig) {
+      nextInterval = createIntervalTimer({
+        mode: workout.recommendedTimerMode === 'rest' ? 'emom' : workout.recommendedTimerMode,
+        rounds: workout.timerConfig.rounds,
+        workSec: workout.timerConfig.workSec,
+        restSec: workout.timerConfig.restSec,
+      });
+    }
+
+    set({ activeSession: session, intervalTimer: nextInterval });
     tryPersistSessionToDb(session);
     return session;
   },
@@ -458,6 +503,65 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set({ restTimerSec: 0, restTimerRunning: false });
   },
 
+  startIntervalTimer: (configOrPreset) => {
+    let timerState: IntervalTimerState;
+    if (typeof configOrPreset === 'string') {
+      const preset = INTERVAL_PRESETS[configOrPreset];
+      timerState = preset
+        ? createIntervalTimer(preset.config)
+        : createIntervalTimer({ mode: 'emom' });
+    } else {
+      timerState = createIntervalTimer(configOrPreset);
+    }
+    set({ intervalTimer: { ...timerState, running: true } });
+  },
+
+  toggleIntervalTimerRunning: () => {
+    const current = get().intervalTimer;
+    if (current.phase === 'complete') {
+      const reset = createIntervalTimer({
+        mode: current.mode,
+        rounds: current.totalRounds,
+        workSec: current.workSec,
+        restSec: current.restSec,
+        prepSec: current.prepSec,
+      });
+      set({ intervalTimer: { ...reset, running: true } });
+      return;
+    }
+    set({ intervalTimer: { ...current, running: !current.running } });
+  },
+
+  resetIntervalTimer: () => {
+    const current = get().intervalTimer;
+    const reset = createIntervalTimer({
+      mode: current.mode,
+      rounds: current.totalRounds,
+      workSec: current.workSec,
+      restSec: current.restSec,
+      prepSec: current.prepSec,
+    });
+    set({ intervalTimer: reset });
+  },
+
+  stopIntervalTimer: () => {
+    set({ intervalTimer: INITIAL_INTERVAL_STATE });
+  },
+
+  tickIntervalTimerStep: () => {
+    const current = get().intervalTimer;
+    if (!current.running) return;
+    const result = tickIntervalTimer(current);
+    if (result.didPhaseChange || result.didRoundChange || result.didComplete) {
+      try {
+        Vibration.vibrate(200);
+      } catch {
+        // Ignore in test env
+      }
+    }
+    set({ intervalTimer: result.nextState });
+  },
+
   finishActiveSession: (notes) => {
     const current = get().activeSession;
     if (!current) return null;
@@ -488,6 +592,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       lastDoneCache: nextCache,
       restTimerSec: 0,
       restTimerRunning: false,
+      intervalTimer: INITIAL_INTERVAL_STATE,
     });
     if (!wasAlreadyFinished) {
       useProfileStore.getState().addCreds(25);
@@ -532,6 +637,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       lastDoneCache: {},
       restTimerSec: 0,
       restTimerRunning: false,
+      intervalTimer: INITIAL_INTERVAL_STATE,
     });
   },
 }));
