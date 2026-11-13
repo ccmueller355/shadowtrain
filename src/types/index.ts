@@ -5,7 +5,8 @@ export type Experience = 'novice' | 'intermediate' | 'advanced';
 export type Units = 'kg' | 'lb';
 export type TrackingType = 'reps' | 'duration';
 export type DifficultyTier = 'beginner' | 'mid' | 'advanced';
-export type TrainerId = 'orc-merc' | 'human-decker' | 'human-soldier' | 'elf-mage' | 'elf-wraith';
+export type TrainerId =
+  'orc-merc' | 'human-decker' | 'human-soldier' | 'elf-mage' | 'elf-wraith' | 'drone-unit-0';
 
 export type Equipment =
   | 'kettlebell'

@@ -119,12 +119,29 @@ export const SHADOW_TRAINERS: TrainerDossier[] = [
   },
 ];
 
+export const TRAINING_DRONE: TrainerDossier = {
+  id: 'drone-unit-0',
+  name: 'UNIT-0 // SPAR-0',
+  callsign: 'UNIT-0',
+  raceClass: 'Synthetic Automaton // Biomechanical Sparring Dummy',
+  unlockCost: 0,
+  specialty: 'Stock Factory Calibration & Neutral Form Metrics',
+  lore: 'Standard-issue corporate sparring dummy from Æ CYBERNETICS. Delivers objective biomechanical execution with zero personality or attitude.',
+  programId: 'stock-calibration',
+  programName: 'UNIT-0 // FACTORY CALIBRATION',
+  programFocus: 'Baseline biomechanics, tempo compliance, and neutral spine execution',
+  signatureExerciseIds: [],
+  skills: { strength: 5, conditioning: 5, mobility: 5, calisthenics: 5, tech: 10 },
+  portrait: require('../../assets/trainers/spar-drone.webp') as ImageSourcePropType,
+};
+
 export function getTrainerById(trainerId?: TrainerId): TrainerDossier {
+  if (trainerId === 'drone-unit-0') return TRAINING_DRONE;
   return SHADOW_TRAINERS.find((t) => t.id === trainerId) ?? SHADOW_TRAINERS[0];
 }
 
 export function isTrainerUnlocked(profile: Profile, trainerId: TrainerId): boolean {
-  if (trainerId === 'orc-merc') return true;
+  if (trainerId === 'orc-merc' || trainerId === 'drone-unit-0') return true;
   const unlocked = profile.unlockedTrainerIds ?? ['orc-merc'];
   return unlocked.includes(trainerId);
 }
@@ -133,6 +150,41 @@ export function canUnlockTrainer(profile: Profile, trainerId: TrainerId): boolea
   if (isTrainerUnlocked(profile, trainerId)) return true;
   const trainer = getTrainerById(trainerId);
   return (profile.creds ?? 0) >= trainer.unlockCost;
+}
+
+export interface CoachSkinDisplay {
+  coach: TrainerDossier;
+  isUnlocked: boolean;
+  isSpecialist: boolean;
+  specialist: TrainerDossier;
+  coachingCue: string;
+}
+
+export function getCoachDisplayForExercise(
+  exercise: { id: string; equipment: string; category?: string },
+  profile: Profile,
+): CoachSkinDisplay {
+  const specialist = getSpecialistTrainerForExercise(exercise);
+  const isSpecialistUnlocked = isTrainerUnlocked(profile, specialist.id);
+
+  if (isSpecialistUnlocked) {
+    return {
+      coach: specialist,
+      isUnlocked: true,
+      isSpecialist: true,
+      specialist,
+      coachingCue: getTrainerCoachingCue(specialist.id),
+    };
+  }
+
+  // Fallback to stock training drone when specialist is locked
+  return {
+    coach: TRAINING_DRONE,
+    isUnlocked: false,
+    isSpecialist: false,
+    specialist,
+    coachingCue: 'SYNTH CUE // EXECUTE WITH NEUTRAL SPINE & CONTROLLED TEMPO',
+  };
 }
 
 export function getSpecialistTrainerForExercise(exercise: {
@@ -182,4 +234,22 @@ export function getSpecialistTrainerForExercise(exercise: {
 
   // Default fallback to Vanguard
   return getTrainerById('human-soldier');
+}
+
+export function getTrainerCoachingCue(trainerId: TrainerId): string {
+  switch (trainerId) {
+    case 'orc-merc':
+      return 'TUSK // LOCK LATS, CRUSH THE HANDLE, ZERO HALF-REPS';
+    case 'human-decker':
+      return 'VALERIE // OVERCLOCK THE CADENCE, MAINTAIN RHYTHM';
+    case 'human-soldier':
+      return 'VANGUARD // BRACE CORE, TACTICAL LOCKOUT ON EVERY REP';
+    case 'elf-mage':
+      return 'LYRA // ALIGN THE ENERGY CONDUITS, CONTROL THE ECCENTRIC';
+    case 'elf-wraith':
+      return 'WRAITH // DEAD SILENCE, LEVERAGE OVER RAW MASS';
+    case 'drone-unit-0':
+    default:
+      return 'UNIT-0 // EXECUTE WITH NEUTRAL SPINE & CONTROLLED TEMPO';
+  }
 }

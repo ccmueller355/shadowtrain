@@ -259,13 +259,14 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       expect(screen.getByText('SHOWING 37 MOVEMENTS')).toBeTruthy();
     });
 
-    it('renders Exercise Detail view with specialist coach card and bundled start/end poses', () => {
+    it('renders Exercise Detail view with specialist coach card and bundled start/end poses when unlocked', () => {
       render(<ExercisesScreen />);
 
       fireEvent.press(screen.getByTestId('exercise-item-kb-swing-two-hand'));
       expect(screen.getByTestId('exercise-detail-view')).toBeTruthy();
       expect(screen.getByTestId('exercise-specialist-card')).toBeTruthy();
       expect(screen.getByText('SPECIALIST COACH // TUSK')).toBeTruthy();
+      expect(screen.getByTestId('coach-cue-text')).toBeTruthy();
       expect(screen.getByTestId('exercise-pose-start')).toBeTruthy();
       expect(screen.getByTestId('exercise-pose-end')).toBeTruthy();
       expect(screen.queryByTestId('exercise-pose-fallback-card')).toBeNull();
@@ -273,15 +274,18 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       expect(screen.queryByTestId('coach-encrypted-overlay')).toBeNull();
     });
 
-    it('renders encrypted dossier watermark and hologram banner when specialist coach is locked', () => {
+    it('renders training drone UNIT-0 with upgrade banner when specialist coach is locked', () => {
       render(<ExercisesScreen />);
 
       // Ring Dip specialist is Soren Wraith (locked by default, requires 1,000 ¥)
       fireEvent.press(screen.getByTestId('exercise-item-ring-dip'));
+      expect(screen.getByTestId('exercise-specialist-card')).toBeTruthy();
+      expect(screen.getByText('TRAINING DRONE // UNIT-0')).toBeTruthy();
+      expect(screen.getByText('UNIT-0 // SPAR-0')).toBeTruthy();
       expect(screen.getByTestId('coach-locked-badge')).toBeTruthy();
-      expect(screen.getByText('ENCRYPTED // 1000 ¥')).toBeTruthy();
+      expect(screen.getByText('LOCKED SPECIALIST // 1000 ¥')).toBeTruthy();
       expect(screen.getByTestId('coach-encrypted-overlay')).toBeTruthy();
-      expect(screen.getByText('[DOSSIER ENCRYPTED // 1000 ¥]')).toBeTruthy();
+      expect(screen.getByText('[DEFAULT SYNTH DRONE // UPGRADE AVAILABLE]')).toBeTruthy();
     });
 
     it('falls back to the themed pose card when no showcase images are bundled', () => {

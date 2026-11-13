@@ -7,7 +7,11 @@ import { useProfileStore } from '../../src/stores/profileStore';
 import { filterExercises, useExerciseStore } from '../../src/stores/exerciseStore';
 import { formatLastDoneSummary, useSessionStore } from '../../src/stores/sessionStore';
 import { formatSuggestionChip, suggestNext } from '../../src/engine/suggest';
-import { getSpecialistTrainerForExercise, isTrainerUnlocked } from '../../src/engine/trainers';
+import {
+  getCoachDisplayForExercise,
+  getSpecialistTrainerForExercise,
+  isTrainerUnlocked,
+} from '../../src/engine/trainers';
 import { getExerciseShowcase } from '../../src/engine/exerciseShowcases';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { Equipment, Exercise } from '../../src/types';
@@ -77,7 +81,8 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
     const lastSummary = formatLastDoneSummary(lastSets, detailExercise.trackingType);
     const suggestion = suggestNext(lastSets, profile, detailExercise);
     const suggestionChip = formatSuggestionChip(suggestion, profile.units);
-    const specialist = getSpecialistTrainerForExercise(detailExercise);
+    const coachDisplay = getCoachDisplayForExercise(detailExercise, profile);
+    const { coach, isSpecialist, specialist, coachingCue } = coachDisplay;
     const isSpecialistUnlocked = isTrainerUnlocked(profile, specialist.id);
     const showcase = getExerciseShowcase(detailExercise.id);
     const nextProgression = detailExercise.nextProgressionId
@@ -107,27 +112,40 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
         </View>
 
         <ScrollView style={styles.list}>
-          {/* M8: Specialist Trainer Showcase Card */}
+          {/* M11: Adaptive Coach & Drone Showcase Card */}
           <CyberpunkCard style={styles.card}>
             <View style={styles.specialistRow} testID="exercise-specialist-card">
-              <Image source={specialist.portrait} style={styles.specialistThumb} />
+              <Image
+                source={coach.portrait}
+                style={styles.specialistThumb}
+                testID="exercise-coach-portrait"
+              />
               <View style={styles.specialistInfo}>
                 <View style={styles.specialistBadgeRow}>
                   <Text style={[styles.badge, ts.accent]}>
-                    SPECIALIST COACH // {specialist.callsign}
+                    {isSpecialist
+                      ? `SPECIALIST COACH // ${coach.callsign}`
+                      : `TRAINING DRONE // ${coach.callsign}`}
                   </Text>
                   {!isSpecialistUnlocked && (
                     <Text
                       style={[styles.lockedCoachTag, { borderColor: theme.colors.secondary }]}
                       testID="coach-locked-badge"
                     >
-                      ENCRYPTED // {specialist.unlockCost} ¥
+                      LOCKED SPECIALIST // {specialist.unlockCost} ¥
                     </Text>
                   )}
                 </View>
-                <Text style={[styles.specialistName, ts.text]}>{specialist.name}</Text>
+                <Text style={[styles.specialistName, ts.text]}>{coach.name}</Text>
+                <Text
+                  style={[styles.coachingCueText, ts.accent]}
+                  numberOfLines={2}
+                  testID="coach-cue-text"
+                >
+                  "{coachingCue}"
+                </Text>
                 <Text style={[styles.specialistSpecialty, ts.textMuted]} numberOfLines={2}>
-                  {specialist.specialty}
+                  {coach.specialty}
                 </Text>
               </View>
             </View>
@@ -169,18 +187,18 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                     style={[
                       styles.encryptedHoloBanner,
                       {
-                        backgroundColor: 'rgba(20, 16, 28, 0.88)',
+                        backgroundColor: 'rgba(20, 16, 28, 0.90)',
                         borderColor: theme.colors.secondary,
                       },
                     ]}
                     testID="coach-encrypted-overlay"
                   >
                     <Text style={[styles.encryptedBannerTitle, { color: theme.colors.secondary }]}>
-                      [DOSSIER ENCRYPTED // {specialist.unlockCost} ¥]
+                      [DEFAULT SYNTH DRONE // UPGRADE AVAILABLE]
                     </Text>
                     <Text style={[styles.encryptedBannerSub, ts.textMuted]}>
-                      Unlock {specialist.callsign} in Settings with Creds to decrypt full coach
-                      telemetry & breakdown
+                      Unlock {specialist.callsign} ({specialist.unlockCost} ¥) in Settings to
+                      decrypt {specialist.name}'s signature poses & coaching telemetry
                     </Text>
                   </View>
                 )}
@@ -508,6 +526,14 @@ const styles = StyleSheet.create({
   specialistInfo: { flex: 1 },
   specialistName: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 2 },
   specialistSpecialty: { fontSize: 10, fontFamily: 'monospace', marginTop: 2 },
+  coachingCueText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    fontStyle: 'italic',
+    marginTop: 3,
+    marginBottom: 2,
+  },
   poseFallback: {
     borderWidth: 1,
     borderRadius: 6,
