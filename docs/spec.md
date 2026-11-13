@@ -498,6 +498,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 | **M12** | Program Templates & Round-Based Timer       | Cult programs (Simple & Sinister, Rite of Passage, Convict Calisthenics) + interval/round-based timer (EMOM/Tabata/Rounds) with extensible catalog | M    |
 | **M13** | Visual Overhaul: Seductive Shadow Roster    | High-glam cyberpunk revamp, 5 Trainer editorial dossiers in VitePress + 100% complete START/END WebP exercise frames                               | M    |
 | **M14** | Offline Cyberpunk Audio Sound Pack          | Cybernetic voice cues, countdown beeps, interval bells, and coach quips on rest timer expiration                                                   | S    |
+| **M15** | Cryptographic Vault & Ledger Integrity      | AsyncStorage Profile persistence, SQLite ledger replay/reconciliation, and HMAC-SHA256 tamper-proof backup checksum                                | S    |
 
 ### 7.1 Build Phases
 
@@ -530,6 +531,11 @@ Each milestone = **one issue**, one coding-agent session, one PR.
      - Configurable Round & Interval Timer in Session Logger: EMOM, Tabata, round count, work/rest interval beepers.
    - **M13 (Visual Overhaul: Seductive Shadow Roster) [COMPLETED]**: High-voltage visual revamp of the female and elven operatives in `assets/trainers/`, `assets/exercises/`, and `docs/trainers/`. Infuse raw cyberpunk allure, form-fitting tactical cyberware, lethal elegance, and provocative aesthetic charisma (Valerie "Glitch", Lyra "Aether", Kaelen "Titan", Marcus "Vanguard", Soren "Wraith", and UNIT-0 Spar-Drone). Includes 100% complete START/END WebP exercise frames for all 14 core movements and full VitePress editorial dossiers.
    - **M14 (Offline Cyberpunk Audio Sound Pack)**: Offline synthesized voice cues, countdown beeps, interval bells, and trainer completion quips when timers expire or sets finish.
+   - **M15 (Cryptographic Vault & Ledger Integrity)**: Dual-ledger persistence & anti-tampering:
+     - Wire `@react-native-async-storage/async-storage` via `zustand/middleware/persist` to `useProfileStore` so profile and Creds survive app termination.
+     - Implement a deterministic ledger replay engine (`src/engine/vault.ts` or `analytics.ts`): reconstruct and reconcile Cred balances directly from the SQLite session ledger and claimed achievement records.
+     - Introduce cryptographic payload signatures (HMAC-SHA256 checksum) in `src/engine/portability.ts` backup envelopes (`meta.checksum`) to reject manually edited or forged backup files.
+     - Add unit tests for anti-tamper rejection and ledger reconciliation.
 
 **Definition of done (every milestone):**
 
