@@ -1,0 +1,78 @@
+name: EAS Build
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'EAS Build Profile'
+        required: true
+        default: 'preview'
+        type: choice
+        options:
+          - development
+          - preview
+          - production
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Android (${{ github.event.inputs.profile || 'tag' }})
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: TypeScript strict check
+        run: npx tsc --noEmit
+
+      - name: Run Jest test suite
+        run: npm test
+
+      - name: Determine EAS Profile
+        id: profile
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "BUILD_PROFILE=${{ github.event.inputs.profile }}" >> $GITHUB_ENV
+          else
+            TAG_NAME=${{ github.ref_name }}
+            if [[ "$TAG_NAME" == *-dev ]]; then
+              echo "BUILD_PROFILE=development" >> $GITHUB_ENV
+            elif [[ "$TAG_NAME" == *-prod ]]; then
+              echo "BUILD_PROFILE=production" >> $GITHUB_ENV
+            else
+              echo "BUILD_PROFILE=preview" >> $GITHUB_ENV
+            fi
+          fi
+
+      - name: Build Android package on EAS
+        id: build
+        run: |
+          echo "Starting EAS build with profile: ${{ env.BUILD_PROFILE }}"
+          BUILD_OUTPUT=$(eas build --platform android --profile ${{ env.BUILD_PROFILE }} --non-interactive --no-wait --json 2>/dev/null)
+          echo "$BUILD_OUTPUT"
+          BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.[0].id // ""')
+          echo "Build ID: $BUILD_ID"
