@@ -31,23 +31,23 @@ Lyra channels mana through structural alignment, deep joint decompression, slow-
 
 > 🔍 _Click any editorial plate or exercise frame below to inspect the full uncompressed render._
 
-### Plate 01: Architectural Cutout Stance (Primary Editorial Portrait)
+### Plate 01: Full-Mesh Obsidian Stance (Primary Editorial Portrait)
+
+[![Lyra Fullbody Mesh](/trainers/lyra-fullbody-portrait.jpg)](/trainers/lyra-fullbody-portrait.jpg)
+
+- **Lens Spec**: 50mm f/1.8 · Volumetric Cyan & Violet Rim Lighting
+- **Canvas**: 3:4 Vertical Studio Portrait
+- **Description**: Full-coverage translucent micro-mesh and carbon-fiber study paired with dual 32kg cyan mana-circuit kettlebells.
+
+---
+
+### Plate 02: Architectural Cutout Stance (Cutout Variant)
 
 [![Lyra Fullbody Cutout](/trainers/lyra-fullbody-cutout.jpg)](/trainers/lyra-fullbody-cutout.jpg)
 
 - **Lens Spec**: 50mm f/1.8 · Volumetric Cyan & Violet Rim Lighting
 - **Canvas**: 3:4 Vertical Studio Portrait
 - **Description**: Sculpted athletic form in architectural cutouts and matte carbon-fiber bodysuit, traced with amber and cyan arcane circuitry beside a mana-inlaid kettlebell.
-
----
-
-### Plate 02: Full-Mesh Obsidian Stance (Archive Mesh Variant)
-
-[![Lyra Fullbody Mesh](/trainers/lyra-fullbody-portrait.jpg)](/trainers/lyra-fullbody-portrait.jpg)
-
-- **Lens Spec**: 50mm f/1.8 · Volumetric Cyan & Violet Rim
-- **Canvas**: 3:4 Vertical Studio Portrait
-- **Description**: Full-coverage translucent micro-mesh and carbon-fiber study paired with dual 32kg cyan mana-circuit kettlebells.
 
 ---
 
