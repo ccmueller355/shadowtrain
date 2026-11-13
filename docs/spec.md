@@ -481,20 +481,23 @@ shadow-train/
 
 Each milestone = **one issue**, one coding-agent session, one PR.
 
-| #       | Milestone                                   | Acceptance Criteria                                                                                                                              | Est. |
-| :------ | :------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------- | :--- |
-| **M0**  | Scaffold from `shadowlist`                  | Repo builds, tabs render, theme hook works, grocery logic removed                                                                                | S    |
-| **M1**  | SQLite layer + schema                       | Schema created on first run, migrations scaffold in place, repo helpers tested                                                                   | S    |
-| **M2**  | Import exercises & equipment filter         | `import-exercises.ts` seeds DB (core kit + public dataset); picker filters by `availableEquipment`                                               | S    |
-| **M3**  | Logger screen (no suggestions)              | Add exercise, log sets (reps/weight or duration), finish session; session persists & resumes                                                     | M    |
-| **M4**  | Last-done prefill                           | Reopening an exercise pre-fills last session's working sets                                                                                      | S    |
-| **M5**  | Progression engine                          | `suggestNext()` implemented (fixed-KB/rings step-loading + timed + plate increments), unit tests green, suggestion chip shown on Logger & Detail | M    |
-| **M6**  | Progress & Statistics view                  | Time-window selector (`Last Workout` / `Week` / `Month`) + `◀/▶` history navigation, visual intensity heatmap & volume chart, PR list            | M    |
-| **M7**  | Settings, Trainers & I/O                    | Profile edits, 5-Trainer Dossier & Split selector, 1-file JSON export/import (`meta.version: 1`) + CSV session log export                        | M    |
-| **M8**  | Trainer HD renders & exercise batch         | 5 sharp HD Trainer portraits (`Orc Merc`, `Decker`, `Soldier`, `Mage`, `Wraith`) + 25–30 core-kit specialist showcase images & fallback          | M    |
-| **M9**  | Distribution build                          | EAS internal build installs on device; session survives app restart                                                                              | S    |
-| **M10** | Trainer Plans, Edit/Delete, Creds & Streaks | Trainer+Goal Workout Plan blueprint (`Start Planned Workout`), edit/delete past sessions + Logger Back/Cancel, Creds (`¥`) missions & streaks    | M    |
-| **M11** | Æ Training Drone & Specialist Unlock Skins  | Generic stock Wireframe Training Drone for base movements; unlocking Trainers dynamically skins exercises with elite Specialist poses & cues     | S    |
+| #       | Milestone                                   | Acceptance Criteria                                                                                                                                | Est. |
+| :------ | :------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------- | :--- |
+| **M0**  | Scaffold from `shadowlist`                  | Repo builds, tabs render, theme hook works, grocery logic removed                                                                                  | S    |
+| **M1**  | SQLite layer + schema                       | Schema created on first run, migrations scaffold in place, repo helpers tested                                                                     | S    |
+| **M2**  | Import exercises & equipment filter         | `import-exercises.ts` seeds DB (core kit + public dataset); picker filters by `availableEquipment`                                                 | S    |
+| **M3**  | Logger screen (no suggestions)              | Add exercise, log sets (reps/weight or duration), finish session; session persists & resumes                                                       | M    |
+| **M4**  | Last-done prefill                           | Reopening an exercise pre-fills last session's working sets                                                                                        | S    |
+| **M5**  | Progression engine                          | `suggestNext()` implemented (fixed-KB/rings step-loading + timed + plate increments), unit tests green, suggestion chip shown on Logger & Detail   | M    |
+| **M6**  | Progress & Statistics view                  | Time-window selector (`Last Workout` / `Week` / `Month`) + `◀/▶` history navigation, visual intensity heatmap & volume chart, PR list              | M    |
+| **M7**  | Settings, Trainers & I/O                    | Profile edits, 5-Trainer Dossier & Split selector, 1-file JSON export/import (`meta.version: 1`) + CSV session log export                          | M    |
+| **M8**  | Trainer HD renders & exercise batch         | 5 sharp HD Trainer portraits (`Orc Merc`, `Decker`, `Soldier`, `Mage`, `Wraith`) + 25–30 core-kit specialist showcase images & fallback            | M    |
+| **M9**  | Distribution build                          | EAS internal build installs on device; session survives app restart                                                                                | S    |
+| **M10** | Trainer Plans, Edit/Delete, Creds & Streaks | Trainer+Goal Workout Plan blueprint (`Start Planned Workout`), edit/delete past sessions + Logger Back/Cancel, Creds (`¥`) missions & streaks      | M    |
+| **M11** | Æ Training Drone & Specialist Unlock Skins  | Generic stock Wireframe Training Drone for base movements; unlocking Trainers dynamically skins exercises with elite Specialist poses & cues       | S    |
+| **M12** | Program Templates & Round-Based Timer       | Cult programs (Simple & Sinister, Rite of Passage, Convict Calisthenics) + interval/round-based timer (EMOM/Tabata/Rounds) with extensible catalog | M    |
+| **M13** | Visual Overhaul: Seductive Shadow Roster    | Re-render female trainers & operatives with high-glam cyberpunk aesthetic, intense visual charisma & seductive edge                                | M    |
+| **M14** | Offline Cyberpunk Audio Sound Pack          | Cybernetic voice cues, countdown beeps, interval bells, and coach quips on rest timer expiration                                                   | S    |
 
 ### 7.1 Build Phases
 
@@ -518,6 +521,15 @@ Each milestone = **one issue**, one coding-agent session, one PR.
    - **M8 (5 Trainer HD Renders & Core Kit Showcase Batch)**: Draft `docs/image-prompts.md`, bundle the 5 sharp `1024×1024` HD Trainer portraits (`Tusk`, `Valerie`, `Vanguard`, `Lyra`, `Wraith`), and bundle WebP `start`/`end` exercise showcase poses demonstrated by each movement's specialist trainer + themed placeholder fallback.
    - **M9 (EAS Distribution Build)**: Configure `eas.json` & GitHub Actions release workflow and build the installable Android APK.
    - **M11 (Æ CYBERNETICS Training Drone & Specialist Skins)**: Add the generic stock Wireframe Training Drone for base movements. Unlocking Shadow Trainers with Creds (¥) dynamically upgrades exercises from stock drone to elite Specialist trainer showcase skins and voice cues.
+5. **Phase 5: Cult Programs, Glam Roster & Cyber-Audio (`M12` → `M14`)**
+   - _Goal_: Extensible cult workout templates, round/interval-based timers, provocative visual character overhaul, and immersive cyber audio cues.
+   - **M12 (Program Templates & Round-Based Timer)**: Layer extensible program templates on top of the session engine:
+     - _Simple & Sinister_ (Pavel Tsatsouline: 100 Swings + 10 TGUs, timed tests).
+     - _Rite of Passage (ROP)_ (Clean & Press ladders + Snatch cadence).
+     - _Convict Calisthenics Progression Trees_ (Step 1 ➔ 10).
+     - Configurable Round & Interval Timer in Session Logger: EMOM, Tabata, round count, work/rest interval beepers.
+   - **M13 (Visual Overhaul: Seductive Shadow Roster)**: High-voltage visual revamp of the female and elven operatives in `assets/trainers/` and `docs/image-prompts.md`. Infuse raw cyberpunk allure, form-fitting tactical cyberware, lethal elegance, and provocative aesthetic charisma (Valerie "Glitch", Lyra "Aether", and new shadow trainers).
+   - **M14 (Offline Cyberpunk Audio Sound Pack)**: Offline synthesized voice cues, countdown beeps, interval bells, and trainer completion quips when timers expire or sets finish.
 
 **Definition of done (every milestone):**
 
