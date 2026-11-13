@@ -25,7 +25,19 @@ export default withMermaid(
       nav: [
         { text: 'Home', link: '/' },
         { text: 'MVP Spec', link: '/spec' },
-        { text: '5 Shadow Trainers', link: '/image-prompts' },
+        {
+          text: 'Shadow Dossier',
+          items: [
+            { text: 'Roster Overview', link: '/trainers/' },
+            { text: '01 // Lyra "Aether" Vael', link: '/trainers/lyra' },
+            { text: '02 // Valerie "Glitch" Vance', link: '/trainers/valerie' },
+            { text: '03 // Kaelen "Tusk" Vorga', link: '/trainers/kaelen' },
+            { text: '04 // Marcus "Vanguard" Kade', link: '/trainers/marcus' },
+            { text: '05 // Soren "Wraith" Kael', link: '/trainers/soren' },
+            { text: '00 // UNIT-0 Spar-Drone', link: '/trainers/drone' },
+          ],
+        },
+        { text: 'Art Prompts', link: '/image-prompts' },
         { text: 'CI & Testing', link: '/ci-and-testing' },
         { text: 'Coverage', link: '/coverage' },
       ],
@@ -37,9 +49,21 @@ export default withMermaid(
             items: [
               { text: 'Overview & Roadmap', link: '/' },
               { text: 'MVP Plan & Spec (M0–M10)', link: '/spec' },
-              { text: '5 Shadow Trainers & Art Prompts', link: '/image-prompts' },
               { text: 'CI, Pre-Commit & CT Tests', link: '/ci-and-testing' },
               { text: 'Code Coverage', link: '/coverage' },
+            ],
+          },
+          {
+            text: 'Shadow Dossier // Specialists',
+            items: [
+              { text: 'Roster Overview', link: '/trainers/' },
+              { text: '01 // Lyra "Aether" Vael', link: '/trainers/lyra' },
+              { text: '02 // Valerie "Glitch" Vance', link: '/trainers/valerie' },
+              { text: '03 // Kaelen "Tusk" Vorga', link: '/trainers/kaelen' },
+              { text: '04 // Marcus "Vanguard" Kade', link: '/trainers/marcus' },
+              { text: '05 // Soren "Wraith" Kael', link: '/trainers/soren' },
+              { text: '00 // UNIT-0 Spar-Drone', link: '/trainers/drone' },
+              { text: 'Generative Art Prompts', link: '/image-prompts' },
             ],
           },
         ],

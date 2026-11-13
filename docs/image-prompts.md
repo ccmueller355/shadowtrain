@@ -85,13 +85,13 @@ Instead of generating 5 duplicate icon sets for every exercise, each movement in
 
 ---
 
-## 4. Showcase Bundle Status
+## 4. Showcase Bundle Status (100% Complete)
 
-14 core-kit exercises are bundled under `assets/exercises/<exercise_id>/{start,end}.webp` (768×768), mapped in `src/engine/exerciseShowcases.ts`. Exercises without images (or with a missing pose) fall back to the themed placeholder card.
+All 14 core-kit exercises are fully bundled under `assets/exercises/<exercise_id>/{start,end}.webp` (768×768 WebP, <35KB each), mapped in `src/engine/exerciseShowcases.ts`.
 
-**Pending poses** (image quota exhausted during M8; follow-up batch):
+**Milestone M13 Visual Overhaul Status**:
 
-- `bw-hollow-body-hold` — `end`
-- `stretch-90-90-hip` — `end`
-
-**Needs a re-roll for pose accuracy**: `ring-dip` `start` (should be arms-locked support), `bw-pistol-squat` `start` (should be standing on one leg), `bw-push-up` `start` (should be high plank).
+- ✅ **100% Core Kit START & END Coverage**: All 14 movements have both START setup and END lockout poses.
+- ✅ **Closed Poses**: `bw-hollow-body-hold` (Banana hollow lockout) and `stretch-90-90-hip` (forward hinge) added.
+- ✅ **High-Glam Operative Revamp**: New high-resolution editorial suites for Lyra "Aether" Vael and Valerie "Glitch" Vance integrated.
+- 🔗 **Detailed Lore & Editorial Plates**: See the complete [Shadow Dossier & Character Bios](/trainers/).

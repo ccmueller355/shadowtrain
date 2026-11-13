@@ -496,7 +496,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 | **M10** | Trainer Plans, Edit/Delete, Creds & Streaks | Trainer+Goal Workout Plan blueprint (`Start Planned Workout`), edit/delete past sessions + Logger Back/Cancel, Creds (`¥`) missions & streaks      | M    |
 | **M11** | Æ Training Drone & Specialist Unlock Skins  | Generic stock Wireframe Training Drone for base movements; unlocking Trainers dynamically skins exercises with elite Specialist poses & cues       | S    |
 | **M12** | Program Templates & Round-Based Timer       | Cult programs (Simple & Sinister, Rite of Passage, Convict Calisthenics) + interval/round-based timer (EMOM/Tabata/Rounds) with extensible catalog | M    |
-| **M13** | Visual Overhaul: Seductive Shadow Roster    | Re-render female trainers & operatives with high-glam cyberpunk aesthetic, intense visual charisma & seductive edge                                | M    |
+| **M13** | Visual Overhaul: Seductive Shadow Roster    | High-glam cyberpunk revamp, 5 Trainer editorial dossiers in VitePress + 100% complete START/END WebP exercise frames                               | M    |
 | **M14** | Offline Cyberpunk Audio Sound Pack          | Cybernetic voice cues, countdown beeps, interval bells, and coach quips on rest timer expiration                                                   | S    |
 
 ### 7.1 Build Phases
@@ -528,7 +528,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
      - _Rite of Passage (ROP)_ (Clean & Press ladders + Snatch cadence).
      - _Convict Calisthenics Progression Trees_ (Step 1 ➔ 10).
      - Configurable Round & Interval Timer in Session Logger: EMOM, Tabata, round count, work/rest interval beepers.
-   - **M13 (Visual Overhaul: Seductive Shadow Roster)**: High-voltage visual revamp of the female and elven operatives in `assets/trainers/` and `docs/image-prompts.md`. Infuse raw cyberpunk allure, form-fitting tactical cyberware, lethal elegance, and provocative aesthetic charisma (Valerie "Glitch", Lyra "Aether", and new shadow trainers).
+   - **M13 (Visual Overhaul: Seductive Shadow Roster) [COMPLETED]**: High-voltage visual revamp of the female and elven operatives in `assets/trainers/`, `assets/exercises/`, and `docs/trainers/`. Infuse raw cyberpunk allure, form-fitting tactical cyberware, lethal elegance, and provocative aesthetic charisma (Valerie "Glitch", Lyra "Aether", Kaelen "Titan", Marcus "Vanguard", Soren "Wraith", and UNIT-0 Spar-Drone). Includes 100% complete START/END WebP exercise frames for all 14 core movements and full VitePress editorial dossiers.
    - **M14 (Offline Cyberpunk Audio Sound Pack)**: Offline synthesized voice cues, countdown beeps, interval bells, and trainer completion quips when timers expire or sets finish.
 
 **Definition of done (every milestone):**
