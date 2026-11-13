@@ -520,25 +520,41 @@ export default function SettingsScreen() {
         animationType="fade"
         onRequestClose={() => setFullViewImage(null)}
       >
-        <View style={styles.modalBackdrop}>
-          <View style={[styles.modalCard, { borderColor: theme.colors.primary }]}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setFullViewImage(null)}
+          style={styles.modalBackdrop}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+            style={[styles.modalCard, { borderColor: theme.colors.primary }]}
+          >
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, ts.accent]}>{fullViewTitle}</Text>
+              <Text style={[styles.modalTitle, ts.accent]} numberOfLines={1} ellipsizeMode="tail">
+                {fullViewTitle}
+              </Text>
               <TouchableOpacity
                 onPress={() => setFullViewImage(null)}
                 style={styles.modalCloseBtn}
                 testID="close-fullview-modal"
               >
-                <Text style={[styles.modalCloseText, { color: theme.colors.secondary }]}>
-                  ✕ CLOSE
-                </Text>
+                <Text style={styles.modalCloseText}>✕ CLOSE</Text>
               </TouchableOpacity>
             </View>
             {fullViewImage && (
               <Image source={fullViewImage} style={styles.modalFullImage} resizeMode="contain" />
             )}
-          </View>
-        </View>
+            <TouchableOpacity
+              onPress={() => setFullViewImage(null)}
+              style={styles.modalBottomDismissBtn}
+            >
+              <Text style={[styles.modalBottomDismissText, ts.textMuted]}>
+                [ TAP ANYWHERE OR PRESS TO CLOSE ]
+              </Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
     </ScrollView>
   );
@@ -680,28 +696,48 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#2a2236',
     paddingBottom: 8,
+    gap: 8,
   },
   modalTitle: {
+    flex: 1,
     fontSize: 12,
     fontWeight: 'bold',
     fontFamily: 'monospace',
     letterSpacing: 0.5,
+    paddingRight: 4,
   },
   modalCloseBtn: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ff4444',
+    backgroundColor: 'rgba(255, 68, 68, 0.15)',
+    flexShrink: 0,
   },
   modalCloseText: {
     fontSize: 11,
     fontWeight: 'bold',
     fontFamily: 'monospace',
+    color: '#ff5555',
   },
   modalFullImage: {
     width: '100%',
-    height: 480,
+    height: 440,
+    maxHeight: '80%',
+  },
+  modalBottomDismissBtn: {
+    marginTop: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  modalBottomDismissText: {
+    fontSize: 10,
+    fontFamily: 'monospace',
+    letterSpacing: 0.5,
   },
 });
