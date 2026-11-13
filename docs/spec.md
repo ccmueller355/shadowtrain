@@ -499,6 +499,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 | **M13** | Visual Overhaul: Seductive Shadow Roster    | High-glam cyberpunk revamp, 5 Trainer editorial dossiers in VitePress + 100% complete START/END WebP exercise frames                               | M    |
 | **M14** | Offline Cyberpunk Audio Sound Pack          | Cybernetic voice cues, countdown beeps, interval bells, and coach quips on rest timer expiration                                                   | S    |
 | **M15** | Cryptographic Vault & Ledger Integrity      | AsyncStorage Profile persistence, SQLite ledger replay/reconciliation, and HMAC-SHA256 tamper-proof backup checksum                                | S    |
+| **M16** | Atelier Vael Batch 2: Titan Pit & Unit-0    | Kaelen 8K core trio + Soren Pistol Squat 8K + UNIT-0 Spar-Drone robot dummies for locked trainers + dynamic unlock skinning                        | M    |
 
 ### 7.1 Build Phases
 
@@ -536,6 +537,10 @@ Each milestone = **one issue**, one coding-agent session, one PR.
      - Implement a deterministic ledger replay engine (`src/engine/vault.ts` or `analytics.ts`): reconstruct and reconcile Cred balances directly from the SQLite session ledger and claimed achievement records.
      - Introduce cryptographic payload signatures (HMAC-SHA256 checksum) in `src/engine/portability.ts` backup envelopes (`meta.checksum`) to reject manually edited or forged backup files.
      - Add unit tests for anti-tamper rejection and ledger reconciliation.
+   - **M16 (Atelier Vael Batch 2: Titan Pit & Unit-0 Sparring Matrix)**: Visual unification & dynamic unlock skins:
+     - Ingest 8K Atelier Vael START & END frames for Kaelen Vorga's heavy iron trio (`kb-swing-two-hand`, `kb-goblet-squat`, `kb-clean-and-press`) and Soren's `bw-pistol-squat`.
+     - Ingest UNIT-0 Spar-Drone biomechanical dummy START & END frames for all movements taught by locked trainers (Valerie, Marcus, Lyra, Soren).
+     - Wire dynamic exercise skinning in `src/engine/exerciseShowcases.ts`: movements taught by locked specialists display UNIT-0; upon Cred unlock, they automatically transform into the elite 8K Specialist illustrations.
 
 **Definition of done (every milestone):**
 
