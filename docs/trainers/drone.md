@@ -31,9 +31,11 @@ When higher-tier shadow specialists (Lyra, Valerie, Marcus, Soren) are locked or
 
 ## 📸 Editorial Plates Gallery
 
+> 🔍 _Click any editorial plate or exercise frame below to inspect the full uncompressed render._
+
 ### Plate 01: Push-Up Setup Calibration
 
-![Drone Pushup Start](/trainers/drone-pushup-start.jpg)
+[![Drone Pushup Start](/trainers/drone-pushup-start.jpg)](/trainers/drone-pushup-start.jpg)
 
 - **Lens Spec**: 50mm f/2.0 · Neutral White & Cyan Studio Key
 - **Description**: Biomechanical sparring drone locked in a perfect neutral-spine plank setup against obsidian floor tiles.
@@ -42,7 +44,7 @@ When higher-tier shadow specialists (Lyra, Valerie, Marcus, Soren) are locked or
 
 ### Plate 02: Push-Up Depth Execution
 
-![Drone Pushup End](/trainers/drone-pushup-end.jpg)
+[![Drone Pushup End](/trainers/drone-pushup-end.jpg)](/trainers/drone-pushup-end.jpg)
 
 - **Lens Spec**: 50mm f/2.0 · Side Isometric View
 - **Description**: Precision 90-degree elbow bend with sensor array glowing green to confirm optimal chest clearance.

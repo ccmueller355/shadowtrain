@@ -29,9 +29,11 @@ Kaelen treats training as structural fortification. Every swing, clean, press, a
 
 ## 📸 Editorial Plates Gallery
 
+> 🔍 _Click any editorial plate or exercise frame below to inspect the full uncompressed render._
+
 ### Plate 01: Titan Heavy Iron Stance
 
-![Kaelen Fullbody Titan](/trainers/kaelen-fullbody-titan.jpg)
+[![Kaelen Fullbody Titan](/trainers/kaelen-fullbody-titan.jpg)](/trainers/kaelen-fullbody-titan.jpg)
 
 - **Lens Spec**: 40mm f/2.0 · Low Angle Volumetric Amber & Orange Rim
 - **Canvas**: 3:4 Vertical Studio Portrait
@@ -41,7 +43,7 @@ Kaelen treats training as structural fortification. Every swing, clean, press, a
 
 ### Plate 02: Orc Visor & Tusks Visage Study
 
-![Kaelen Visage Study](/trainers/kaelen-closeup-titan.jpg)
+[![Kaelen Visage Study](/trainers/kaelen-closeup-titan.jpg)](/trainers/kaelen-closeup-titan.jpg)
 
 - **Lens Spec**: 85mm f/1.4 · Direct Key with Warm Orange Rim
 - **Description**: Intimidating close-up portrait showing lower canine tusks, scarred jade-green skin, and glowing amber ballistic monocular visor.
@@ -50,7 +52,7 @@ Kaelen treats training as structural fortification. Every swing, clean, press, a
 
 ### Plate 03: Cyberarm Kettlebell Torque Study
 
-![Kaelen Cyberarm Detail](/trainers/kaelen-cyberarm-kettlebell.jpg)
+[![Kaelen Cyberarm Detail](/trainers/kaelen-cyberarm-kettlebell.jpg)](/trainers/kaelen-cyberarm-kettlebell.jpg)
 
 - **Lens Spec**: 100mm f/2.8 Macro · Studio Amber Rim
 - **Description**: Macro study of the industrial chrome pneumatic cyberarm crushing the handle of a 48kg iron bell with hydraulic pistons engaged.
@@ -59,7 +61,7 @@ Kaelen treats training as structural fortification. Every swing, clean, press, a
 
 ### Plate 04: Underground Bunker Stance
 
-![Kaelen Stance Titan](/trainers/kaelen-stance-titan.jpg)
+[![Kaelen Stance Titan](/trainers/kaelen-stance-titan.jpg)](/trainers/kaelen-stance-titan.jpg)
 
 - **Lens Spec**: 35mm f/2.2 · Wide Industrial Pit Frame
 - **Description**: Wide environmental framing inside a reinforced bunker with overhead crane hooks and amber industrial telemetry grids.

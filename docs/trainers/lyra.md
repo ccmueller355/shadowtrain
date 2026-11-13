@@ -29,9 +29,11 @@ Lyra channels mana through structural alignment, deep joint decompression, slow-
 
 ## 📸 Editorial Plates Gallery
 
+> 🔍 _Click any editorial plate or exercise frame below to inspect the full uncompressed render._
+
 ### Plate 01: Primary Editorial Portrait
 
-![Lyra Fullbody Portrait](/trainers/lyra-fullbody-portrait.jpg)
+[![Lyra Fullbody Portrait](/trainers/lyra-fullbody-portrait.jpg)](/trainers/lyra-fullbody-portrait.jpg)
 
 - **Lens Spec**: 50mm f/1.8 · Volumetric Cyan & Violet Rim Lighting
 - **Canvas**: 3:4 Vertical Studio Portrait
@@ -41,7 +43,7 @@ Lyra channels mana through structural alignment, deep joint decompression, slow-
 
 ### Plate 02: Architectural Cutout Stance
 
-![Lyra Cutout Stance](/trainers/lyra-stance-cutout.jpg)
+[![Lyra Cutout Stance](/trainers/lyra-stance-cutout.jpg)](/trainers/lyra-stance-cutout.jpg)
 
 - **Lens Spec**: 35mm f/2.0 · Low Angle Volumetric Cyan Rim
 - **Description**: Dynamic low-angle wide framing showing full-body proportions, architectural thigh cutouts, and glowing floor reflections.
@@ -50,7 +52,7 @@ Lyra channels mana through structural alignment, deep joint decompression, slow-
 
 ### Plate 03: Visage & Chrome Cyber-Cuffs Study
 
-![Lyra Visage Study](/trainers/lyra-closeup-visage.jpg)
+[![Lyra Visage Study](/trainers/lyra-closeup-visage.jpg)](/trainers/lyra-closeup-visage.jpg)
 
 - **Lens Spec**: 85mm f/1.4 · Macro Soft Key with Cyan Rim
 - **Description**: Intimate close-up portrait highlighting lavender glowing eyes, fine perspiration dew, damp silver hair locks, and polished silver ear cuffs.
@@ -59,7 +61,7 @@ Lyra channels mana through structural alignment, deep joint decompression, slow-
 
 ### Plate 04: Arcane Kettlebell Conduit Detail
 
-![Lyra Kettlebell Detail](/trainers/lyra-kettlebell-detail.jpg)
+[![Lyra Kettlebell Detail](/trainers/lyra-kettlebell-detail.jpg)](/trainers/lyra-kettlebell-detail.jpg)
 
 - **Lens Spec**: 100mm f/2.8 Macro · Studio Amber & Cyan Rim
 - **Description**: Still life macro study of a 24kg competition kettlebell etched with glowing cyan runes resting on a carbon platform.
@@ -81,10 +83,10 @@ Lyra channels mana through structural alignment, deep joint decompression, slow-
 
 _Flow-state stability and thoracic rotation under vertical load._
 
-|                         START: Grounded Roll & Press                          |                          END: Locked Overhead Standout                           |
-| :---------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
-|             ![TGU Start](/exercises/kb-turkish-get-up-start.jpg)              |                 ![TGU End](/exercises/kb-turkish-get-up-end.jpg)                 |
-| _Roll onto elbow, pack the shoulder down, maintain vertical cyan-traced arm._ | _Drive through heel to tall standing lockout, eyes locked onto the bell handle._ |
+|                                  START: Grounded Roll & Press                                  |                              END: Locked Overhead Standout                               |
+| :--------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------: |
+| [![TGU Start](/exercises/kb-turkish-get-up-start.jpg)](/exercises/kb-turkish-get-up-start.jpg) | [![TGU End](/exercises/kb-turkish-get-up-end.jpg)](/exercises/kb-turkish-get-up-end.jpg) |
+|         _Roll onto elbow, pack the shoulder down, maintain vertical cyan-traced arm._          |     _Drive through heel to tall standing lockout, eyes locked onto the bell handle._     |
 
 ---
 
@@ -92,10 +94,10 @@ _Flow-state stability and thoracic rotation under vertical load._
 
 _Pelvic de-rotation and deep hip capsule decompression._
 
-|                      START: Seated Double-Angle Setup                       |                 END: Tall Torso Forward Hinge                 |
-| :-------------------------------------------------------------------------: | :-----------------------------------------------------------: |
-|           ![90/90 Start](/exercises/stretch-90-90-hip-start.jpg)            |      ![90/90 End](/exercises/stretch-90-90-hip-end.jpg)       |
-| _Both knees pinned at 90-degree angles, spine tall, hips squared to floor._ | _Slow eccentric hinge over lead shin without spinal flexion._ |
+|                                 START: Seated Double-Angle Setup                                 |                               END: Tall Torso Forward Hinge                                |
+| :----------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: |
+| [![90/90 Start](/exercises/stretch-90-90-hip-start.jpg)](/exercises/stretch-90-90-hip-start.jpg) | [![90/90 End](/exercises/stretch-90-90-hip-end.jpg)](/exercises/stretch-90-90-hip-end.jpg) |
+|           _Both knees pinned at 90-degree angles, spine tall, hips squared to floor._            |               _Slow eccentric hinge over lead shin without spinal flexion._                |
 
 ---
 
@@ -103,10 +105,10 @@ _Pelvic de-rotation and deep hip capsule decompression._
 
 _Psoas and rectus femoris elongation with glute lockout._
 
-|                START: Rear Foot Elevated Setup                |                 END: Tall Vertical Posture & Glute Squeeze                 |
-| :-----------------------------------------------------------: | :------------------------------------------------------------------------: |
-|      ![Couch Start](/exercises/stretch-couch-start.jpg)       |               ![Couch End](/exercises/stretch-couch-end.jpg)               |
-| _Rear knee against bunker wall, shin vertical, chest lifted._ | _Squeeze glute forward, posterior pelvic tilt to isolate deep hip flexor._ |
+|                             START: Rear Foot Elevated Setup                              |                     END: Tall Vertical Posture & Glute Squeeze                     |
+| :--------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
+| [![Couch Start](/exercises/stretch-couch-start.jpg)](/exercises/stretch-couch-start.jpg) | [![Couch End](/exercises/stretch-couch-end.jpg)](/exercises/stretch-couch-end.jpg) |
+|              _Rear knee against bunker wall, shin vertical, chest lifted._               |     _Squeeze glute forward, posterior pelvic tilt to isolate deep hip flexor._     |
 
 ---
 

@@ -29,9 +29,11 @@ Soren's training exploits suspended instability. Working exclusively on free-han
 
 ## 📸 Editorial Plates Gallery
 
+> 🔍 _Click any editorial plate or exercise frame below to inspect the full uncompressed render._
+
 ### Plate 01: Suspended Ring L-Sit Stance
 
-![Soren Fullbody L-Sit](/trainers/soren-fullbody-lsit.jpg)
+[![Soren Fullbody L-Sit](/trainers/soren-fullbody-lsit.jpg)](/trainers/soren-fullbody-lsit.jpg)
 
 - **Lens Spec**: 50mm f/1.8 · Volumetric Phantom Violet Rim Lighting
 - **Canvas**: 3:4 Vertical Studio Portrait
@@ -41,7 +43,7 @@ Soren's training exploits suspended instability. Working exclusively on free-han
 
 ### Plate 02: Wraith Visage Study
 
-![Soren Visage Study](/trainers/soren-closeup-visage.jpg)
+[![Soren Visage Study](/trainers/soren-closeup-visage.jpg)](/trainers/soren-closeup-visage.jpg)
 
 - **Lens Spec**: 85mm f/1.4 · Direct Key with Soft Violet Rim
 - **Description**: Intense close-up portrait of the elven acrobat showing pointed ears, luminous purple eyes, and razor-sharp jawline.
@@ -50,7 +52,7 @@ Soren's training exploits suspended instability. Working exclusively on free-han
 
 ### Plate 03: Gymnastic Rings Hardware Detail
 
-![Soren Rings Detail](/trainers/soren-rings-detail.jpg)
+[![Soren Rings Detail](/trainers/soren-rings-detail.jpg)](/trainers/soren-rings-detail.jpg)
 
 - **Lens Spec**: 100mm f/2.8 Macro · Studio Violet Rim
 - **Description**: Wooden competition rings suspended by reinforced black Kevlar webbing straps with metal adjustment buckles.
@@ -59,7 +61,7 @@ Soren's training exploits suspended instability. Working exclusively on free-han
 
 ### Plate 04: Acrobat Dynamic Stance
 
-![Soren Acrobat Stance](/trainers/soren-acrobat-stance.jpg)
+[![Soren Acrobat Stance](/trainers/soren-acrobat-stance.jpg)](/trainers/soren-acrobat-stance.jpg)
 
 - **Lens Spec**: 35mm f/2.0 · Low Angle Studio Frame
 - **Description**: Dynamic leaping gymnast stance showing extreme lats width, serratus definition, and floor shadow reflection.
@@ -83,7 +85,7 @@ _Free-floating shoulder depression and triceps lockout with ring turnover._
 
 |                               START: Top Support Lockout                               |                             END: Deep 90-Degree Elbow Dip                             |
 | :------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------: |
-|                      ![Dip Start](/exercises/ring-dip-start.jpg)                       |                        ![Dip End](/exercises/ring-dip-end.jpg)                        |
+|      [![Dip Start](/exercises/ring-dip-start.jpg)](/exercises/ring-dip-start.jpg)      |        [![Dip End](/exercises/ring-dip-end.jpg)](/exercises/ring-dip-end.jpg)         |
 | _Rings turned out 45 degrees, elbows locked, shoulders depressed down away from ears._ | _Slow eccentric descent until biceps touch ring top, forearms vertical, no swinging._ |
 
 ---
@@ -92,10 +94,10 @@ _Free-floating shoulder depression and triceps lockout with ring turnover._
 
 _Extreme isometric core and hip flexor hold suspended above ground._
 
-|                       START: Ring Support Setup                        |                             END: Full 90-Degree L-Sit Lockout                              |
-| :--------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: |
-|          ![L-Sit Start](/exercises/ring-l-sit-hold-start.jpg)          |                      ![L-Sit End](/exercises/ring-l-sit-hold-end.jpg)                      |
-| _Grip rings tight, depress scapulae, elevate torso with knees tucked._ | _Extend both legs horizontally parallel to floor, toes pointed, trembling isometric hold._ |
+|                                  START: Ring Support Setup                                   |                             END: Full 90-Degree L-Sit Lockout                              |
+| :------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: |
+| [![L-Sit Start](/exercises/ring-l-sit-hold-start.jpg)](/exercises/ring-l-sit-hold-start.jpg) |   [![L-Sit End](/exercises/ring-l-sit-hold-end.jpg)](/exercises/ring-l-sit-hold-end.jpg)   |
+|            _Grip rings tight, depress scapulae, elevate torso with knees tucked._            | _Extend both legs horizontally parallel to floor, toes pointed, trembling isometric hold._ |
 
 ---
 

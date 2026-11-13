@@ -105,6 +105,7 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
           <Image
             source={activeTrainer.portrait}
             style={[styles.trainerAvatar, { borderColor: theme.colors.primary }]}
+            resizeMode="contain"
           />
           <View style={styles.trainerMetaCol}>
             <Text style={[styles.trainerLabel, ts.accent]}>
@@ -401,7 +402,14 @@ const styles = StyleSheet.create({
   credsChipText: { fontSize: 12, fontWeight: 'bold', fontFamily: 'monospace' },
   trainerBanner: { marginBottom: 14, padding: 10 },
   trainerBannerRow: { flexDirection: 'row', alignItems: 'center' },
-  trainerAvatar: { width: 52, height: 52, borderRadius: 6, borderWidth: 1, marginRight: 10 },
+  trainerAvatar: {
+    width: 54,
+    height: 64,
+    borderRadius: 6,
+    borderWidth: 1,
+    marginRight: 10,
+    backgroundColor: '#0c0914',
+  },
   trainerMetaCol: { flex: 1 },
   trainerLabel: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   trainerName: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 2 },

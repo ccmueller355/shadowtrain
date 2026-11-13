@@ -29,9 +29,11 @@ Valerie's conditioning philosophy revolves around neural core stabilization, hig
 
 ## 📸 Editorial Plates Gallery
 
+> 🔍 _Click any editorial plate or exercise frame below to inspect the full uncompressed render._
+
 ### Plate 01: Primary Editorial Portrait
 
-![Valerie Fullbody Portrait](/trainers/valerie-fullbody-portrait.jpg)
+[![Valerie Fullbody Portrait](/trainers/valerie-fullbody-portrait.jpg)](/trainers/valerie-fullbody-portrait.jpg)
 
 - **Lens Spec**: 50mm f/1.8 · Volumetric Cyan & Amber Rim Lighting
 - **Canvas**: 3:4 Vertical Studio Portrait
@@ -41,7 +43,7 @@ Valerie's conditioning philosophy revolves around neural core stabilization, hig
 
 ### Plate 02: Temple Neural-Jack Visage Study
 
-![Valerie Visage Study](/trainers/valerie-closeup-visage.jpg)
+[![Valerie Visage Study](/trainers/valerie-closeup-visage.jpg)](/trainers/valerie-closeup-visage.jpg)
 
 - **Lens Spec**: 85mm f/1.4 · Direct Key with Cyan Rim
 - **Description**: Focused portrait study highlighting the right temple chrome neural port, hazel eyes, and post-session skin sheen.
@@ -50,7 +52,7 @@ Valerie's conditioning philosophy revolves around neural core stabilization, hig
 
 ### Plate 03: Optical Jump-Rope Hardware Still Life
 
-![Valerie Jumprope Detail](/trainers/valerie-jumprope-detail.jpg)
+[![Valerie Jumprope Detail](/trainers/valerie-jumprope-detail.jpg)](/trainers/valerie-jumprope-detail.jpg)
 
 - **Lens Spec**: 100mm f/2.8 Macro · Studio Amber Rim
 - **Description**: Coiled optical-fiber speed rope glowing cyan beside an amber telemetry sensor and carbon-textured grip handles.
@@ -59,7 +61,7 @@ Valerie's conditioning philosophy revolves around neural core stabilization, hig
 
 ### Plate 04: Hex-Glyph Hacker Stance
 
-![Valerie Hacker Stance](/trainers/valerie-hacker-stance.jpg)
+[![Valerie Hacker Stance](/trainers/valerie-hacker-stance.jpg)](/trainers/valerie-hacker-stance.jpg)
 
 - **Lens Spec**: 35mm f/2.0 · Low Angle Wide Environmental Frame
 - **Description**: High-tension athletic pose surrounded by floating matrix telemetry glyphs and electric cyan floor grids.
@@ -81,10 +83,10 @@ Valerie's conditioning philosophy revolves around neural core stabilization, hig
 
 _Lightweight, high-cadence spring mechanics and reactive ankle stiffness._
 
-|                         START: Athletic Setup & Wrist Loaded                         |                         END: Explosive Single-Bounce Apex                         |
-| :----------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
-|                ![Rope Start](/exercises/rope-basic-bounce-start.jpg)                 |                 ![Rope End](/exercises/rope-basic-bounce-end.jpg)                 |
-| _Elbows tucked to ribs, relaxed shoulders, optical cord pre-tensioned behind heels._ | _Micro-jump on forefeet, wrists rotate forward, core braced against oscillation._ |
+|                              START: Athletic Setup & Wrist Loaded                               |                             END: Explosive Single-Bounce Apex                             |
+| :---------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
+| [![Rope Start](/exercises/rope-basic-bounce-start.jpg)](/exercises/rope-basic-bounce-start.jpg) | [![Rope End](/exercises/rope-basic-bounce-end.jpg)](/exercises/rope-basic-bounce-end.jpg) |
+|      _Elbows tucked to ribs, relaxed shoulders, optical cord pre-tensioned behind heels._       |     _Micro-jump on forefeet, wrists rotate forward, core braced against oscillation._     |
 
 ---
 
@@ -92,10 +94,10 @@ _Lightweight, high-cadence spring mechanics and reactive ankle stiffness._
 
 _Multi-planar shoulder mobility and anti-rotational core stabilization._
 
-|                   START: Inverted Horn Grip at Chin                    |                         END: Posterior Orbit Behind Head                          |
-| :--------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
-|              ![Halo Start](/exercises/kb-halo-start.jpg)               |                      ![Halo End](/exercises/kb-halo-end.jpg)                      |
-| _Hold kettlebell by horns upside down at upper sternum, ribcage down._ | _Smooth circular orbit around neck crown without head bobbing or spinal arching._ |
+|                      START: Inverted Horn Grip at Chin                      |                         END: Posterior Orbit Behind Head                          |
+| :-------------------------------------------------------------------------: | :-------------------------------------------------------------------------------: |
+| [![Halo Start](/exercises/kb-halo-start.jpg)](/exercises/kb-halo-start.jpg) |       [![Halo End](/exercises/kb-halo-end.jpg)](/exercises/kb-halo-end.jpg)       |
+|   _Hold kettlebell by horns upside down at upper sternum, ribcage down._    | _Smooth circular orbit around neck crown without head bobbing or spinal arching._ |
 
 ---
 
@@ -103,10 +105,10 @@ _Multi-planar shoulder mobility and anti-rotational core stabilization._
 
 _Gymnastic midline flexion and total anterior chain recruitment._
 
-|                  START: Supine Pelvic Tuck & Arm Reach                   |                              END: Full Banana Hollow Lever                              |
-| :----------------------------------------------------------------------: | :-------------------------------------------------------------------------------------: |
-|        ![Hollow Start](/exercises/bw-hollow-body-hold-start.jpg)         |                  ![Hollow End](/exercises/bw-hollow-body-hold-end.jpg)                  |
-| _Lower back pressed flat into obsidian floor, knees bent to 90 degrees._ | _Arms and legs extended long, lower back glued down, rib-to-pelvis distance minimized._ |
+|                                 START: Supine Pelvic Tuck & Arm Reach                                 |                                  END: Full Banana Hollow Lever                                  |
+| :---------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------: |
+| [![Hollow Start](/exercises/bw-hollow-body-hold-start.jpg)](/exercises/bw-hollow-body-hold-start.jpg) | [![Hollow End](/exercises/bw-hollow-body-hold-end.jpg)](/exercises/bw-hollow-body-hold-end.jpg) |
+|               _Lower back pressed flat into obsidian floor, knees bent to 90 degrees._                |     _Arms and legs extended long, lower back glued down, rib-to-pelvis distance minimized._     |
 
 ---
 
