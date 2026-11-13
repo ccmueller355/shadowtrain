@@ -24,6 +24,7 @@ export default withMermaid(
 
       nav: [
         { text: 'Home', link: '/' },
+        { text: 'Operator Manual', link: '/manual' },
         { text: 'MVP Spec', link: '/spec' },
         {
           text: 'Shadow Dossier',
@@ -48,6 +49,7 @@ export default withMermaid(
             text: 'ShadowTrain Deck',
             items: [
               { text: 'Overview & Roadmap', link: '/' },
+              { text: 'Field Operator Manual', link: '/manual' },
               { text: 'MVP Plan & Spec (M0–M10)', link: '/spec' },
               { text: 'CI, Pre-Commit & CT Tests', link: '/ci-and-testing' },
               { text: 'Code Coverage', link: '/coverage' },
