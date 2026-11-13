@@ -1,5 +1,5 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
-import { Exercise, Profile, Session, SetRecord, TrainerId } from '../types';
+import { Exercise, Profile, Session, SessionDuration, SetRecord, TrainerId } from '../types';
 import { formatSuggestionChip, Suggestion, suggestNext } from './suggest';
 import { getTrainerById } from './trainers';
 
@@ -82,8 +82,20 @@ export function generateAdaptivePlan(options: {
   recentSessions: Session[];
   refreshIndex?: number;
   nowMs?: number;
+  targetDuration?: SessionDuration;
+  weeklyTargetDays?: number;
 }): PlannedWorkout {
-  const { profile, exercises, recentSessions, refreshIndex = 0, nowMs = Date.now() } = options;
+  const {
+    profile,
+    exercises,
+    recentSessions,
+    refreshIndex = 0,
+    nowMs = Date.now(),
+    targetDuration,
+    weeklyTargetDays,
+  } = options;
+  const durationMode = targetDuration ?? profile.targetDuration ?? 'standard';
+  const targetDays = weeklyTargetDays ?? profile.weeklyTargetDays ?? 4;
   const trainer = getTrainerById(profile.activeTrainerId);
   const finished = recentSessions
     .filter((s) => s.finishedAt !== undefined)
@@ -158,11 +170,32 @@ export function generateAdaptivePlan(options: {
     selectedExercises.push(...fallback);
   }
 
-  const items: PlannedExerciseItem[] = selectedExercises.map((ex) => {
+  let finalExercises = selectedExercises;
+  if (durationMode === 'express') {
+    finalExercises = selectedExercises.slice(0, 2);
+  } else if (durationMode === 'beast') {
+    const extra = exercises.filter(
+      (e) => availableSet.has(e.equipment) && !selectedExercises.some((s) => s.id === e.id),
+    );
+    finalExercises = [...selectedExercises, ...extra].slice(0, 5);
+  }
+
+  const items: PlannedExerciseItem[] = finalExercises.map((ex) => {
     const history = findLastWorkingSets(finished, ex.id);
-    const rawSuggestion = suggestNext(history, profile, ex);
-    const suggestion: Suggestion =
+    const profileWithOverrides = {
+      ...profile,
+      targetDuration: durationMode,
+      weeklyTargetDays: targetDays,
+    };
+    const rawSuggestion = suggestNext(history, profileWithOverrides, ex);
+    let suggestion: Suggestion =
       adaptationMode === 'ramp_back' ? { ...rawSuggestion, sets: 2 } : rawSuggestion;
+
+    if (durationMode === 'express') {
+      suggestion = { ...suggestion, sets: Math.min(2, suggestion.sets) };
+    } else if (durationMode === 'beast') {
+      suggestion = { ...suggestion, sets: Math.max(4, suggestion.sets) };
+    }
 
     return {
       exercise: ex,
@@ -171,13 +204,18 @@ export function generateAdaptivePlan(options: {
     };
   });
 
+  const durationSuffix = ` // ${durationMode.toUpperCase()} (${finalExercises.length} MOVES) · ${targetDays}D/WK`;
+  const formattedReasonChip = reasonChip.includes(durationMode.toUpperCase())
+    ? reasonChip
+    : `${reasonChip}${durationSuffix}`;
+
   const variantLabel = VARIANT_LABELS[activeVariantIdx] ?? 'CUSTOM SPLIT';
 
   return {
     title: `${trainer.callsign} · ${variantLabel}`,
     variantLabel,
     adaptationMode,
-    reasonChip,
+    reasonChip: formattedReasonChip,
     items,
   };
 }

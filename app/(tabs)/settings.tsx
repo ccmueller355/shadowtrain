@@ -28,7 +28,7 @@ import { useSessionStore } from '../../src/stores/sessionStore';
 import { ThemeName, themes } from '../../src/theme/themes';
 import { useAppTheme } from '../../src/theme/useTheme';
 import { useThemeStyles } from '../../src/theme/useThemeStyles';
-import { Equipment, Goal, TrainerId, Units } from '../../src/types';
+import { Equipment, Goal, SessionDuration, TrainerId, Units } from '../../src/types';
 
 const THEME_KEYS = Object.keys(themes) as ThemeName[];
 const GOALS: Goal[] = ['strength', 'hypertrophy', 'endurance'];
@@ -48,6 +48,13 @@ const ALL_EQUIPMENT: Equipment[] = [
   'machine',
 ];
 
+const FREQUENCIES = [2, 3, 4, 5, 6];
+const DURATIONS: { id: SessionDuration; label: string }[] = [
+  { id: 'express', label: 'EXPRESS (~20m)' },
+  { id: 'standard', label: 'STANDARD (~40m)' },
+  { id: 'beast', label: 'BEAST (~60m)' },
+];
+
 export default function SettingsScreen() {
   const theme = useAppTheme();
   const ts = useThemeStyles();
@@ -59,6 +66,8 @@ export default function SettingsScreen() {
   const setGoal = useProfileStore((s) => s.setGoal);
   const setUnits = useProfileStore((s) => s.setUnits);
   const setFixedKettlebellWeight = useProfileStore((s) => s.setFixedKettlebellWeight);
+  const setWeeklyTargetDays = useProfileStore((s) => s.setWeeklyTargetDays);
+  const setTargetDuration = useProfileStore((s) => s.setTargetDuration);
   const toggleEquipment = useProfileStore((s) => s.toggleEquipment);
   const unlockAndSelectTrainer = useProfileStore((s) => s.unlockAndSelectTrainer);
 
@@ -345,6 +354,48 @@ export default function SettingsScreen() {
                   {w}
                   {profile.units}
                 </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <Text style={[styles.subLabel, ts.textMuted]}>WEEKLY FREQUENCY (MISSION TARGET)</Text>
+        <View style={styles.chipRow}>
+          {FREQUENCIES.map((freq) => {
+            const active = (profile.weeklyTargetDays ?? 4) === freq;
+            return (
+              <TouchableOpacity
+                key={freq}
+                testID={`frequency-btn-${freq}`}
+                style={[
+                  styles.smallChip,
+                  ts.surface,
+                  { borderColor: active ? theme.colors.primary : theme.colors.border },
+                ]}
+                onPress={() => setWeeklyTargetDays(freq)}
+              >
+                <Text style={[styles.chipText, active ? ts.accent : ts.text]}>{freq} DAYS/WK</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <Text style={[styles.subLabel, ts.textMuted]}>SESSION DURATION / VOLUME SCALE</Text>
+        <View style={styles.chipRow}>
+          {DURATIONS.map((dur) => {
+            const active = (profile.targetDuration ?? 'standard') === dur.id;
+            return (
+              <TouchableOpacity
+                key={dur.id}
+                testID={`duration-btn-${dur.id}`}
+                style={[
+                  styles.smallChip,
+                  ts.surface,
+                  { borderColor: active ? theme.colors.primary : theme.colors.border },
+                ]}
+                onPress={() => setTargetDuration(dur.id)}
+              >
+                <Text style={[styles.chipText, active ? ts.accent : ts.text]}>{dur.label}</Text>
               </TouchableOpacity>
             );
           })}

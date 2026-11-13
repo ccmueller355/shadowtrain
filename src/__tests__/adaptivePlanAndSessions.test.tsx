@@ -221,5 +221,118 @@ describe('M10 Adaptive Workout Plan, Weekly Streaks, Session Edit/Delete & Logge
       fireEvent.press(screen.getByTestId('delete-session-session-planned'));
       expect(useSessionStore.getState().recentSessions).toHaveLength(0);
     });
+
+    it('launches cult programs from HomeScreen and controls the interval timer in SessionLoggerScreen (M12)', () => {
+      const onStartSession = jest.fn();
+      const onFinish = jest.fn();
+
+      // Render HomeScreen
+      const home = render(<HomeScreen onStartSession={onStartSession} />);
+      expect(screen.getByTestId('cult-programs-card')).toBeTruthy();
+
+      // Select Rite of Passage program
+      fireEvent.press(screen.getByTestId('select-program-rite-of-passage'));
+
+      // Launch Cult Workout
+      fireEvent.press(screen.getByTestId('launch-cult-program-btn'));
+      expect(onStartSession).toHaveBeenCalledWith('session-rite-of-passage');
+
+      const activeSession = useSessionStore.getState().activeSession;
+      expect(activeSession?.name).toContain('RITE OF PASSAGE');
+      expect(activeSession?.entries.length).toBeGreaterThanOrEqual(2);
+      home.unmount();
+
+      // Mount SessionLoggerScreen with launched session
+      const logger = render(
+        <SessionLoggerScreen sessionId="session-rite-of-passage" onFinishSession={onFinish} />,
+      );
+
+      // Verify preset bar or interval timer banner is present
+      const intervalBanner = screen.queryByTestId('interval-timer-banner');
+      if (!intervalBanner) {
+        fireEvent.press(screen.getByTestId('interval-preset-tabata'));
+      }
+      expect(screen.getByTestId('interval-timer-banner')).toBeTruthy();
+      expect(screen.getByTestId('interval-timer-countdown')).toBeTruthy();
+
+      // Toggle pause/play
+      fireEvent.press(screen.getByTestId('interval-timer-toggle'));
+      // Reset timer
+      fireEvent.press(screen.getByTestId('interval-timer-reset'));
+      // Stop timer
+      fireEvent.press(screen.getByTestId('interval-timer-close'));
+      expect(screen.queryByTestId('interval-timer-banner')).toBeNull();
+      expect(screen.getByTestId('interval-preset-bar')).toBeTruthy();
+
+      logger.unmount();
+    });
+
+    it('dynamically adapts plan exercises, volume, and steppers based on session duration & frequency (M12)', () => {
+      // 1. Pure engine test: Express vs Beast
+      const expressPlan = generateAdaptivePlan({
+        profile: DEFAULT_PROFILE,
+        exercises: DEFAULT_SEED_EXERCISES,
+        recentSessions: [],
+        targetDuration: 'express',
+        weeklyTargetDays: 3,
+        nowMs: NOW_MS,
+      });
+      expect(expressPlan.items).toHaveLength(2);
+      expect(expressPlan.reasonChip).toContain('EXPRESS');
+      expect(expressPlan.items[0].suggestion.sets).toBeLessThanOrEqual(2);
+
+      const beastPlan = generateAdaptivePlan({
+        profile: DEFAULT_PROFILE,
+        exercises: DEFAULT_SEED_EXERCISES,
+        recentSessions: [],
+        targetDuration: 'beast',
+        weeklyTargetDays: 5,
+        nowMs: NOW_MS,
+      });
+      expect(beastPlan.items.length).toBeGreaterThanOrEqual(4);
+      expect(beastPlan.reasonChip).toContain('BEAST');
+      expect(beastPlan.items[0].suggestion.sets).toBeGreaterThanOrEqual(4);
+
+      // 2. HomeScreen duration selector UI
+      const onStartSession = jest.fn();
+      const home = render(<HomeScreen onStartSession={onStartSession} />);
+
+      fireEvent.press(screen.getByTestId('plan-duration-express'));
+      expect(useProfileStore.getState().profile.targetDuration).toBe('express');
+
+      fireEvent.press(screen.getByTestId('plan-duration-beast'));
+      expect(useProfileStore.getState().profile.targetDuration).toBe('beast');
+      home.unmount();
+
+      // 3. SessionLogger interval timer steppers
+      useSessionStore.getState().startIntervalTimer({
+        mode: 'emom',
+        rounds: 10,
+        workSec: 60,
+        restSec: 0,
+      });
+
+      const onFinish = jest.fn();
+      const logger = render(
+        <SessionLoggerScreen sessionId="session-stepper-test" onFinishSession={onFinish} />,
+      );
+
+      expect(useSessionStore.getState().intervalTimer.totalRounds).toBe(10);
+      expect(useSessionStore.getState().intervalTimer.workSec).toBe(60);
+
+      fireEvent.press(screen.getByTestId('interval-rounds-plus'));
+      expect(useSessionStore.getState().intervalTimer.totalRounds).toBe(15);
+
+      fireEvent.press(screen.getByTestId('interval-rounds-minus'));
+      expect(useSessionStore.getState().intervalTimer.totalRounds).toBe(10);
+
+      fireEvent.press(screen.getByTestId('interval-work-minus'));
+      expect(useSessionStore.getState().intervalTimer.workSec).toBe(45);
+
+      fireEvent.press(screen.getByTestId('interval-work-plus'));
+      expect(useSessionStore.getState().intervalTimer.workSec).toBe(60);
+
+      logger.unmount();
+    });
   });
 });

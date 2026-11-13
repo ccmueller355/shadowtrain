@@ -289,5 +289,23 @@ describe('M7 Settings, 5 Shadow Trainers Dossier, Creds & Data Portability', () 
       expect(getTrainerCoachingCue('elf-wraith')).toContain('WRAITH');
       expect(getTrainerCoachingCue('drone-unit-0')).toContain('UNIT-0');
     });
+
+    it('updates weekly frequency and session duration from settings controls (M12)', () => {
+      render(<SettingsScreen />);
+
+      // Frequency selection
+      fireEvent.press(screen.getByTestId('frequency-btn-5'));
+      expect(useProfileStore.getState().profile.weeklyTargetDays).toBe(5);
+
+      fireEvent.press(screen.getByTestId('frequency-btn-2'));
+      expect(useProfileStore.getState().profile.weeklyTargetDays).toBe(2);
+
+      // Duration selection
+      fireEvent.press(screen.getByTestId('duration-btn-express'));
+      expect(useProfileStore.getState().profile.targetDuration).toBe('express');
+
+      fireEvent.press(screen.getByTestId('duration-btn-beast'));
+      expect(useProfileStore.getState().profile.targetDuration).toBe('beast');
+    });
   });
 });

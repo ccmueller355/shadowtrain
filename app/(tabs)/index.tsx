@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { computeWeeklyStreak, generateAdaptivePlan } from '../../src/engine/plan';
+import { CULT_PROGRAMS, CultProgram } from '../../src/engine/programs';
 import { getTrainerById } from '../../src/engine/trainers';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
 import { useProfileStore } from '../../src/stores/profileStore';
@@ -21,12 +22,20 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
   const recentSessions = useSessionStore((s) => s.recentSessions);
   const startSession = useSessionStore((s) => s.startSession);
   const startPlannedSession = useSessionStore((s) => s.startPlannedSession);
+  const startProgramSession = useSessionStore((s) => s.startProgramSession);
   const openExistingSession = useSessionStore((s) => s.openExistingSession);
   const cancelOrDeleteSession = useSessionStore((s) => s.cancelOrDeleteSession);
   const profile = useProfileStore((s) => s.profile);
+  const setTargetDuration = useProfileStore((s) => s.setTargetDuration);
   const exercises = useExerciseStore((s) => s.exercises);
 
   const [refreshIndex, setRefreshIndex] = useState(0);
+  const [selectedProgramId, setSelectedProgramId] = useState<string>(CULT_PROGRAMS[0].id);
+  const [selectedWorkoutIndex, setSelectedWorkoutIndex] = useState(0);
+
+  const currentProgram = CULT_PROGRAMS.find((p) => p.id === selectedProgramId) ?? CULT_PROGRAMS[0];
+  const currentWorkout =
+    currentProgram.workouts[selectedWorkoutIndex] ?? currentProgram.workouts[0];
 
   const activeTrainer = getTrainerById(profile.activeTrainerId);
 
@@ -53,6 +62,11 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
 
   const handleStartPlanned = () => {
     const created = startPlannedSession(adaptivePlan, 'session-planned');
+    onStartSession?.(created.id);
+  };
+
+  const handleStartProgram = (prog: CultProgram, wIndex = 0) => {
+    const created = startProgramSession(prog, wIndex, `session-${prog.id}`);
     onStartSession?.(created.id);
   };
 
@@ -148,6 +162,36 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
             {adaptivePlan.reasonChip}
           </Text>
 
+          <View style={styles.planDurationRow} testID="plan-duration-selector">
+            {(
+              [
+                { id: 'express', label: '⚡ EXPRESS ~20m' },
+                { id: 'standard', label: '🛡️ STANDARD ~40m' },
+                { id: 'beast', label: '🔥 BEAST ~60m' },
+              ] as const
+            ).map((dur) => {
+              const active = (profile.targetDuration ?? 'standard') === dur.id;
+              return (
+                <TouchableOpacity
+                  key={dur.id}
+                  testID={`plan-duration-${dur.id}`}
+                  style={[
+                    styles.planDurationChip,
+                    {
+                      borderColor: active ? theme.colors.primary : theme.colors.border,
+                      backgroundColor: active ? theme.colors.surface : 'transparent',
+                    },
+                  ]}
+                  onPress={() => setTargetDuration(dur.id)}
+                >
+                  <Text style={[styles.planDurationChipText, active ? ts.accent : ts.textMuted]}>
+                    {dur.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
           {adaptivePlan.items.map((item) => (
             <View
               key={item.exercise.id}
@@ -172,6 +216,109 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
               ⚡ START PLANNED WORKOUT ({adaptivePlan.items.length} MOVES)
             </Text>
           </TouchableOpacity>
+        </View>
+      </CyberpunkCard>
+
+      <CyberpunkCard glow={false} style={styles.planCard}>
+        <View testID="cult-programs-card">
+          <Text style={[styles.planTitle, ts.accent]}>CULT PROTOCOLS // TEMPLATE MATRIX</Text>
+          <Text style={[styles.planReason, ts.textMuted]}>
+            TIME-TESTED HARDSTYLE & PRISON CALISTHENICS BLUEPRINTS
+          </Text>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.programTabsRow}
+          >
+            {CULT_PROGRAMS.map((prog) => {
+              const active = prog.id === selectedProgramId;
+              return (
+                <TouchableOpacity
+                  key={prog.id}
+                  testID={`select-program-${prog.id}`}
+                  style={[
+                    styles.programTabChip,
+                    {
+                      borderColor: active ? theme.colors.primary : theme.colors.border,
+                      backgroundColor: active ? theme.colors.surface : 'transparent',
+                    },
+                  ]}
+                  onPress={() => {
+                    setSelectedProgramId(prog.id);
+                    setSelectedWorkoutIndex(0);
+                  }}
+                >
+                  <Text style={[styles.programTabChipText, active ? ts.accent : ts.textMuted]}>
+                    {prog.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          <View style={styles.programDetailsBox}>
+            <View style={styles.programMetaRow}>
+              <Text style={[styles.programBadgeText, ts.accent]}>{currentProgram.badge}</Text>
+              <Text style={[styles.programOriginText, ts.textMuted]}>
+                {currentProgram.cultOrigin}
+              </Text>
+            </View>
+            <Text style={[styles.programDescText, ts.text]}>{currentProgram.description}</Text>
+
+            {currentProgram.workouts.length > 1 && (
+              <View style={styles.workoutVariantRow}>
+                {currentProgram.workouts.map((w, wIdx) => {
+                  const isWActive = wIdx === selectedWorkoutIndex;
+                  return (
+                    <TouchableOpacity
+                      key={w.id}
+                      testID={`select-workout-${w.id}`}
+                      style={[
+                        styles.workoutVariantBtn,
+                        {
+                          borderColor: isWActive ? theme.colors.primary : theme.colors.border,
+                          backgroundColor: isWActive ? theme.colors.border : 'transparent',
+                        },
+                      ]}
+                      onPress={() => setSelectedWorkoutIndex(wIdx)}
+                    >
+                      <Text
+                        style={[styles.workoutVariantBtnText, isWActive ? ts.accent : ts.textMuted]}
+                      >
+                        {w.title}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            )}
+
+            <View style={styles.targetsListBox}>
+              <Text style={[styles.targetsListTitle, ts.accent]}>
+                {currentWorkout.title} // {currentWorkout.subtitle}
+              </Text>
+              {currentWorkout.targets.map((t, idx) => (
+                <View key={`${t.exerciseId}-${idx}`} style={styles.targetItemRow}>
+                  <Text style={[styles.targetExName, ts.text]}>• {t.exerciseId}</Text>
+                  <Text style={[styles.targetSetsReps, ts.textMuted]}>
+                    {t.sets} × {t.durationSec ? `${t.durationSec}s` : `${t.reps} reps`}
+                    {t.isWarmup ? ' (WARMUP)' : ''}
+                  </Text>
+                </View>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              testID="launch-cult-program-btn"
+              style={[styles.plannedBtn, { backgroundColor: theme.colors.primary }]}
+              onPress={() => handleStartProgram(currentProgram, selectedWorkoutIndex)}
+            >
+              <Text style={[styles.primaryBtnText, { color: theme.colors.headerBg }]}>
+                ⚡ LAUNCH CULT WORKOUT ({currentWorkout.recommendedTimerMode.toUpperCase()})
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </CyberpunkCard>
 
@@ -301,6 +448,19 @@ const styles = StyleSheet.create({
   },
   refreshBtnText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   planReason: { fontSize: 10, fontFamily: 'monospace', marginBottom: 8 },
+  planDurationRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 10,
+    flexWrap: 'wrap',
+  },
+  planDurationChip: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  planDurationChipText: { fontSize: 9, fontWeight: 'bold', fontFamily: 'monospace' },
   planItemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -345,4 +505,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   smallActionText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
+  programTabsRow: { flexDirection: 'row', marginBottom: 10, paddingVertical: 2 },
+  programTabChip: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    marginRight: 8,
+  },
+  programTabChipText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
+  programDetailsBox: { paddingTop: 2 },
+  programMetaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  programBadgeText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
+  programOriginText: { fontSize: 9, fontFamily: 'monospace' },
+  programDescText: { fontSize: 11, fontFamily: 'monospace', marginBottom: 8 },
+  workoutVariantRow: { flexDirection: 'row', gap: 6, marginBottom: 8, flexWrap: 'wrap' },
+  workoutVariantBtn: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  workoutVariantBtnText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
+  targetsListBox: {
+    borderTopWidth: 1,
+    borderTopColor: '#33333344',
+    paddingTop: 6,
+    marginBottom: 6,
+  },
+  targetsListTitle: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace', marginBottom: 4 },
+  targetItemRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 2 },
+  targetExName: { fontSize: 10, fontFamily: 'monospace' },
+  targetSetsReps: { fontSize: 10, fontFamily: 'monospace' },
 });

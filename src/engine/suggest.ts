@@ -53,6 +53,19 @@ export function isStepLoadedExercise(exercise: Exercise, profile: Profile): bool
   return false;
 }
 
+function resolveTargetSets(baseSets: number, profile: Profile): number {
+  if (profile.targetDuration === 'express') {
+    return Math.min(2, baseSets);
+  }
+  if (profile.targetDuration === 'beast') {
+    return Math.max(4, baseSets);
+  }
+  if (profile.weeklyTargetDays && profile.weeklyTargetDays >= 5) {
+    return Math.min(3, baseSets);
+  }
+  return baseSets;
+}
+
 export function suggestNext(
   history: SetRecord[] | null,
   profile: Profile,
@@ -60,6 +73,7 @@ export function suggestNext(
 ): Suggestion {
   const workingSets = (history ?? []).filter((s) => !s.isWarmup);
   const stepLoaded = isStepLoadedExercise(exercise, profile);
+  const defaultSets = resolveTargetSets(3, profile);
 
   // 1. No working history -> first_time
   if (workingSets.length === 0) {
@@ -68,7 +82,7 @@ export function suggestNext(
       return {
         action: 'first_time',
         durationSec,
-        sets: 3,
+        sets: defaultSets,
         reason: 'First time — default timed sets',
       };
     }
@@ -80,7 +94,7 @@ export function suggestNext(
         action: 'first_time',
         reps: profile.repRange.min,
         weight,
-        sets: 3,
+        sets: defaultSets,
         reason: 'First time — start at bottom of rep range',
       };
     }
@@ -91,7 +105,7 @@ export function suggestNext(
       action: 'first_time',
       reps: profile.repRange.max,
       weight: defaultWeight,
-      sets: 3,
+      sets: defaultSets,
       reason: 'First time — establish baseline working weight',
     };
   }
