@@ -66,6 +66,80 @@ export const EXERCISE_SHOWCASES: Record<string, ExerciseShowcase> = {
   },
 };
 
-export function getExerciseShowcase(exerciseId: string): ExerciseShowcase | undefined {
+export const DRONE_SHOWCASES: Record<string, ExerciseShowcase> = {
+  'bw-hollow-body-hold': {
+    start:
+      require('../../assets/exercises/bw-hollow-body-hold/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/bw-hollow-body-hold/drone-end.webp') as ImageSourcePropType,
+  },
+  'bw-pistol-squat': {
+    start:
+      require('../../assets/exercises/bw-pistol-squat/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/bw-pistol-squat/drone-end.webp') as ImageSourcePropType,
+  },
+  'bw-push-up': {
+    start: require('../../assets/exercises/bw-push-up/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/bw-push-up/drone-end.webp') as ImageSourcePropType,
+  },
+  'bw-squat': {
+    start: require('../../assets/exercises/bw-squat/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/bw-squat/drone-end.webp') as ImageSourcePropType,
+  },
+  'kb-clean-and-press': {
+    start:
+      require('../../assets/exercises/kb-clean-and-press/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/kb-clean-and-press/drone-end.webp') as ImageSourcePropType,
+  },
+  'kb-goblet-squat': {
+    start:
+      require('../../assets/exercises/kb-goblet-squat/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/kb-goblet-squat/drone-end.webp') as ImageSourcePropType,
+  },
+  'kb-halo': {
+    start: require('../../assets/exercises/kb-halo/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/kb-halo/drone-end.webp') as ImageSourcePropType,
+  },
+  'kb-swing-two-hand': {
+    start:
+      require('../../assets/exercises/kb-swing-two-hand/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/kb-swing-two-hand/drone-end.webp') as ImageSourcePropType,
+  },
+  'kb-turkish-get-up': {
+    start:
+      require('../../assets/exercises/kb-turkish-get-up/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/kb-turkish-get-up/drone-end.webp') as ImageSourcePropType,
+  },
+  'ring-dip': {
+    start: require('../../assets/exercises/ring-dip/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/ring-dip/drone-end.webp') as ImageSourcePropType,
+  },
+  'ring-l-sit-hold': {
+    start:
+      require('../../assets/exercises/ring-l-sit-hold/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/ring-l-sit-hold/drone-end.webp') as ImageSourcePropType,
+  },
+  'rope-basic-bounce': {
+    start:
+      require('../../assets/exercises/rope-basic-bounce/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/rope-basic-bounce/drone-end.webp') as ImageSourcePropType,
+  },
+  'stretch-90-90-hip': {
+    start:
+      require('../../assets/exercises/stretch-90-90-hip/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/stretch-90-90-hip/drone-end.webp') as ImageSourcePropType,
+  },
+  'stretch-couch': {
+    start: require('../../assets/exercises/stretch-couch/drone-start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/stretch-couch/drone-end.webp') as ImageSourcePropType,
+  },
+};
+
+export function getExerciseShowcase(
+  exerciseId: string,
+  useDrone = false,
+): ExerciseShowcase | undefined {
+  if (useDrone && DRONE_SHOWCASES[exerciseId]) {
+    return DRONE_SHOWCASES[exerciseId];
+  }
   return EXERCISE_SHOWCASES[exerciseId];
 }

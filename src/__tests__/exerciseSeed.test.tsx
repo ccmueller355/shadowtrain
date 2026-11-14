@@ -303,12 +303,21 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       expect(screen.queryByTestId('exercise-pose-images')).toBeNull();
     });
 
-    it('bundles every showcase image referenced for core-kit exercises', () => {
-      const { EXERCISE_SHOWCASES } = require('../engine/exerciseShowcases');
+    it('bundles every showcase image referenced for core-kit exercises (specialist & UNIT-0)', () => {
+      const {
+        DRONE_SHOWCASES,
+        EXERCISE_SHOWCASES,
+        getExerciseShowcase,
+      } = require('../engine/exerciseShowcases');
       const ids = Object.keys(EXERCISE_SHOWCASES);
       expect(ids.length).toBe(14);
       ids.forEach((id) => {
         expect(EXERCISE_SHOWCASES[id].start).toBeTruthy();
+        expect(EXERCISE_SHOWCASES[id].end).toBeTruthy();
+        expect(DRONE_SHOWCASES[id].start).toBeTruthy();
+        expect(DRONE_SHOWCASES[id].end).toBeTruthy();
+        expect(getExerciseShowcase(id, true)).toBe(DRONE_SHOWCASES[id]);
+        expect(getExerciseShowcase(id, false)).toBe(EXERCISE_SHOWCASES[id]);
       });
     });
   });

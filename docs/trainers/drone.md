@@ -70,14 +70,24 @@ As you earn **Creds (`¥`)** through completed sessions, missions, and streaks, 
 
 ---
 
-## 🤖 Sparring Calibration Exercise Frames
+## 🤖 Sparring Calibration Exercise Frames (All 14 Core Movements)
 
 | Movement                | Start Frame                                                                                 | End Frame                                                                             |
 | :---------------------- | :------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------ |
+| **Two-Hand KB Swing**   | [![Drone Swing Start](/trainers/drone-swing-start.jpg)](/trainers/drone-swing-start.jpg)    | [![Drone Swing End](/trainers/drone-swing-end.jpg)](/trainers/drone-swing-end.jpg)    |
+| **KB Goblet Squat**     | [![Drone Goblet Start](/trainers/drone-goblet-start.jpg)](/trainers/drone-goblet-start.jpg) | [![Drone Goblet End](/trainers/drone-goblet-end.jpg)](/trainers/drone-goblet-end.jpg) |
+| **KB Clean & Press**    | [![Drone Clean Start](/trainers/drone-clean-start.jpg)](/trainers/drone-clean-start.jpg)    | [![Drone Clean End](/trainers/drone-clean-end.jpg)](/trainers/drone-clean-end.jpg)    |
+| **Kettlebell Halo**     | [![Drone Halo Start](/trainers/drone-halo-start.jpg)](/trainers/drone-halo-start.jpg)       | [![Drone Halo End](/trainers/drone-halo-end.jpg)](/trainers/drone-halo-end.jpg)       |
+| **Turkish Get-Up**      | [![Drone TGU Start](/trainers/drone-tgu-start.jpg)](/trainers/drone-tgu-start.jpg)          | [![Drone TGU End](/trainers/drone-tgu-end.jpg)](/trainers/drone-tgu-end.jpg)          |
 | **Push-Up Calibration** | [![Drone Pushup Start](/trainers/drone-pushup-start.jpg)](/trainers/drone-pushup-start.jpg) | [![Drone Pushup End](/trainers/drone-pushup-end.jpg)](/trainers/drone-pushup-end.jpg) |
-| **Jump Rope Cadence**   | [![Drone Rope Start](/trainers/drone-rope-start.jpg)](/trainers/drone-rope-start.jpg)       | [![Drone Rope End](/trainers/drone-rope-end.jpg)](/trainers/drone-rope-end.jpg)       |
+| **Bodyweight Squat**    | [![Drone Squat Start](/trainers/drone-squat-start.jpg)](/trainers/drone-squat-start.jpg)    | [![Drone Squat End](/trainers/drone-squat-end.jpg)](/trainers/drone-squat-end.jpg)    |
+| **Hollow Body Hold**    | [![Drone Hollow Start](/trainers/drone-hollow-start.jpg)](/trainers/drone-hollow-start.jpg) | [![Drone Hollow End](/trainers/drone-hollow-end.jpg)](/trainers/drone-hollow-end.jpg) |
+| **Pistol Squat**        | [![Drone Pistol Start](/trainers/drone-pistol-start.jpg)](/trainers/drone-pistol-start.jpg) | [![Drone Pistol End](/trainers/drone-pistol-end.jpg)](/trainers/drone-pistol-end.jpg) |
 | **Ring Dip Baseline**   | [![Drone Dip Start](/trainers/drone-dip-start.jpg)](/trainers/drone-dip-start.jpg)          | [![Drone Dip End](/trainers/drone-dip-end.jpg)](/trainers/drone-dip-end.jpg)          |
-| **Turkish Get-Up Path** | [![Drone TGU Start](/trainers/drone-tgu-start.jpg)](/trainers/drone-tgu-start.jpg)          | [![Drone TGU End](/trainers/drone-tgu-end.jpg)](/trainers/drone-tgu-end.jpg)          |
+| **Ring L-Sit Hold**     | [![Drone L-Sit Start](/trainers/drone-lsit-start.jpg)](/trainers/drone-lsit-start.jpg)      | [![Drone L-Sit End](/trainers/drone-lsit-end.jpg)](/trainers/drone-lsit-end.jpg)      |
+| **Jump Rope Cadence**   | [![Drone Rope Start](/trainers/drone-rope-start.jpg)](/trainers/drone-rope-start.jpg)       | [![Drone Rope End](/trainers/drone-rope-end.jpg)](/trainers/drone-rope-end.jpg)       |
+| **90/90 Hip Switch**    | [![Drone Hip Start](/trainers/drone-hip-start.jpg)](/trainers/drone-hip-start.jpg)          | [![Drone Hip End](/trainers/drone-hip-end.jpg)](/trainers/drone-hip-end.jpg)          |
+| **Couch Stretch**       | [![Drone Couch Start](/trainers/drone-couch-start.jpg)](/trainers/drone-couch-start.jpg)    | [![Drone Couch End](/trainers/drone-couch-end.jpg)](/trainers/drone-couch-end.jpg)    |
 
 ---
 

@@ -99,7 +99,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
     const coachDisplay = getCoachDisplayForExercise(detailExercise, profile);
     const { coach, isSpecialist, specialist, coachingCue } = coachDisplay;
     const isSpecialistUnlocked = isTrainerUnlocked(profile, specialist.id);
-    const showcase = getExerciseShowcase(detailExercise.id);
+    const showcase = getExerciseShowcase(detailExercise.id, !isSpecialistUnlocked);
     const nextProgression = detailExercise.nextProgressionId
       ? exercises.find((e) => e.id === detailExercise.nextProgressionId)
       : undefined;
