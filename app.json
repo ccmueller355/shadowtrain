@@ -40,7 +40,8 @@
           "enableBackgroundPlayback": true,
           "enableBackgroundRecording": false
         }
-      ]
+      ],
+      "expo-asset"
     ]
   }
 }
