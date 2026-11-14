@@ -1,7 +1,19 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Svg, { Circle, Line, Path, Polygon, Rect } from 'react-native-svg';
+import { ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Svg, {
+  Circle,
+  ClipPath,
+  Defs,
+  Image as SvgImage,
+  Line,
+  LinearGradient,
+  Path,
+  Pattern,
+  Polygon,
+  Rect,
+  Stop,
+} from 'react-native-svg';
 import {
   ExerciseRigKeyframes,
   getHighlightedSegments,
@@ -9,6 +21,7 @@ import {
   RigPose,
 } from '../engine/cyberRig';
 import { RigSkin } from '../engine/rigSkins';
+import { getTrainerById } from '../engine/trainers';
 
 interface CyberRigViewProps {
   pose: RigPose;
@@ -110,38 +123,55 @@ function renderProp(pose: RigPose, skin: RigSkin): React.ReactNode {
   return null;
 }
 
-function renderHeadGlyph(pose: RigPose, skin: RigSkin): React.ReactNode {
+function renderHeadGlyph(
+  pose: RigPose,
+  skin: RigSkin,
+  portrait?: ImageSourcePropType,
+): React.ReactNode {
   const { x, y } = pose.head;
-  const r = 11;
+  const r = 14;
   return (
     <>
       <Circle cx={x} cy={y} r={r + 4} fill={skin.glowColor} />
       <Circle cx={x} cy={y} r={r} fill="#0b1120" stroke={skin.limbColor} strokeWidth={2.5} />
-      {skin.headShape === 'visor' && (
+      {portrait ? (
+        <SvgImage
+          x={x - r}
+          y={y - r}
+          width={r * 2}
+          height={r * 2}
+          href={portrait}
+          preserveAspectRatio="xMidYMin slice"
+          clipPath="url(#head-clip)"
+        />
+      ) : null}
+      <Circle cx={x} cy={y} r={r} fill="none" stroke={skin.limbColor} strokeWidth={2.2} />
+      {!portrait && skin.headShape === 'visor' && (
         <Rect x={x - 8} y={y - 3} width={16} height={5} rx={2} fill={skin.jointColor} />
       )}
       {skin.headShape === 'horns' && (
         <>
           <Polygon
-            points={`${x - 9},${y - 4} ${x - 14},${y - 15} ${x - 4},${y - 9}`}
+            points={`${x - 10},${y - 6} ${x - 16},${y - 18} ${x - 4},${y - 11}`}
             fill={skin.accentColor}
           />
           <Polygon
-            points={`${x + 9},${y - 4} ${x + 14},${y - 15} ${x + 4},${y - 9}`}
+            points={`${x + 10},${y - 6} ${x + 16},${y - 18} ${x + 4},${y - 11}`}
             fill={skin.accentColor}
           />
         </>
       )}
       {skin.headShape === 'helmet' && (
         <Path
-          d={`M ${x - 11} ${y - 2} A 11 11 0 0 1 ${x + 11} ${y - 2} Z`}
-          fill={skin.accentColor}
-          fillOpacity={0.6}
+          d={`M ${x - 13} ${y - 6} A 13 13 0 0 1 ${x + 13} ${y - 6}`}
+          fill="none"
+          stroke={skin.accentColor}
+          strokeWidth={3}
         />
       )}
       {skin.headShape === 'hood' && (
         <Polygon
-          points={`${x - 13},${y + 4} ${x},${y - 16} ${x + 13},${y + 4}`}
+          points={`${x - 15},${y + 4} ${x},${y - 19} ${x + 15},${y + 4}`}
           fill="none"
           stroke={skin.accentColor}
           strokeWidth={2}
@@ -149,11 +179,11 @@ function renderHeadGlyph(pose: RigPose, skin: RigSkin): React.ReactNode {
       )}
       {skin.headShape === 'crown' && (
         <Polygon
-          points={`${x - 9},${y - 10} ${x - 4},${y - 17} ${x},${y - 11} ${x + 4},${y - 17} ${x + 9},${y - 10}`}
+          points={`${x - 10},${y - 13} ${x - 5},${y - 20} ${x},${y - 14} ${x + 5},${y - 20} ${x + 10},${y - 13}`}
           fill={skin.jointColor}
         />
       )}
-      {skin.headShape === 'cyber-bob' && (
+      {!portrait && skin.headShape === 'cyber-bob' && (
         <Line
           x1={x - 7}
           y1={y - 2}
@@ -179,6 +209,7 @@ export function CyberRigView({
 }: CyberRigViewProps): React.ReactElement {
   const highlighted = getHighlightedSegments(primaryMuscles);
   const activeColor = highlightColor ?? skin.accentColor;
+  const trainerPortrait = getTrainerById(skin.id).portrait;
   const segments: [typeof pose.head, typeof pose.head][] = [
     [pose.neck, pose.hip],
     [pose.shoulderL, pose.shoulderR],
@@ -210,6 +241,25 @@ export function CyberRigView({
   return (
     <View style={styles.wrapper} testID={testID}>
       <Svg width={size} height={size} viewBox="0 0 200 200" style={styles.svg}>
+        <Defs>
+          <LinearGradient id="torso-grad" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0%" stopColor={skin.accentColor} stopOpacity={0.45} />
+            <Stop offset="50%" stopColor="#0f172a" stopOpacity={0.95} />
+            <Stop offset="100%" stopColor={skin.limbColor} stopOpacity={0.35} />
+          </LinearGradient>
+          <Pattern id="armor-weave" width="8" height="8" patternUnits="userSpaceOnUse">
+            <Rect width="8" height="8" fill="#0b1120" fillOpacity={0.4} />
+            <Path
+              d="M 0 8 L 8 0 M -2 2 L 2 -2 M 6 10 L 10 6"
+              stroke={skin.limbColor}
+              strokeOpacity={0.32}
+              strokeWidth={1}
+            />
+          </Pattern>
+          <ClipPath id="head-clip">
+            <Circle cx={pose.head.x} cy={pose.head.y} r={14} />
+          </ClipPath>
+        </Defs>
         {GRID_COORDS.map((c) => (
           <React.Fragment key={c}>
             <Line x1={c} y1={8} x2={c} y2={192} stroke="#1e293b" strokeWidth={1} />
@@ -228,14 +278,17 @@ export function CyberRigView({
 
         {renderProp(pose, skin)}
 
-        {/* Armored Cyber-Cuirass / Torso Silhouette */}
+        {/* Armored Cyber-Cuirass / Torso Silhouette with Carbon-Fiber Weave */}
         <Polygon
-          points={`${pose.shoulderL.x},${pose.shoulderL.y} ${pose.shoulderR.x},${pose.shoulderR.y} ${pose.hip.x + 11},${pose.hip.y} ${pose.hip.x - 11},${pose.hip.y}`}
-          fill="#0f172a"
-          fillOpacity={0.92}
+          points={`${pose.shoulderL.x},${pose.shoulderL.y} ${pose.shoulderR.x},${pose.shoulderR.y} ${pose.hip.x + 12},${pose.hip.y} ${pose.hip.x - 12},${pose.hip.y}`}
+          fill="url(#torso-grad)"
           stroke={highlighted.has(0) ? activeColor : skin.limbColor}
           strokeWidth={2}
           strokeLinejoin="round"
+        />
+        <Polygon
+          points={`${pose.shoulderL.x},${pose.shoulderL.y} ${pose.shoulderR.x},${pose.shoulderR.y} ${pose.hip.x + 12},${pose.hip.y} ${pose.hip.x - 12},${pose.hip.y}`}
+          fill="url(#armor-weave)"
         />
 
         {segments.map(([a, b], idx) => {
@@ -332,7 +385,7 @@ export function CyberRigView({
           />
         ))}
 
-        {renderHeadGlyph(pose, skin)}
+        {renderHeadGlyph(pose, skin, trainerPortrait)}
       </Svg>
       {caption ? <Text style={styles.caption}>{caption}</Text> : null}
     </View>
