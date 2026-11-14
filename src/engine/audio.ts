@@ -45,8 +45,8 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'human-decker': {
-    pitch: 1.18,
-    rate: 1.1,
+    pitch: 1.15,
+    rate: 1.12,
     gender: 'female',
     quips: {
       rest_done: ['Timer zeroed. Jack back in, partner.', 'Green light on the deck. Next set.'],
@@ -84,8 +84,8 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'elf-mage': {
-    pitch: 1.28,
-    rate: 0.92,
+    pitch: 1.48,
+    rate: 0.9,
     gender: 'female',
     quips: {
       rest_done: ['Mana recharged. Channel the next set.', 'The weave is ready. Begin.'],
