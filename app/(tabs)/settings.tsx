@@ -75,6 +75,7 @@ export default function SettingsScreen() {
   const setTargetDuration = useProfileStore((s) => s.setTargetDuration);
   const toggleEquipment = useProfileStore((s) => s.toggleEquipment);
   const unlockAndSelectTrainer = useProfileStore((s) => s.unlockAndSelectTrainer);
+  const addCreds = useProfileStore((s) => s.addCreds);
 
   const recentSessions = useSessionStore((s) => s.recentSessions);
   const activeSession = useSessionStore((s) => s.activeSession);
@@ -166,11 +167,24 @@ export default function SettingsScreen() {
     <ScrollView style={[styles.container, ts.bg]} testID="screen-settings">
       <View style={styles.headerRow}>
         <Text style={[styles.title, ts.accent]}>DECK SETTINGS</Text>
-        <View
-          style={[styles.credsBadge, { borderColor: theme.colors.primary }]}
-          testID="creds-balance-badge"
-        >
-          <Text style={[styles.credsBadgeText, ts.accent]}>CREDS: {profile.creds ?? 0} ¥</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          {__DEV__ ? (
+            <TouchableOpacity
+              testID="dev-add-creds-btn"
+              onPress={() => addCreds(1000)}
+              style={[styles.credsBadge, { borderColor: theme.colors.secondary }]}
+            >
+              <Text style={[styles.credsBadgeText, { color: theme.colors.secondary }]}>
+                DEV +1000 ¥
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          <View
+            style={[styles.credsBadge, { borderColor: theme.colors.primary }]}
+            testID="creds-balance-badge"
+          >
+            <Text style={[styles.credsBadgeText, ts.accent]}>CREDS: {profile.creds ?? 0} ¥</Text>
+          </View>
         </View>
       </View>
 
