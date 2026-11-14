@@ -73,8 +73,8 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'elf-wraith': {
-    pitch: 0.76,
-    rate: 1.04,
+    pitch: 0.94,
+    rate: 1.06,
     gender: 'male',
     quips: {
       rest_done: ['Silence ends. Strike the next set.', 'The clock is zero. Flow again.'],
