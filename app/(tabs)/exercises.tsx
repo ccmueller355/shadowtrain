@@ -179,10 +179,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
             {/* Start/End showcase poses; themed fallback card when none bundled */}
             {showcase?.start || showcase?.end ? (
               <View style={styles.poseRowContainer}>
-                <View
-                  style={[styles.poseRow, !isSpecialistUnlocked && styles.poseRowEncrypted]}
-                  testID="exercise-pose-images"
-                >
+                <View style={styles.poseRow} testID="exercise-pose-images">
                   {showcase.start ? (
                     <TouchableOpacity
                       activeOpacity={0.8}
@@ -197,7 +194,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                     >
                       <Image
                         source={showcase.start}
-                        style={[styles.poseImage, !isSpecialistUnlocked && styles.poseImageLocked]}
+                        style={styles.poseImage}
                         resizeMode="contain"
                         testID="exercise-pose-start"
                       />
@@ -218,7 +215,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                     >
                       <Image
                         source={showcase.end}
-                        style={[styles.poseImage, !isSpecialistUnlocked && styles.poseImageLocked]}
+                        style={styles.poseImage}
                         resizeMode="contain"
                         testID="exercise-pose-end"
                       />
@@ -644,8 +641,6 @@ const styles = StyleSheet.create({
   },
   poseRow: { flexDirection: 'row', gap: 12, justifyContent: 'center', marginVertical: 6 },
   poseRowContainer: { position: 'relative' },
-  poseRowEncrypted: { opacity: 0.35 },
-  poseImageLocked: { opacity: 0.6 },
   poseCol: { flex: 1, maxWidth: 170, alignItems: 'center' },
   poseImage: { width: '100%', height: 180, borderRadius: 8, backgroundColor: '#0c0914' },
   poseCaption: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 4 },
@@ -666,13 +661,10 @@ const styles = StyleSheet.create({
     color: '#ffaa00',
   },
   encryptedHoloBanner: {
-    position: 'absolute',
-    left: 8,
-    right: 8,
-    top: '25%',
+    marginTop: 8,
     borderWidth: 1,
     borderRadius: 8,
-    padding: 10,
+    padding: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
