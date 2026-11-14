@@ -311,5 +311,43 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
         expect(EXERCISE_SHOWCASES[id].start).toBeTruthy();
       });
     });
+
+    it('closes Exercise Detail view on smartphone hardware back press and navigates progression ladder', () => {
+      const { BackHandler } = require('react-native');
+      let backCallback: (() => boolean) | undefined;
+      const removeSpy = jest.fn();
+      const addSpy = jest
+        .spyOn(BackHandler, 'addEventListener')
+        .mockImplementation((_event, cb) => {
+          backCallback = cb as () => boolean;
+          return { remove: removeSpy } as { remove: () => void };
+        });
+
+      render(<ExercisesScreen />);
+
+      // On list view, hardware back does not consume event
+      expect(backCallback?.()).toBe(false);
+
+      // Open Two-Hand Kettlebell Swing -> has nextProgressionId
+      fireEvent.press(screen.getByTestId('exercise-item-kb-swing-two-hand'));
+      expect(screen.getByTestId('exercise-detail-view')).toBeTruthy();
+      expect(screen.getByTestId('exercise-detail-next-tier')).toBeTruthy();
+
+      // Tapping next progression advances to next tier
+      fireEvent.press(screen.getByTestId('exercise-detail-next-tier'));
+      expect(screen.getByTestId('exercise-detail-title')).toHaveTextContent(
+        'One-Arm Kettlebell Swing',
+      );
+
+      // Hardware back closes detail view and consumes event
+      let handled = false;
+      act(() => {
+        handled = backCallback?.() ?? false;
+      });
+      expect(handled).toBe(true);
+      expect(screen.queryByTestId('exercise-detail-view')).toBeNull();
+
+      addSpy.mockRestore();
+    });
   });
 });
