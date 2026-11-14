@@ -1,5 +1,6 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
 import { Exercise, Profile, Session, ThemeName } from '../types';
+import { constantTimeEqual, hmacSha256Hex } from './vault';
 
 export interface BackupMeta {
   format: 'shadowtrain-backup';
@@ -7,6 +8,7 @@ export interface BackupMeta {
   dbSchemaVersion: 1;
   appVersion: string;
   exportedAt: string;
+  checksum?: string;
 }
 
 export interface BackupEnvelopeV1 {
@@ -26,8 +28,20 @@ export interface SerializeBackupOptions {
   appVersion?: string;
 }
 
+export function computeBackupChecksum(envelope: BackupEnvelopeV1): string {
+  const { checksum: _ignored, ...unsignedMeta } = envelope.meta;
+  const canonicalPayload = JSON.stringify({
+    meta: unsignedMeta,
+    profile: envelope.profile,
+    ...(envelope.theme ? { theme: envelope.theme } : {}),
+    customExercises: envelope.customExercises ?? [],
+    sessions: envelope.sessions,
+  });
+  return hmacSha256Hex(canonicalPayload);
+}
+
 export function serializeBackupJson(options: SerializeBackupOptions): string {
-  const envelope: BackupEnvelopeV1 = {
+  const unsignedEnvelope: BackupEnvelopeV1 = {
     meta: {
       format: 'shadowtrain-backup',
       version: 1,
@@ -40,7 +54,15 @@ export function serializeBackupJson(options: SerializeBackupOptions): string {
     customExercises: options.customExercises ?? [],
     sessions: options.sessions,
   };
-  return JSON.stringify(envelope, null, 2);
+  const checksum = computeBackupChecksum(unsignedEnvelope);
+  const signedEnvelope: BackupEnvelopeV1 = {
+    ...unsignedEnvelope,
+    meta: {
+      ...unsignedEnvelope.meta,
+      checksum,
+    },
+  };
+  return JSON.stringify(signedEnvelope, null, 2);
 }
 
 export function parseAndValidateBackupJson(rawJson: string): BackupEnvelopeV1 {
@@ -72,13 +94,24 @@ export function parseAndValidateBackupJson(rawJson: string): BackupEnvelopeV1 {
     throw new Error('Backup payload is missing sessions array');
   }
 
-  return {
+  const envelope: BackupEnvelopeV1 = {
     meta: candidate.meta,
     profile: candidate.profile,
     ...(candidate.theme ? { theme: candidate.theme } : {}),
     customExercises: Array.isArray(candidate.customExercises) ? candidate.customExercises : [],
     sessions: candidate.sessions,
   };
+
+  const providedChecksum = candidate.meta.checksum;
+  const expectedChecksum = computeBackupChecksum(envelope);
+  if (
+    typeof providedChecksum !== 'string' ||
+    !constantTimeEqual(providedChecksum, expectedChecksum)
+  ) {
+    throw new Error('Backup integrity check failed: invalid or missing checksum');
+  }
+
+  return envelope;
 }
 
 function escapeCsvCell(value: string | number | boolean | null | undefined): string {

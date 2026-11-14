@@ -532,7 +532,7 @@ Each milestone = **one issue**, one coding-agent session, one PR.
      - Configurable Round & Interval Timer in Session Logger: EMOM, Tabata, round count, work/rest interval beepers.
    - **M13 (Visual Overhaul: Seductive Shadow Roster) [COMPLETED]**: High-voltage visual revamp of the female and elven operatives in `assets/trainers/`, `assets/exercises/`, and `docs/trainers/`. Infuse raw cyberpunk allure, form-fitting tactical cyberware, lethal elegance, and provocative aesthetic charisma (Valerie "Glitch", Lyra "Aether", Kaelen "Titan", Marcus "Vanguard", Soren "Wraith", and UNIT-0 Spar-Drone). Includes 100% complete START/END WebP exercise frames for all 14 core movements and full VitePress editorial dossiers.
    - **M14 (Offline Cyberpunk Audio Sound Pack)**: Offline synthesized voice cues, countdown beeps, interval bells, and trainer completion quips when timers expire or sets finish.
-   - **M15 (Cryptographic Vault & Ledger Integrity)**: Dual-ledger persistence & anti-tampering:
+   - **M15 (Cryptographic Vault & Ledger Integrity) [COMPLETED]**: Dual-ledger persistence & anti-tampering:
      - Wire `@react-native-async-storage/async-storage` via `zustand/middleware/persist` to `useProfileStore` so profile and Creds survive app termination.
      - Implement a deterministic ledger replay engine (`src/engine/vault.ts` or `analytics.ts`): reconstruct and reconcile Cred balances directly from the SQLite session ledger and claimed achievement records.
      - Introduce cryptographic payload signatures (HMAC-SHA256 checksum) in `src/engine/portability.ts` backup envelopes (`meta.checksum`) to reject manually edited or forged backup files.
