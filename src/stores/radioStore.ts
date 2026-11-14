@@ -104,6 +104,18 @@ function teardownStreamPlayer(): void {
   }
 }
 
+export const DEFAULT_FAVORITE_STATIONS: RadioStation[] = [
+  {
+    id: '98d0e6a9-4919-11e8-b1b0-52543be04c81',
+    name: 'Sunshine Live - Workout',
+    countryCode: 'DE',
+    tags: 'workout,electronic,dance',
+    streamUrl: 'https://stream.sunshine-live.de/workout/mp3-192',
+    codec: 'MP3',
+    bitrate: 192,
+  },
+];
+
 export const useRadioStore = create<RadioState>()(
   persist(
     (set, get) => {
@@ -117,7 +129,7 @@ export const useRadioStore = create<RadioState>()(
         voiceEnabled: true,
         radioEnabled: false,
         radioVolume: 0.7,
-        favorites: [],
+        favorites: DEFAULT_FAVORITE_STATIONS,
         resolvedPresetCache: {},
         customStreamUrl: '',
         activeStation: null,

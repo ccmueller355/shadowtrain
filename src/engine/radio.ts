@@ -37,6 +37,14 @@ const USER_AGENT = 'Shadowtrain/0.1.1';
 /** Curated regional workout & electronic presets (resolved live via Radio Browser API). */
 export const RADIO_PRESETS: RadioPreset[] = [
   {
+    id: 'de-sunshine-workout',
+    label: 'Sunshine Live Workout',
+    region: 'DE',
+    countryCode: 'DE',
+    searchName: 'Sunshine Live - Workout',
+    fallbackTag: 'workout',
+  },
+  {
     id: 'de-sunshine-live',
     label: 'Sunshine Live',
     region: 'DE',
