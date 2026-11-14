@@ -491,7 +491,7 @@ export default function SettingsScreen() {
 
       <Text style={[styles.section, ts.sectionHeader]}>CYBER-AUDIO &amp; WORKOUT RADIO</Text>
       <CyberpunkCard style={styles.portabilityCard}>
-        <View style={styles.chipRow}>
+        <View style={styles.audioToggleRow}>
           <TouchableOpacity
             testID="toggle-sound-cues"
             onPress={() => {
@@ -500,15 +500,18 @@ export default function SettingsScreen() {
               if (next) void playCyberCue('set_complete', { enabled: true });
             }}
             style={[
-              styles.themeChip,
+              styles.audioChip,
               {
                 borderColor: soundEnabled ? theme.colors.primary : theme.colors.border,
                 backgroundColor: soundEnabled ? theme.colors.checkedBg : 'transparent',
               },
             ]}
           >
-            <Text style={[styles.chipText, soundEnabled ? ts.accent : ts.textMuted]}>
-              SOUND CUES: {soundEnabled ? 'ON' : 'OFF'}
+            <Text
+              style={[styles.audioChipText, soundEnabled ? ts.accent : ts.textMuted]}
+              numberOfLines={1}
+            >
+              SOUND: {soundEnabled ? 'ON' : 'OFF'}
             </Text>
           </TouchableOpacity>
 
@@ -524,15 +527,18 @@ export default function SettingsScreen() {
               }
             }}
             style={[
-              styles.themeChip,
+              styles.audioChip,
               {
                 borderColor: voiceEnabled ? theme.colors.primary : theme.colors.border,
                 backgroundColor: voiceEnabled ? theme.colors.checkedBg : 'transparent',
               },
             ]}
           >
-            <Text style={[styles.chipText, voiceEnabled ? ts.accent : ts.textMuted]}>
-              TRAINER VOICE: {voiceEnabled ? 'ON' : 'OFF'}
+            <Text
+              style={[styles.audioChipText, voiceEnabled ? ts.accent : ts.textMuted]}
+              numberOfLines={1}
+            >
+              VOICE: {voiceEnabled ? 'ON' : 'OFF'}
             </Text>
           </TouchableOpacity>
 
@@ -540,14 +546,17 @@ export default function SettingsScreen() {
             testID="toggle-workout-radio"
             onPress={toggleRadio}
             style={[
-              styles.themeChip,
+              styles.audioChip,
               {
                 borderColor: radioEnabled ? theme.colors.primary : theme.colors.border,
                 backgroundColor: radioEnabled ? theme.colors.checkedBg : 'transparent',
               },
             ]}
           >
-            <Text style={[styles.chipText, radioEnabled ? ts.accent : ts.textMuted]}>
+            <Text
+              style={[styles.audioChipText, radioEnabled ? ts.accent : ts.textMuted]}
+              numberOfLines={1}
+            >
               RADIO: {radioEnabled ? 'ON' : 'OFF'}
             </Text>
           </TouchableOpacity>
@@ -831,5 +840,23 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'monospace',
     letterSpacing: 0.5,
+  },
+  audioToggleRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  audioChip: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+  },
+  audioChipText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
   },
 });
