@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { computeWeeklyStreak, generateAdaptivePlan } from '../../src/engine/plan';
-import { CULT_PROGRAMS, CultProgram } from '../../src/engine/programs';
+import { CultProgram, WORKOUT_CULT_PROGRAMS } from '../../src/engine/programs';
 import { getTrainerById } from '../../src/engine/trainers';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
 import { useProfileStore } from '../../src/stores/profileStore';
@@ -30,10 +30,11 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
   const exercises = useExerciseStore((s) => s.exercises);
 
   const [refreshIndex, setRefreshIndex] = useState(0);
-  const [selectedProgramId, setSelectedProgramId] = useState<string>(CULT_PROGRAMS[0].id);
+  const [selectedProgramId, setSelectedProgramId] = useState<string>(WORKOUT_CULT_PROGRAMS[0].id);
   const [selectedWorkoutIndex, setSelectedWorkoutIndex] = useState(0);
 
-  const currentProgram = CULT_PROGRAMS.find((p) => p.id === selectedProgramId) ?? CULT_PROGRAMS[0];
+  const currentProgram =
+    WORKOUT_CULT_PROGRAMS.find((p) => p.id === selectedProgramId) ?? WORKOUT_CULT_PROGRAMS[0];
   const currentWorkout =
     currentProgram.workouts[selectedWorkoutIndex] ?? currentProgram.workouts[0];
 
@@ -232,7 +233,7 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
             showsHorizontalScrollIndicator={false}
             style={styles.programTabsRow}
           >
-            {CULT_PROGRAMS.map((prog) => {
+            {WORKOUT_CULT_PROGRAMS.map((prog) => {
               const active = prog.id === selectedProgramId;
               return (
                 <TouchableOpacity

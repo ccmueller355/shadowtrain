@@ -2,8 +2,10 @@
 import {
   buildEntriesFromCultWorkout,
   buildPlannedWorkoutFromCult,
+  COOLDOWN_CULT_PROGRAMS,
   CULT_PROGRAMS,
   getCultProgramById,
+  WORKOUT_CULT_PROGRAMS,
 } from '../engine/programs';
 import { Exercise, Profile } from '../types';
 
@@ -58,6 +60,12 @@ describe('Cult Program Templates & Catalog (M12)', () => {
     expect(ids).toContain('tabata-conditioning');
     expect(ids).toContain('bio-hacker-desk-reset');
     expect(ids).toContain('full-body-cooldown');
+
+    expect(WORKOUT_CULT_PROGRAMS.every((p) => p.category !== 'mobility')).toBe(true);
+    expect(COOLDOWN_CULT_PROGRAMS.map((p) => p.id)).toEqual([
+      'bio-hacker-desk-reset',
+      'full-body-cooldown',
+    ]);
   });
 
   it('retrieves program by id', () => {
