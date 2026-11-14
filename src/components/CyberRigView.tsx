@@ -150,18 +150,38 @@ function renderHeadGlyph(pose: RigPose, skin: RigSkin): React.ReactNode {
         />
       )}
       {skin.headShape === 'hood' && (
-        <Polygon
-          points={`${x - 13},${y + 4} ${x},${y - 16} ${x + 13},${y + 4}`}
-          fill="none"
-          stroke={skin.accentColor}
-          strokeWidth={2}
-        />
+        <>
+          <Polygon
+            points={`${x - 10},${y - 2} ${x - 20},${y - 7} ${x - 10},${y + 3}`}
+            fill={skin.accentColor}
+          />
+          <Polygon
+            points={`${x + 10},${y - 2} ${x + 20},${y - 7} ${x + 10},${y + 3}`}
+            fill={skin.accentColor}
+          />
+          <Polygon
+            points={`${x - 13},${y + 4} ${x},${y - 16} ${x + 13},${y + 4}`}
+            fill="none"
+            stroke={skin.accentColor}
+            strokeWidth={2}
+          />
+        </>
       )}
       {skin.headShape === 'crown' && (
-        <Polygon
-          points={`${x - 9},${y - 10} ${x - 4},${y - 17} ${x},${y - 11} ${x + 4},${y - 17} ${x + 9},${y - 10}`}
-          fill={skin.jointColor}
-        />
+        <>
+          <Polygon
+            points={`${x - 10},${y - 2} ${x - 21},${y - 8} ${x - 10},${y + 3}`}
+            fill={skin.accentColor}
+          />
+          <Polygon
+            points={`${x + 10},${y - 2} ${x + 21},${y - 8} ${x + 10},${y + 3}`}
+            fill={skin.accentColor}
+          />
+          <Polygon
+            points={`${x - 9},${y - 10} ${x - 4},${y - 17} ${x},${y - 11} ${x + 4},${y - 17} ${x + 9},${y - 10}`}
+            fill={skin.jointColor}
+          />
+        </>
       )}
       {skin.headShape === 'cyber-bob' && (
         <Line
