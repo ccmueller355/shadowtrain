@@ -497,9 +497,10 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 | **M11** | Æ Training Drone & Specialist Unlock Skins  | Generic stock Wireframe Training Drone for base movements; unlocking Trainers dynamically skins exercises with elite Specialist poses & cues       | S    |
 | **M12** | Program Templates & Round-Based Timer       | Cult programs (Simple & Sinister, Rite of Passage, Convict Calisthenics) + interval/round-based timer (EMOM/Tabata/Rounds) with extensible catalog | M    |
 | **M13** | Visual Overhaul: Seductive Shadow Roster    | High-glam cyberpunk revamp, 5 Trainer editorial dossiers in VitePress + 100% complete START/END WebP exercise frames                               | M    |
-| **M14** | Offline Cyberpunk Audio Sound Pack          | Cybernetic voice cues, countdown beeps, interval bells, and coach quips on rest timer expiration                                                   | S    |
+| **M14** | Cyber-Audio Sound Pack & Workout Radio      | Cybernetic voice cues, countdown beeps, interval bells, trainer quips, `duckOthers` audio ducking, Radio Browser API live search & presets         | M    |
 | **M15** | Cryptographic Vault & Ledger Integrity      | AsyncStorage Profile persistence, SQLite ledger replay/reconciliation, and HMAC-SHA256 tamper-proof backup checksum                                | S    |
 | **M16** | Atelier Vael Batch 2: Titan Pit & Unit-0    | Kaelen 8K core trio + Soren Pistol Squat 8K + UNIT-0 Spar-Drone robot dummies for locked trainers + dynamic unlock skinning                        | M    |
+| **M17** | Universal 2D Cyber-Skeleton Rig & Skins     | Parametric 14-joint SVG rig (`cyberRig.ts`), 6 swappable Trainer/UNIT-0 skins (`rigSkins.ts`), `CyberRigView.tsx`, & 60fps Start↔End interpolation | M    |
 
 ### 7.1 Build Phases
 
@@ -531,7 +532,25 @@ Each milestone = **one issue**, one coding-agent session, one PR.
      - _Convict Calisthenics Progression Trees_ (Step 1 ➔ 10).
      - Configurable Round & Interval Timer in Session Logger: EMOM, Tabata, round count, work/rest interval beepers.
    - **M13 (Visual Overhaul: Seductive Shadow Roster) [COMPLETED]**: High-voltage visual revamp of the female and elven operatives in `assets/trainers/`, `assets/exercises/`, and `docs/trainers/`. Infuse raw cyberpunk allure, form-fitting tactical cyberware, lethal elegance, and provocative aesthetic charisma (Valerie "Glitch", Lyra "Aether", Kaelen "Titan", Marcus "Vanguard", Soren "Wraith", and UNIT-0 Spar-Drone). Includes 100% complete START/END WebP exercise frames for all 14 core movements and full VitePress editorial dossiers.
-   - **M14 (Offline Cyberpunk Audio Sound Pack)**: Offline synthesized voice cues, countdown beeps, interval bells, and trainer completion quips when timers expire or sets finish.
+   - **M14 (Cyber-Audio Sound Pack & Optional Workout Radio)**:
+     - **Offline Sound Pack & Speech**: Offline synthesized voice cues (`expo-speech`), countdown beeps, interval bells, and trainer completion quips when timers expire or sets finish via `expo-audio`.
+     - **OS Audio Ducking (`duckOthers`)**: Configure `setAudioModeAsync({ interruptionMode: 'duckOthers', playsInSilentMode: true })` so external apps (Spotify, Amazon Music, YouTube Music) automatically dip in volume during timer cues and restore afterward.
+     - **Optional Internet Radio Toggle, Live Search & Presets**:
+       - Built-in `expo-audio` stream player (`useAudioPlayer({ uri })`, background playback enabled, auto-ducked during voice/beep cues).
+       - **Live Station Discovery (`radio-browser.info` API)**: Free, keyless directory lookup (`GET /json/stations/search` with custom `User-Agent`, `hidebroken=true`, mirror fallback across `de1`/`nl1`/`at1.api.radio-browser.info`) to search any station by name, `countrycode`, or `tag` (`electronic`, `workout`, `synthwave`, etc.), resolving `url_resolved` dynamically instead of hardcoding brittle stream URLs.
+       - **Favorites & Offline Cache**: ★ Favorite any station and cache resolved `url_resolved` endpoints in `AsyncStorage`, plus a user-editable custom stream URL slot.
+       - **Regional Workout / Electronic Presets** (resolved via Radio Browser `stationuuid`/query on first play):
+         - **Germany / DACH**: _Sunshine Live_, _ENERGY Live / Fitness_, _DASDING_
+         - **Europe**: _I ♥ Workout_ (I Love Music)
+         - **UK**: _KISS FM UK_
+         - **France**: _NRJ Fitness_ / _Hotmix Radio – Sport Workout_
+         - **Spain**: _LOS40 Dance_
+         - **Netherlands**: _SLAM!_
+         - **US**: _iHeart Evolution / KIIS-FM_ (or verified direct Icecast workout stream)
+         - **Japan**: _block.fm_ (Tokyo)
+         - **China**: _CNR Hit FM 88.7_
+         - **Middle East**: _Virgin Radio Dubai 104.4_
+         - **India**: _Club Mirchi_
    - **M15 (Cryptographic Vault & Ledger Integrity) [COMPLETED]**: Dual-ledger persistence & anti-tampering:
      - Wire `@react-native-async-storage/async-storage` via `zustand/middleware/persist` to `useProfileStore` so profile and Creds survive app termination.
      - Implement a deterministic ledger replay engine (`src/engine/vault.ts` or `analytics.ts`): reconstruct and reconcile Cred balances directly from the SQLite session ledger and claimed achievement records.
@@ -541,6 +560,16 @@ Each milestone = **one issue**, one coding-agent session, one PR.
      - Ingest 8K Atelier Vael START & END frames for Kaelen Vorga's heavy iron trio (`kb-swing-two-hand`, `kb-goblet-squat`, `kb-clean-and-press`) and Soren's `bw-pistol-squat`.
      - Ingest UNIT-0 Spar-Drone biomechanical dummy START & END frames for all movements taught by locked trainers (Valerie, Marcus, Lyra, Soren).
      - Wire dynamic exercise skinning in `src/engine/exerciseShowcases.ts`: movements taught by locked specialists display UNIT-0; upon Cred unlock, they automatically transform into the elite 8K Specialist illustrations.
+6. **Phase 6: Universal 2D Form Telemetry (`M17`)**
+   - _Goal_: Replace per-exercise static image bottlenecks (`50+ exercises × 2 poses × 6 skins`) with 1 parametric 2D cyber-skeleton rig rendered via `react-native-svg` + 6 lightweight character skin configs (`UNIT-0` + 5 unlocked specialists), coexisting cleanly with existing `.webp` showcases.
+   - **M17 (Universal 2D Cyber-Skeleton Rig & Character Skins)**:
+     - **Parametric 2D Rig (`src/engine/cyberRig.ts`)**: 14-joint 2D kinematic pose normalized to a `200×200` SVG viewport (`head`, `neck`, `shoulderL/R`, `elbowL/R`, `wristL/R`, `hip`, `kneeL/R`, `ankleL/R`, plus optional `prop`: `kettlebell`, `rings`, `rope`, `wall`, `floor`), `start`/`end` coordinate keyframes, smooth linear/eased interpolation (`t ∈ [0, 1]`), and equipment/category fallback poses.
+     - **6 Swappable Character Skins (`src/engine/rigSkins.ts`)**: Declarative `RigSkin` configs (`drone-unit-0`, `orc-merc`, `human-decker`, `human-soldier`, `elf-wraith`, `elf-mage`) with distinct limb/joint/glow palettes, stroke weights, armor plates, and `headShape` SVG glyphs, auto-selected via `getCoachDisplayForExercise(exercise, profile)`.
+     - **Renderer Component (`src/components/CyberRigView.tsx`)**: `react-native-svg` renderer with subtle cyber-grid reference lines, equipment props, articulated limbs + glowing joints, character head/crest glyph, and optional `primaryMuscles` highlight pulse.
+     - **Phased Rollout**:
+       - `M17-A`: Install `react-native-svg`, build `cyberRig.ts`, `rigSkins.ts`, `CyberRigView.tsx`, add `stretch-*` + `kb-*` keyframes, and wire `[2D RIG]` / `[STATIC]` toggle in `app/(tabs)/exercises.tsx` (plus automatic fallback instead of text-only pose fallback).
+       - `M17-B`: Full 50-exercise keyframe coverage + `primaryMuscles` segment highlight in `theme.colors.secondary`.
+       - `M17-C`: Live 60fps `▶ ANIMATE` loop & scrub slider (`start → end → start`).
 
 **Definition of done (every milestone):**
 
