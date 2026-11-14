@@ -1,8 +1,13 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Svg, { Circle, Line, Path, Polygon, Rect } from 'react-native-svg';
-import { RigPose } from '../engine/cyberRig';
+import {
+  ExerciseRigKeyframes,
+  getHighlightedSegments,
+  interpolateRigPose,
+  RigPose,
+} from '../engine/cyberRig';
 import { RigSkin } from '../engine/rigSkins';
 
 interface CyberRigViewProps {
@@ -10,6 +15,8 @@ interface CyberRigViewProps {
   skin: RigSkin;
   size?: number;
   caption?: string;
+  primaryMuscles?: string[];
+  highlightColor?: string;
   testID?: string;
 }
 
@@ -166,8 +173,12 @@ export function CyberRigView({
   skin,
   size = 148,
   caption,
+  primaryMuscles,
+  highlightColor,
   testID,
 }: CyberRigViewProps): React.ReactElement {
+  const highlighted = getHighlightedSegments(primaryMuscles);
+  const activeColor = highlightColor ?? skin.accentColor;
   const segments: [typeof pose.head, typeof pose.head][] = [
     [pose.neck, pose.hip],
     [pose.shoulderL, pose.shoulderR],
@@ -217,28 +228,32 @@ export function CyberRigView({
 
         {renderProp(pose, skin)}
 
-        {segments.map(([a, b], idx) => (
-          <React.Fragment key={idx}>
-            <Line
-              x1={a.x}
-              y1={a.y}
-              x2={b.x}
-              y2={b.y}
-              stroke={skin.glowColor}
-              strokeWidth={skin.limbWidth + 4}
-              strokeLinecap="round"
-            />
-            <Line
-              x1={a.x}
-              y1={a.y}
-              x2={b.x}
-              y2={b.y}
-              stroke={skin.limbColor}
-              strokeWidth={skin.limbWidth}
-              strokeLinecap="round"
-            />
-          </React.Fragment>
-        ))}
+        {segments.map(([a, b], idx) => {
+          const isHot = highlighted.has(idx);
+          return (
+            <React.Fragment key={idx}>
+              <Line
+                x1={a.x}
+                y1={a.y}
+                x2={b.x}
+                y2={b.y}
+                stroke={isHot ? activeColor : skin.glowColor}
+                strokeOpacity={isHot ? 0.5 : 1}
+                strokeWidth={skin.limbWidth + (isHot ? 6 : 4)}
+                strokeLinecap="round"
+              />
+              <Line
+                x1={a.x}
+                y1={a.y}
+                x2={b.x}
+                y2={b.y}
+                stroke={isHot ? activeColor : skin.limbColor}
+                strokeWidth={skin.limbWidth}
+                strokeLinecap="round"
+              />
+            </React.Fragment>
+          );
+        })}
 
         {skin.shoulderArmor && (
           <>
@@ -278,9 +293,145 @@ export function CyberRigView({
   );
 }
 
+interface CyberRigPlayerProps {
+  keyframes: ExerciseRigKeyframes;
+  skin: RigSkin;
+  primaryMuscles?: string[];
+  highlightColor?: string;
+}
+
+const SCRUB_STEPS = [0, 0.25, 0.5, 0.75, 1];
+
+/** Interactive 60fps ping-pong rig animator + phase scrub bar. */
+export function CyberRigPlayer({
+  keyframes,
+  skin,
+  primaryMuscles,
+  highlightColor,
+}: CyberRigPlayerProps): React.ReactElement {
+  const [animating, setAnimating] = useState(false);
+  const [phase, setPhase] = useState(0);
+
+  useEffect(() => {
+    if (!animating) return;
+    let rafId = 0;
+    const startMs = Date.now();
+    const tick = () => {
+      const elapsed = (Date.now() - startMs) % 2200;
+      const norm = elapsed / 1100;
+      setPhase(norm <= 1 ? norm : 2 - norm);
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [animating]);
+
+  const currentPose = interpolateRigPose(keyframes.start, keyframes.end, phase);
+  const activeColor = highlightColor ?? skin.accentColor;
+
+  return (
+    <View style={styles.playerWrap} testID="cyber-rig-player">
+      <View style={styles.dualRow}>
+        <CyberRigView
+          pose={currentPose}
+          skin={skin}
+          size={196}
+          primaryMuscles={primaryMuscles}
+          highlightColor={activeColor}
+          caption={`PHASE // ${Math.round(phase * 100)}%`}
+          testID="exercise-rig-live"
+        />
+      </View>
+
+      <View style={styles.controlsRow}>
+        <TouchableOpacity
+          testID="rig-animate-toggle"
+          onPress={() => setAnimating((a) => !a)}
+          style={[
+            styles.ctrlBtn,
+            {
+              borderColor: activeColor,
+              backgroundColor: animating ? 'rgba(255,255,255,0.08)' : 'transparent',
+            },
+          ]}
+        >
+          <Text style={[styles.ctrlText, { color: activeColor }]}>
+            {animating ? '⏸ PAUSE' : '▶ ANIMATE'}
+          </Text>
+        </TouchableOpacity>
+
+        <View style={styles.scrubRow} testID="rig-scrub-bar">
+          {SCRUB_STEPS.map((step) => {
+            const active = !animating && Math.abs(phase - step) < 0.08;
+            return (
+              <TouchableOpacity
+                key={step}
+                testID={`rig-scrub-${Math.round(step * 100)}`}
+                onPress={() => {
+                  setAnimating(false);
+                  setPhase(step);
+                }}
+                style={[
+                  styles.scrubStep,
+                  {
+                    borderColor: active ? activeColor : '#334155',
+                    backgroundColor: active ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  },
+                ]}
+              >
+                <Text style={[styles.scrubText, { color: active ? activeColor : '#94a3b8' }]}>
+                  {Math.round(step * 100)}%
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   wrapper: {
     alignItems: 'center',
+  },
+  playerWrap: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  dualRow: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  controlsRow: {
+    width: '100%',
+    gap: 8,
+    alignItems: 'center',
+  },
+  ctrlBtn: {
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+  ctrlText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+  },
+  scrubRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  scrubStep: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  scrubText: {
+    fontSize: 10,
+    fontFamily: 'monospace',
   },
   svg: {
     borderRadius: 6,

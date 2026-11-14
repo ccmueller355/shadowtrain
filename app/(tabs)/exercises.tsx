@@ -27,7 +27,7 @@ import {
 import { getExerciseShowcase } from '../../src/engine/exerciseShowcases';
 import { getRigKeyframesForExercise } from '../../src/engine/cyberRig';
 import { getRigSkinForTrainer } from '../../src/engine/rigSkins';
-import { CyberRigView } from '../../src/components/CyberRigView';
+import { CyberRigPlayer } from '../../src/components/CyberRigView';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { Equipment, Exercise } from '../../src/types';
 
@@ -294,24 +294,12 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                 testID={hasStaticShowcase ? 'exercise-rig-poses' : 'exercise-pose-fallback-card'}
                 style={styles.poseRowContainer}
               >
-                <View style={styles.poseRow}>
-                  <View style={styles.poseCol}>
-                    <CyberRigView
-                      pose={rigKeyframes.start}
-                      skin={rigSkin}
-                      caption="START POSE"
-                      testID="exercise-rig-start"
-                    />
-                  </View>
-                  <View style={styles.poseCol}>
-                    <CyberRigView
-                      pose={rigKeyframes.end}
-                      skin={rigSkin}
-                      caption="END POSE"
-                      testID="exercise-rig-end"
-                    />
-                  </View>
-                </View>
+                <CyberRigPlayer
+                  keyframes={rigKeyframes}
+                  skin={rigSkin}
+                  primaryMuscles={detailExercise.primaryMuscles}
+                  highlightColor={theme.colors.secondary}
+                />
                 <Text style={[styles.poseMeta, ts.textMuted]}>2D CYBER-RIG // {rigSkin.label}</Text>
               </View>
             )}

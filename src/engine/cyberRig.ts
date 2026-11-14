@@ -439,7 +439,243 @@ export const RIG_KEYFRAMES: Record<string, ExerciseRigKeyframes> = {
       prop: 'rope',
     },
   },
+  'ring-pull-up': {
+    start: {
+      ...STAND_BASE,
+      head: { x: 100, y: 66 },
+      neck: { x: 100, y: 80 },
+      shoulderL: { x: 84, y: 86 },
+      shoulderR: { x: 116, y: 86 },
+      elbowL: { x: 80, y: 58 },
+      elbowR: { x: 120, y: 58 },
+      wristL: { x: 82, y: 32 },
+      wristR: { x: 118, y: 32 },
+      hip: { x: 100, y: 126 },
+      kneeL: { x: 92, y: 154 },
+      kneeR: { x: 108, y: 154 },
+      ankleL: { x: 90, y: 176 },
+      ankleR: { x: 110, y: 176 },
+      prop: 'rings',
+    },
+    end: {
+      ...STAND_BASE,
+      head: { x: 100, y: 30 },
+      neck: { x: 100, y: 44 },
+      shoulderL: { x: 84, y: 50 },
+      shoulderR: { x: 116, y: 50 },
+      elbowL: { x: 70, y: 66 },
+      elbowR: { x: 130, y: 66 },
+      wristL: { x: 82, y: 32 },
+      wristR: { x: 118, y: 32 },
+      hip: { x: 100, y: 94 },
+      kneeL: { x: 92, y: 126 },
+      kneeR: { x: 108, y: 126 },
+      ankleL: { x: 90, y: 154 },
+      ankleR: { x: 110, y: 154 },
+      prop: 'rings',
+    },
+  },
+  'bw-pistol-squat': {
+    start: STAND_BASE,
+    end: {
+      ...STAND_BASE,
+      head: { x: 96, y: 74 },
+      neck: { x: 96, y: 90 },
+      shoulderL: { x: 80, y: 96 },
+      shoulderR: { x: 112, y: 96 },
+      elbowL: { x: 104, y: 96 },
+      elbowR: { x: 128, y: 96 },
+      wristL: { x: 128, y: 94 },
+      wristR: { x: 148, y: 94 },
+      hip: { x: 90, y: 144 },
+      kneeL: { x: 110, y: 144 },
+      kneeR: { x: 130, y: 142 },
+      ankleL: { x: 98, y: 178 },
+      ankleR: { x: 162, y: 142 },
+    },
+  },
+  'bw-plank': {
+    start: {
+      ...STAND_BASE,
+      head: { x: 146, y: 134 },
+      neck: { x: 134, y: 142 },
+      shoulderL: { x: 128, y: 142 },
+      shoulderR: { x: 136, y: 146 },
+      elbowL: { x: 128, y: 174 },
+      elbowR: { x: 136, y: 174 },
+      wristL: { x: 148, y: 176 },
+      wristR: { x: 154, y: 176 },
+      hip: { x: 92, y: 150 },
+      kneeL: { x: 64, y: 162 },
+      kneeR: { x: 66, y: 164 },
+      ankleL: { x: 40, y: 176 },
+      ankleR: { x: 42, y: 176 },
+    },
+    end: {
+      ...STAND_BASE,
+      head: { x: 146, y: 132 },
+      neck: { x: 134, y: 140 },
+      shoulderL: { x: 128, y: 140 },
+      shoulderR: { x: 136, y: 144 },
+      elbowL: { x: 128, y: 174 },
+      elbowR: { x: 136, y: 174 },
+      wristL: { x: 148, y: 176 },
+      wristR: { x: 154, y: 176 },
+      hip: { x: 92, y: 146 },
+      kneeL: { x: 64, y: 160 },
+      kneeR: { x: 66, y: 162 },
+      ankleL: { x: 40, y: 176 },
+      ankleR: { x: 42, y: 176 },
+    },
+  },
+  'grip-crush-rep': {
+    start: {
+      ...STAND_BASE,
+      elbowR: { x: 128, y: 76 },
+      wristR: { x: 146, y: 66 },
+    },
+    end: {
+      ...STAND_BASE,
+      elbowR: { x: 126, y: 74 },
+      wristR: { x: 138, y: 62 },
+    },
+  },
+  'stretch-pike-hamstring': {
+    start: STAND_BASE,
+    end: {
+      ...STAND_BASE,
+      head: { x: 124, y: 128 },
+      neck: { x: 114, y: 118 },
+      shoulderL: { x: 108, y: 118 },
+      shoulderR: { x: 118, y: 122 },
+      elbowL: { x: 106, y: 146 },
+      elbowR: { x: 116, y: 148 },
+      wristL: { x: 98, y: 172 },
+      wristR: { x: 108, y: 172 },
+      hip: { x: 86, y: 106 },
+      kneeL: { x: 86, y: 142 },
+      kneeR: { x: 94, y: 142 },
+      ankleL: { x: 86, y: 178 },
+      ankleR: { x: 96, y: 178 },
+    },
+  },
+  'stretch-cat-cow': {
+    start: {
+      ...STAND_BASE,
+      head: { x: 142, y: 126 },
+      neck: { x: 132, y: 132 },
+      shoulderL: { x: 128, y: 134 },
+      shoulderR: { x: 132, y: 138 },
+      elbowL: { x: 128, y: 156 },
+      elbowR: { x: 132, y: 156 },
+      wristL: { x: 128, y: 176 },
+      wristR: { x: 134, y: 176 },
+      hip: { x: 74, y: 134 },
+      kneeL: { x: 72, y: 176 },
+      kneeR: { x: 78, y: 176 },
+      ankleL: { x: 46, y: 176 },
+      ankleR: { x: 52, y: 176 },
+    },
+    end: {
+      ...STAND_BASE,
+      head: { x: 142, y: 144 },
+      neck: { x: 130, y: 134 },
+      shoulderL: { x: 128, y: 134 },
+      shoulderR: { x: 132, y: 138 },
+      elbowL: { x: 128, y: 156 },
+      elbowR: { x: 132, y: 156 },
+      wristL: { x: 128, y: 176 },
+      wristR: { x: 134, y: 176 },
+      hip: { x: 74, y: 134 },
+      kneeL: { x: 72, y: 176 },
+      kneeR: { x: 78, y: 176 },
+      ankleL: { x: 46, y: 176 },
+      ankleR: { x: 52, y: 176 },
+    },
+  },
+  'barbell-deadlift': {
+    start: {
+      ...STAND_BASE,
+      head: { x: 116, y: 74 },
+      neck: { x: 108, y: 88 },
+      shoulderL: { x: 96, y: 94 },
+      shoulderR: { x: 118, y: 94 },
+      elbowL: { x: 96, y: 124 },
+      elbowR: { x: 118, y: 124 },
+      wristL: { x: 96, y: 154 },
+      wristR: { x: 118, y: 154 },
+      hip: { x: 76, y: 122 },
+      kneeL: { x: 92, y: 148 },
+      kneeR: { x: 112, y: 148 },
+    },
+    end: STAND_BASE,
+  },
 };
+
+const RIG_ALIASES: Record<string, string> = {
+  'kb-swing-one-arm': 'kb-swing-two-hand',
+  'kb-snatch': 'kb-clean-and-press',
+  'kb-row-one-arm': 'kb-swing-two-hand',
+  'kb-front-rack-squat': 'kb-goblet-squat',
+  'ring-support-hold': 'ring-dip',
+  'ring-row': 'ring-pull-up',
+  'ring-push-up': 'bw-push-up',
+  'ring-face-pull': 'ring-pull-up',
+  'ring-l-sit-hold': 'ring-dip',
+  'ring-rollout': 'bw-plank',
+  'bw-diamond-push-up': 'bw-push-up',
+  'bw-pike-push-up': 'bw-push-up',
+  'bw-hollow-body-hold': 'bw-plank',
+  'bw-leg-raise': 'bw-plank',
+  'grip-overcrush-hold': 'grip-crush-rep',
+  'grip-pinch-press': 'grip-crush-rep',
+  'rope-boxer-step': 'rope-basic-bounce',
+  'rope-double-unders': 'rope-basic-bounce',
+  'stretch-cossack-hold': 'bw-pistol-squat',
+  'stretch-thoracic-hang': 'ring-pull-up',
+  'stretch-deep-squat-pry': 'bw-squat',
+  'stretch-doorway-pec': 'stretch-pec-doorway',
+  'stretch-thread-needle': 'stretch-thoracic-open',
+  'stretch-figure-four': 'stretch-90-90-hip',
+  'stretch-downward-dog-calf': 'stretch-pike-hamstring',
+  'barbell-back-squat': 'bw-squat',
+  'barbell-bench-press': 'bw-push-up',
+  'dumbbell-incline-press': 'bw-push-up',
+  'dumbbell-romanian-deadlift': 'barbell-deadlift',
+  'cable-lat-pulldown': 'ring-pull-up',
+  'machine-leg-press': 'bw-squat',
+  'bands-pull-apart': 'stretch-pec-doorway',
+};
+
+const MUSCLE_TO_SEGMENTS: Record<string, number[]> = {
+  core: [0],
+  abs: [0],
+  lower_back: [0],
+  chest: [1, 2, 4],
+  shoulders: [1, 2, 4],
+  lats: [0, 1, 2, 4],
+  upper_back: [0, 1],
+  biceps: [2, 3, 4, 5],
+  triceps: [2, 3, 4, 5],
+  forearms: [3, 5],
+  quads: [6, 7, 8, 9],
+  hamstrings: [6, 7, 8, 9],
+  glutes: [6, 8],
+  hips: [6, 8],
+  calves: [7, 9],
+};
+
+/** Return SVG limb segment indices (`0..9`) matching an exercise's `primaryMuscles`. */
+export function getHighlightedSegments(primaryMuscles: string[] = []): Set<number> {
+  const highlighted = new Set<number>();
+  for (const muscle of primaryMuscles) {
+    const indices = MUSCLE_TO_SEGMENTS[muscle.toLowerCase()];
+    if (indices) {
+      for (const idx of indices) highlighted.add(idx);
+    }
+  }
+  return highlighted;
+}
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
@@ -481,6 +717,10 @@ export function getRigKeyframesForExercise(
 ): ExerciseRigKeyframes {
   if (RIG_KEYFRAMES[exercise.id]) {
     return RIG_KEYFRAMES[exercise.id];
+  }
+  const alias = RIG_ALIASES[exercise.id];
+  if (alias && RIG_KEYFRAMES[alias]) {
+    return RIG_KEYFRAMES[alias];
   }
   if (exercise.equipment === 'kettlebell') return RIG_KEYFRAMES['kb-swing-two-hand'];
   if (exercise.equipment === 'rings') return RIG_KEYFRAMES['ring-dip'];

@@ -2,9 +2,16 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
 import { CyberRigView } from '../components/CyberRigView';
-import { getRigKeyframesForExercise, interpolateRigPose, RIG_KEYFRAMES } from '../engine/cyberRig';
+import {
+  getHighlightedSegments,
+  getRigKeyframesForExercise,
+  interpolateRigPose,
+  RIG_KEYFRAMES,
+} from '../engine/cyberRig';
 import { getRigSkinForTrainer, RIG_SKINS } from '../engine/rigSkins';
 import { TrainerId } from '../types';
+import coreKitExercises from '../db/seed/core-kit-exercises.json';
+import publicExercises from '../db/seed/public-exercises.json';
 import ExercisesScreen from '../../app/(tabs)/exercises';
 
 describe('M17-A: 2D Cyber-Skeleton Rig & Character Skins', () => {
@@ -110,8 +117,25 @@ describe('M17-A: 2D Cyber-Skeleton Rig & Character Skins', () => {
     });
   });
 
-  it('toggles between [STATIC] and [2D RIG] in ExercisesScreen detail modal', () => {
-    const { getByTestId, queryByTestId } = render(<ExercisesScreen />);
+  it('covers all 50 seeded exercises and maps primaryMuscles to limb segments', () => {
+    const allSeeded = [...coreKitExercises, ...publicExercises] as {
+      id: string;
+      equipment: 'kettlebell';
+      category: 'hinge';
+    }[];
+    expect(allSeeded).toHaveLength(50);
+    for (const ex of allSeeded) {
+      const kf = getRigKeyframesForExercise(ex);
+      expect(kf.start.head).toBeDefined();
+      expect(kf.end.head).toBeDefined();
+    }
+    expect(getHighlightedSegments(['chest', 'quads']).has(1)).toBe(true);
+    expect(getHighlightedSegments(['chest', 'quads']).has(6)).toBe(true);
+    expect(getHighlightedSegments([]).size).toBe(0);
+  });
+
+  it('toggles between [STATIC] and [2D RIG] and scrubs/animates in ExercisesScreen', () => {
+    const { getByTestId, getByText, queryByTestId } = render(<ExercisesScreen />);
     fireEvent.press(getByTestId('exercise-item-kb-swing-two-hand'));
     expect(getByTestId('exercise-pose-images')).toBeTruthy();
     expect(getByTestId('toggle-rig-mode')).toBeTruthy();
@@ -119,7 +143,15 @@ describe('M17-A: 2D Cyber-Skeleton Rig & Character Skins', () => {
     fireEvent.press(getByTestId('toggle-rig-mode'));
     expect(queryByTestId('exercise-pose-images')).toBeNull();
     expect(getByTestId('exercise-rig-poses')).toBeTruthy();
-    expect(getByTestId('exercise-rig-start')).toBeTruthy();
-    expect(getByTestId('exercise-rig-end')).toBeTruthy();
+    expect(getByTestId('cyber-rig-player')).toBeTruthy();
+    expect(getByTestId('exercise-rig-live')).toBeTruthy();
+
+    fireEvent.press(getByTestId('rig-scrub-50'));
+    expect(getByText('PHASE // 50%')).toBeTruthy();
+
+    fireEvent.press(getByTestId('rig-animate-toggle'));
+    expect(getByText('⏸ PAUSE')).toBeTruthy();
+    fireEvent.press(getByTestId('rig-animate-toggle'));
+    expect(getByText('▶ ANIMATE')).toBeTruthy();
   });
 });
