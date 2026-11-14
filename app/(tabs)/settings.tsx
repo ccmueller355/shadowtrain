@@ -13,6 +13,8 @@ import {
   View,
 } from 'react-native';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
+import { RadioPlayerBar } from '../../src/components/RadioPlayerBar';
+import { playCyberCue, speakTrainerCue } from '../../src/engine/audio';
 import {
   parseAndValidateBackupJson,
   serializeBackupJson,
@@ -26,6 +28,7 @@ import {
 } from '../../src/engine/trainers';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
 import { useProfileStore } from '../../src/stores/profileStore';
+import { useRadioStore } from '../../src/stores/radioStore';
 import { useSessionStore } from '../../src/stores/sessionStore';
 import { ThemeName, themes } from '../../src/theme/themes';
 import { useAppTheme } from '../../src/theme/useTheme';
@@ -72,11 +75,18 @@ export default function SettingsScreen() {
   const setTargetDuration = useProfileStore((s) => s.setTargetDuration);
   const toggleEquipment = useProfileStore((s) => s.toggleEquipment);
   const unlockAndSelectTrainer = useProfileStore((s) => s.unlockAndSelectTrainer);
+  const addCreds = useProfileStore((s) => s.addCreds);
 
   const recentSessions = useSessionStore((s) => s.recentSessions);
   const activeSession = useSessionStore((s) => s.activeSession);
   const restoreSessionsFromBackup = useSessionStore((s) => s.restoreSessionsFromBackup);
   const exercises = useExerciseStore((s) => s.exercises);
+  const soundEnabled = useRadioStore((s) => s.soundEnabled);
+  const voiceEnabled = useRadioStore((s) => s.voiceEnabled);
+  const radioEnabled = useRadioStore((s) => s.radioEnabled);
+  const toggleSound = useRadioStore((s) => s.toggleSound);
+  const toggleVoice = useRadioStore((s) => s.toggleVoice);
+  const toggleRadio = useRadioStore((s) => s.toggleRadio);
 
   const [selectedTrainerId, setSelectedTrainerId] = useState<TrainerId>(
     profile.activeTrainerId ?? 'drone-unit-0',
@@ -157,11 +167,24 @@ export default function SettingsScreen() {
     <ScrollView style={[styles.container, ts.bg]} testID="screen-settings">
       <View style={styles.headerRow}>
         <Text style={[styles.title, ts.accent]}>DECK SETTINGS</Text>
-        <View
-          style={[styles.credsBadge, { borderColor: theme.colors.primary }]}
-          testID="creds-balance-badge"
-        >
-          <Text style={[styles.credsBadgeText, ts.accent]}>CREDS: {profile.creds ?? 0} ¥</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          {__DEV__ ? (
+            <TouchableOpacity
+              testID="dev-add-creds-btn"
+              onPress={() => addCreds(1000)}
+              style={[styles.credsBadge, { borderColor: theme.colors.secondary }]}
+            >
+              <Text style={[styles.credsBadgeText, { color: theme.colors.secondary }]}>
+                DEV +1000 ¥
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          <View
+            style={[styles.credsBadge, { borderColor: theme.colors.primary }]}
+            testID="creds-balance-badge"
+          >
+            <Text style={[styles.credsBadgeText, ts.accent]}>CREDS: {profile.creds ?? 0} ¥</Text>
+          </View>
         </View>
       </View>
 
@@ -466,6 +489,82 @@ export default function SettingsScreen() {
         })}
       </View>
 
+      <Text style={[styles.section, ts.sectionHeader]}>CYBER-AUDIO &amp; WORKOUT RADIO</Text>
+      <CyberpunkCard style={styles.portabilityCard}>
+        <View style={styles.audioToggleRow}>
+          <TouchableOpacity
+            testID="toggle-sound-cues"
+            onPress={() => {
+              const next = !soundEnabled;
+              toggleSound();
+              if (next) void playCyberCue('set_complete', { enabled: true });
+            }}
+            style={[
+              styles.audioChip,
+              {
+                borderColor: soundEnabled ? theme.colors.primary : theme.colors.border,
+                backgroundColor: soundEnabled ? theme.colors.checkedBg : 'transparent',
+              },
+            ]}
+          >
+            <Text
+              style={[styles.audioChipText, soundEnabled ? ts.accent : ts.textMuted]}
+              numberOfLines={1}
+            >
+              SOUND: {soundEnabled ? 'ON' : 'OFF'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="toggle-voice-cues"
+            onPress={() => {
+              const next = !voiceEnabled;
+              toggleVoice();
+              if (next) {
+                speakTrainerCue(profile.activeTrainerId ?? 'drone-unit-0', 'rest_done', {
+                  enabled: true,
+                });
+              }
+            }}
+            style={[
+              styles.audioChip,
+              {
+                borderColor: voiceEnabled ? theme.colors.primary : theme.colors.border,
+                backgroundColor: voiceEnabled ? theme.colors.checkedBg : 'transparent',
+              },
+            ]}
+          >
+            <Text
+              style={[styles.audioChipText, voiceEnabled ? ts.accent : ts.textMuted]}
+              numberOfLines={1}
+            >
+              VOICE: {voiceEnabled ? 'ON' : 'OFF'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="toggle-workout-radio"
+            onPress={toggleRadio}
+            style={[
+              styles.audioChip,
+              {
+                borderColor: radioEnabled ? theme.colors.primary : theme.colors.border,
+                backgroundColor: radioEnabled ? theme.colors.checkedBg : 'transparent',
+              },
+            ]}
+          >
+            <Text
+              style={[styles.audioChipText, radioEnabled ? ts.accent : ts.textMuted]}
+              numberOfLines={1}
+            >
+              RADIO: {radioEnabled ? 'ON' : 'OFF'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {radioEnabled ? <RadioPlayerBar /> : null}
+      </CyberpunkCard>
+
       <Text style={[styles.section, ts.sectionHeader]}>DATA PORTABILITY (BACKUP & CSV)</Text>
       <CyberpunkCard style={styles.portabilityCard}>
         <View style={styles.portabilityBtnRow}>
@@ -741,5 +840,23 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'monospace',
     letterSpacing: 0.5,
+  },
+  audioToggleRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  audioChip: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+  },
+  audioChipText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
   },
 });
