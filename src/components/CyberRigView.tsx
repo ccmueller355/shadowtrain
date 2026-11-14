@@ -396,6 +396,7 @@ interface CyberRigPlayerProps {
   skin: RigSkin;
   primaryMuscles?: string[];
   highlightColor?: string;
+  cycleMs?: number;
 }
 
 const SCRUB_STEPS = [0, 0.25, 0.5, 0.75, 1];
@@ -406,6 +407,7 @@ export function CyberRigPlayer({
   skin,
   primaryMuscles,
   highlightColor,
+  cycleMs = 2200,
 }: CyberRigPlayerProps): React.ReactElement {
   const [animating, setAnimating] = useState(false);
   const [phase, setPhase] = useState(0);
@@ -414,15 +416,16 @@ export function CyberRigPlayer({
     if (!animating) return;
     let rafId = 0;
     const startMs = Date.now();
+    const halfMs = cycleMs / 2;
     const tick = () => {
-      const elapsed = (Date.now() - startMs) % 2200;
-      const norm = elapsed / 1100;
+      const elapsed = (Date.now() - startMs) % cycleMs;
+      const norm = elapsed / halfMs;
       setPhase(norm <= 1 ? norm : 2 - norm);
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [animating]);
+  }, [animating, cycleMs]);
 
   const currentPose = interpolateRigPose(keyframes.start, keyframes.end, phase);
   const activeColor = highlightColor ?? skin.accentColor;

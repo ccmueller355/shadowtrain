@@ -324,6 +324,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                   skin={rigSkin}
                   primaryMuscles={detailExercise.primaryMuscles}
                   highlightColor={theme.colors.secondary}
+                  cycleMs={detailExercise.category === 'stretching' ? 6400 : 2200}
                 />
                 <Text style={[styles.poseMeta, ts.textMuted]}>2D CYBER-RIG // {rigSkin.label}</Text>
               </View>
