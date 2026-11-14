@@ -56,6 +56,8 @@ describe('Cult Program Templates & Catalog (M12)', () => {
     expect(ids).toContain('convict-calisthenics');
     expect(ids).toContain('armor-building-complex');
     expect(ids).toContain('tabata-conditioning');
+    expect(ids).toContain('bio-hacker-desk-reset');
+    expect(ids).toContain('full-body-cooldown');
   });
 
   it('retrieves program by id', () => {
