@@ -1,12 +1,15 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import ExercisesScreen from '../(tabs)/exercises';
 import { useAppTheme } from '../../src/theme/useTheme';
 import { useThemeStyles } from '../../src/theme/useThemeStyles';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
+import { RadioPlayerBar } from '../../src/components/RadioPlayerBar';
+import { playCyberCue, speakTrainerCue } from '../../src/engine/audio';
 import { useProfileStore } from '../../src/stores/profileStore';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
+import { useRadioStore } from '../../src/stores/radioStore';
 import { formatSuggestionChip, suggestNext } from '../../src/engine/suggest';
 import { formatIntervalTime } from '../../src/engine/intervalTimer';
 import { COOLDOWN_CULT_PROGRAMS, ProgramWorkout } from '../../src/engine/programs';
@@ -33,6 +36,12 @@ export default function SessionLoggerScreen({
 
   const profile = useProfileStore((s) => s.profile);
   const exercises = useExerciseStore((s) => s.exercises);
+  const soundEnabled = useRadioStore((s) => s.soundEnabled);
+  const voiceEnabled = useRadioStore((s) => s.voiceEnabled);
+  const radioEnabled = useRadioStore((s) => s.radioEnabled);
+  const toggleRadio = useRadioStore((s) => s.toggleRadio);
+  const prevRestSecRef = useRef(0);
+  const prevIntervalPhaseRef = useRef<string>('off');
 
   const activeSession = useSessionStore((s) => s.activeSession);
   const restTimerSec = useSessionStore((s) => s.restTimerSec);
@@ -81,12 +90,54 @@ export default function SessionLoggerScreen({
   }, [restTimerRunning, tickRestTimer]);
 
   useEffect(() => {
+    const prev = prevRestSecRef.current;
+    const trainerId = profile.activeTrainerId ?? 'drone-unit-0';
+    if (restTimerRunning && restTimerSec >= 1 && restTimerSec <= 3 && restTimerSec !== prev) {
+      void playCyberCue('countdown_pip', { enabled: soundEnabled });
+    } else if (prev > 0 && restTimerSec === 0) {
+      void playCyberCue('rest_complete', { enabled: soundEnabled });
+      speakTrainerCue(trainerId, 'rest_done', { enabled: voiceEnabled });
+    }
+    prevRestSecRef.current = restTimerSec;
+  }, [restTimerSec, restTimerRunning, soundEnabled, voiceEnabled, profile.activeTrainerId]);
+
+  useEffect(() => {
     if (!intervalTimer.running) return undefined;
     const interval = setInterval(() => {
       tickIntervalTimerStep();
     }, 1000);
     return () => clearInterval(interval);
   }, [intervalTimer.running, tickIntervalTimerStep]);
+
+  useEffect(() => {
+    const prevPhase = prevIntervalPhaseRef.current;
+    const trainerId = profile.activeTrainerId ?? 'drone-unit-0';
+    if (intervalTimer.phase !== prevPhase) {
+      if (intervalTimer.phase === 'work') {
+        void playCyberCue('interval_work', { enabled: soundEnabled });
+        speakTrainerCue(trainerId, 'interval_work', { enabled: voiceEnabled });
+      } else if (intervalTimer.phase === 'rest') {
+        void playCyberCue('interval_rest', { enabled: soundEnabled });
+        speakTrainerCue(trainerId, 'interval_rest', { enabled: voiceEnabled });
+      } else if (intervalTimer.phase === 'complete' && prevPhase !== 'off') {
+        void playCyberCue('rest_complete', { enabled: soundEnabled });
+      }
+      prevIntervalPhaseRef.current = intervalTimer.phase;
+    } else if (
+      intervalTimer.running &&
+      intervalTimer.remainingSec >= 1 &&
+      intervalTimer.remainingSec <= 3
+    ) {
+      void playCyberCue('countdown_pip', { enabled: soundEnabled });
+    }
+  }, [
+    intervalTimer.phase,
+    intervalTimer.remainingSec,
+    intervalTimer.running,
+    soundEnabled,
+    voiceEnabled,
+    profile.activeTrainerId,
+  ]);
 
   const handleBack = () => {
     onFinishSession?.();
@@ -98,6 +149,9 @@ export default function SessionLoggerScreen({
   };
 
   const handleFinish = () => {
+    speakTrainerCue(profile.activeTrainerId ?? 'drone-unit-0', 'session_finish', {
+      enabled: voiceEnabled,
+    });
     finishActiveSession();
     onFinishSession?.();
   };
@@ -164,6 +218,17 @@ export default function SessionLoggerScreen({
 
         <View style={styles.headerActions}>
           <TouchableOpacity
+            testID="logger-radio-toggle"
+            style={[
+              styles.finishBtn,
+              { borderColor: radioEnabled ? theme.colors.primary : theme.colors.border },
+            ]}
+            onPress={toggleRadio}
+          >
+            <Text style={[styles.finishText, radioEnabled ? ts.accent : ts.textMuted]}>📻</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             testID="cancel-session-btn"
             style={[styles.finishBtn, { borderColor: theme.colors.danger }]}
             onPress={handleCancelOrDelete}
@@ -196,6 +261,8 @@ export default function SessionLoggerScreen({
           },
         ]}
       />
+
+      {radioEnabled ? <RadioPlayerBar compact /> : null}
 
       {(restTimerRunning || restTimerSec > 0) && (
         <View
@@ -599,7 +666,12 @@ export default function SessionLoggerScreen({
                           backgroundColor: set.completed ? theme.colors.primary : 'transparent',
                         },
                       ]}
-                      onPress={() => toggleSetComplete(entry.id, set.id, restDefault)}
+                      onPress={() => {
+                        if (!set.completed) {
+                          void playCyberCue('set_complete', { enabled: soundEnabled });
+                        }
+                        toggleSetComplete(entry.id, set.id, restDefault);
+                      }}
                     >
                       <Text
                         style={[

@@ -13,6 +13,8 @@ import {
   View,
 } from 'react-native';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
+import { RadioPlayerBar } from '../../src/components/RadioPlayerBar';
+import { playCyberCue, speakTrainerCue } from '../../src/engine/audio';
 import {
   parseAndValidateBackupJson,
   serializeBackupJson,
@@ -26,6 +28,7 @@ import {
 } from '../../src/engine/trainers';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
 import { useProfileStore } from '../../src/stores/profileStore';
+import { useRadioStore } from '../../src/stores/radioStore';
 import { useSessionStore } from '../../src/stores/sessionStore';
 import { ThemeName, themes } from '../../src/theme/themes';
 import { useAppTheme } from '../../src/theme/useTheme';
@@ -77,6 +80,12 @@ export default function SettingsScreen() {
   const activeSession = useSessionStore((s) => s.activeSession);
   const restoreSessionsFromBackup = useSessionStore((s) => s.restoreSessionsFromBackup);
   const exercises = useExerciseStore((s) => s.exercises);
+  const soundEnabled = useRadioStore((s) => s.soundEnabled);
+  const voiceEnabled = useRadioStore((s) => s.voiceEnabled);
+  const radioEnabled = useRadioStore((s) => s.radioEnabled);
+  const toggleSound = useRadioStore((s) => s.toggleSound);
+  const toggleVoice = useRadioStore((s) => s.toggleVoice);
+  const toggleRadio = useRadioStore((s) => s.toggleRadio);
 
   const [selectedTrainerId, setSelectedTrainerId] = useState<TrainerId>(
     profile.activeTrainerId ?? 'drone-unit-0',
@@ -513,6 +522,73 @@ export default function SettingsScreen() {
           value={payloadText}
           onChangeText={setPayloadText}
         />
+      </CyberpunkCard>
+
+      <Text style={[styles.section, ts.sectionHeader]}>CYBER-AUDIO &amp; WORKOUT RADIO</Text>
+      <CyberpunkCard style={styles.portabilityCard}>
+        <View style={styles.chipRow}>
+          <TouchableOpacity
+            testID="toggle-sound-cues"
+            onPress={() => {
+              const next = !soundEnabled;
+              toggleSound();
+              if (next) void playCyberCue('set_complete', { enabled: true });
+            }}
+            style={[
+              styles.themeChip,
+              {
+                borderColor: soundEnabled ? theme.colors.primary : theme.colors.border,
+                backgroundColor: soundEnabled ? theme.colors.checkedBg : 'transparent',
+              },
+            ]}
+          >
+            <Text style={[styles.chipText, soundEnabled ? ts.accent : ts.textMuted]}>
+              SOUND CUES: {soundEnabled ? 'ON' : 'OFF'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="toggle-voice-cues"
+            onPress={() => {
+              const next = !voiceEnabled;
+              toggleVoice();
+              if (next) {
+                speakTrainerCue(profile.activeTrainerId ?? 'drone-unit-0', 'rest_done', {
+                  enabled: true,
+                });
+              }
+            }}
+            style={[
+              styles.themeChip,
+              {
+                borderColor: voiceEnabled ? theme.colors.primary : theme.colors.border,
+                backgroundColor: voiceEnabled ? theme.colors.checkedBg : 'transparent',
+              },
+            ]}
+          >
+            <Text style={[styles.chipText, voiceEnabled ? ts.accent : ts.textMuted]}>
+              TRAINER VOICE: {voiceEnabled ? 'ON' : 'OFF'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="toggle-workout-radio"
+            onPress={toggleRadio}
+            style={[
+              styles.themeChip,
+              {
+                borderColor: radioEnabled ? theme.colors.primary : theme.colors.border,
+                backgroundColor: radioEnabled ? theme.colors.checkedBg : 'transparent',
+              },
+            ]}
+          >
+            <Text style={[styles.chipText, radioEnabled ? ts.accent : ts.textMuted]}>
+              RADIO: {radioEnabled ? 'ON' : 'OFF'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {radioEnabled ? <RadioPlayerBar /> : null}
       </CyberpunkCard>
 
       {/* Full-view modal for trainer portrait render */}
