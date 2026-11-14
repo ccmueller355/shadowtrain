@@ -19,6 +19,7 @@ const mockPlayer = {
   volume: 1,
   play: jest.fn(),
   pause: jest.fn(),
+  replace: jest.fn(),
   remove: jest.fn(),
 };
 
@@ -272,9 +273,48 @@ describe('M14: Cyber-Audio Sound Pack & Workout Radio', () => {
         .mockResolvedValue({ ok: true, json: async () => [] }) as unknown as typeof fetch;
       await useRadioStore.getState().playPreset(RADIO_PRESETS[1]);
       expect(useRadioStore.getState().error).toContain('No live stream found');
+
+      // Overlapping playPreset calls: only the latest request wins
+      let resolveFirst!: (val: unknown) => void;
+      const firstPromise = new Promise((r) => {
+        resolveFirst = r;
+      });
+      global.fetch = jest
+        .fn()
+        .mockReturnValueOnce(firstPromise)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => [
+            {
+              stationuuid: 'winner-2',
+              name: 'Winner Stream',
+              countrycode: 'DE',
+              tags: 'dance',
+              url_resolved: 'https://stream.example.com/winner.mp3',
+            },
+          ],
+        }) as unknown as typeof fetch;
+
+      const p1 = useRadioStore.getState().playPreset(RADIO_PRESETS[2]);
+      const p2 = useRadioStore.getState().playPreset(RADIO_PRESETS[3]);
+      await p2;
+      resolveFirst({
+        ok: true,
+        json: async () => [
+          {
+            stationuuid: 'stale-1',
+            name: 'Stale Stream',
+            countrycode: 'DE',
+            tags: 'dance',
+            url_resolved: 'https://stream.example.com/stale.mp3',
+          },
+        ],
+      });
+      await p1;
+      expect(useRadioStore.getState().activeStation?.id).toBe('winner-2');
     });
 
-    it('renders RadioPlayerBar, searches stations, and plays custom URL', async () => {
+    it('renders RadioPlayerBar, opens station modal, searches stations, and plays custom URL', async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         json: async () => [
@@ -290,10 +330,13 @@ describe('M14: Cyber-Audio Sound Pack & Workout Radio', () => {
       }) as unknown as typeof fetch;
 
       const { getByTestId, getByText } = render(<RadioPlayerBar />);
-      expect(getByText('[DE] Sunshine Live')).toBeTruthy();
-
       fireEvent.press(getByTestId('radio-vol-down'));
       fireEvent.press(getByTestId('radio-vol-up'));
+
+      // Open full-screen station picker modal
+      fireEvent.press(getByTestId('radio-open-picker'));
+      expect(getByText('[DE] Sunshine Live Workout')).toBeTruthy();
+
       fireEvent.press(getByTestId(`radio-preset-${RADIO_PRESETS[0].id}`));
 
       await waitFor(() => {
@@ -305,7 +348,7 @@ describe('M14: Cyber-Audio Sound Pack & Workout Radio', () => {
       fireEvent.press(getByTestId('radio-play-pause-btn'));
       fireEvent.press(getByTestId('radio-stop-btn'));
 
-      fireEvent.press(getByTestId('radio-toggle-search'));
+      fireEvent.press(getByTestId('radio-open-picker'));
       fireEvent.changeText(getByTestId('radio-search-input'), 'synthwave');
       fireEvent.press(getByTestId('radio-search-submit'));
 
@@ -318,6 +361,7 @@ describe('M14: Cyber-Audio Sound Pack & Workout Radio', () => {
         expect(useRadioStore.getState().activeStation?.id).toBe('res-1');
       });
 
+      fireEvent.press(getByTestId('radio-open-picker'));
       fireEvent.changeText(getByTestId('radio-custom-url-input'), 'https://my.stream/live.mp3');
       fireEvent.press(getByTestId('radio-custom-url-play'));
       await waitFor(() => {

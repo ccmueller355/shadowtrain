@@ -1,6 +1,14 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import {
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { RADIO_PRESETS, RadioStation, searchRadioStations } from '../engine/radio';
 import { useRadioStore } from '../stores/radioStore';
 import { useAppTheme } from '../theme/useTheme';
@@ -30,7 +38,7 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
   const toggleFavorite = useRadioStore((s) => s.toggleFavorite);
   const setCustomStreamUrl = useRadioStore((s) => s.setCustomStreamUrl);
 
-  const [showSearch, setShowSearch] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<RadioStation[]>([]);
   const [searching, setSearching] = useState(false);
@@ -38,12 +46,23 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
 
   const isFav = activeStation ? favorites.some((f) => f.id === activeStation.id) : false;
 
+  const filteredPresets = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return RADIO_PRESETS;
+    return RADIO_PRESETS.filter(
+      (p) =>
+        p.label.toLowerCase().includes(q) ||
+        p.region.toLowerCase().includes(q) ||
+        p.countryCode.toLowerCase().includes(q),
+    );
+  }, [searchQuery]);
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     setSearching(true);
     setSearchErr(null);
     try {
-      const results = await searchRadioStations({ name: searchQuery.trim(), limit: 8 });
+      const results = await searchRadioStations({ name: searchQuery.trim(), limit: 12 });
       setSearchResults(results);
       if (results.length === 0) setSearchErr('No live stations found.');
     } catch (err) {
@@ -56,6 +75,7 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
   const handlePlayCustom = () => {
     const uri = customStreamUrl.trim();
     if (!uri) return;
+    setPickerOpen(false);
     void playStation({
       id: `custom-${uri}`,
       name: 'Custom Stream',
@@ -145,95 +165,108 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
 
       {error ? <Text style={[styles.errText, { color: theme.colors.danger }]}>{error}</Text> : null}
 
-      {/* Regional Presets */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.presetScroll}>
-        {RADIO_PRESETS.map((preset) => {
-          const isSelected = activeStation?.name.toLowerCase().includes(preset.searchName);
-          return (
-            <TouchableOpacity
-              key={preset.id}
-              testID={`radio-preset-${preset.id}`}
-              onPress={() => void playPreset(preset)}
-              style={[
-                styles.presetChip,
-                {
-                  borderColor: isSelected ? theme.colors.primary : theme.colors.border,
-                  backgroundColor: isSelected ? theme.colors.checkedBg : 'transparent',
-                },
-              ]}
-            >
-              <Text style={[styles.presetText, isSelected ? ts.accent : ts.text]}>
-                [{preset.region}] {preset.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      {/* Station Picker Trigger + Quick Favorite */}
+      <View style={styles.launcherRow}>
+        <TouchableOpacity
+          testID="radio-open-picker"
+          onPress={() => setPickerOpen(true)}
+          style={[
+            styles.pickerBtn,
+            { borderColor: theme.colors.primary, backgroundColor: theme.colors.checkedBg },
+          ]}
+        >
+          <Text style={[styles.pickerBtnText, ts.accent]}>
+            📻 STATIONS ({RADIO_PRESETS.length}) // SEARCH
+          </Text>
+        </TouchableOpacity>
 
-      {/* Expandable Live Search + Favorites + Custom URL (in Settings or when toggled) */}
-      {!compact ? (
-        <View style={styles.searchSection}>
+        {!compact && favorites.length > 0 ? (
           <TouchableOpacity
-            testID="radio-toggle-search"
-            onPress={() => setShowSearch((v) => !v)}
-            style={styles.searchToggleRow}
+            testID="radio-quick-fav-0"
+            onPress={() => void playStation(favorites[0])}
+            style={[styles.quickFavBtn, { borderColor: theme.colors.border }]}
           >
-            <Text style={[styles.searchToggleText, ts.accent]}>
-              {showSearch
-                ? '▾ HIDE LIVE SEARCH & CUSTOM URL'
-                : '▸ SEARCH RADIO-BROWSER / FAVORITES / CUSTOM URL'}
+            <Text style={[styles.quickFavText, ts.text]} numberOfLines={1}>
+              ★ {favorites[0].name}
             </Text>
           </TouchableOpacity>
+        ) : null}
+      </View>
 
-          {showSearch ? (
-            <View style={styles.searchBox}>
-              <View style={styles.inputRow}>
-                <TextInput
-                  testID="radio-search-input"
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  placeholder="Search station (e.g. synthwave, bass, dubai)..."
-                  placeholderTextColor={theme.colors.textSecondary}
-                  style={[
-                    styles.input,
-                    { color: theme.colors.textPrimary, borderColor: theme.colors.border },
-                  ]}
-                  onSubmitEditing={() => void handleSearch()}
-                />
-                <TouchableOpacity
-                  testID="radio-search-submit"
-                  onPress={() => void handleSearch()}
-                  style={[styles.actionBtn, { borderColor: theme.colors.primary }]}
-                >
-                  <Text style={[styles.actionBtnText, ts.accent]}>
-                    {searching ? '...' : 'SCAN'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+      {/* Full-Screen Station Picker Modal */}
+      <Modal visible={pickerOpen} animationType="slide" onRequestClose={() => setPickerOpen(false)}>
+        <View style={[styles.modalRoot, { backgroundColor: theme.colors.background }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: theme.colors.border }]}>
+            <Text style={[styles.modalTitle, ts.accent]}>WORKOUT RADIO // STATIONS</Text>
+            <TouchableOpacity
+              testID="radio-close-picker"
+              onPress={() => setPickerOpen(false)}
+              style={[styles.ctrlBtn, { borderColor: theme.colors.border }]}
+            >
+              <Text style={[styles.ctrlText, ts.textMuted]}>✕ CLOSE</Text>
+            </TouchableOpacity>
+          </View>
 
-              {searchErr ? <Text style={[styles.errText, ts.textMuted]}>{searchErr}</Text> : null}
+          <View style={styles.modalBody}>
+            {/* Filter / Live Search Bar */}
+            <View style={styles.inputRow}>
+              <TextInput
+                testID="radio-search-input"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Filter presets or scan radio-browser..."
+                placeholderTextColor={theme.colors.textSecondary}
+                style={[
+                  styles.input,
+                  { color: theme.colors.textPrimary, borderColor: theme.colors.border },
+                ]}
+                onSubmitEditing={() => void handleSearch()}
+              />
+              <TouchableOpacity
+                testID="radio-search-submit"
+                onPress={() => void handleSearch()}
+                style={[styles.actionBtn, { borderColor: theme.colors.primary }]}
+              >
+                <Text style={[styles.actionBtnText, ts.accent]}>{searching ? '...' : 'SCAN'}</Text>
+              </TouchableOpacity>
+            </View>
 
-              {searchResults.map((st) => (
-                <TouchableOpacity
-                  key={st.id}
-                  testID={`radio-result-${st.id}`}
-                  onPress={() => void playStation(st)}
-                  style={[styles.resultRow, { borderColor: theme.colors.border }]}
-                >
-                  <Text style={[styles.resultName, ts.text]} numberOfLines={1}>
-                    [{st.countryCode || 'NET'}] {st.name}
-                  </Text>
-                  <Text style={[styles.resultMeta, ts.accent]}>▶ PLAY</Text>
-                </TouchableOpacity>
-              ))}
+            {searchErr ? <Text style={[styles.errText, ts.textMuted]}>{searchErr}</Text> : null}
+
+            <ScrollView style={styles.listScroll} contentContainerStyle={styles.listContent}>
+              {searchResults.length > 0 ? (
+                <View style={styles.sectionBlock}>
+                  <Text style={[styles.subLabel, ts.accent]}>LIVE SCAN RESULTS</Text>
+                  {searchResults.map((st) => (
+                    <TouchableOpacity
+                      key={st.id}
+                      testID={`radio-result-${st.id}`}
+                      onPress={() => {
+                        setPickerOpen(false);
+                        void playStation(st);
+                      }}
+                      style={[styles.resultRow, { borderColor: theme.colors.primary }]}
+                    >
+                      <Text style={[styles.resultName, ts.text]} numberOfLines={1}>
+                        [{st.countryCode || 'NET'}] {st.name}
+                      </Text>
+                      <Text style={[styles.resultMeta, ts.accent]}>▶ PLAY</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ) : null}
 
               {favorites.length > 0 ? (
-                <View style={styles.favBlock}>
+                <View style={styles.sectionBlock}>
                   <Text style={[styles.subLabel, ts.textMuted]}>★ FAVORITES</Text>
                   {favorites.map((fav) => (
                     <TouchableOpacity
                       key={fav.id}
-                      onPress={() => void playStation(fav)}
+                      testID={`radio-fav-${fav.id}`}
+                      onPress={() => {
+                        setPickerOpen(false);
+                        void playStation(fav);
+                      }}
                       style={[styles.resultRow, { borderColor: theme.colors.border }]}
                     >
                       <Text style={[styles.resultName, ts.text]} numberOfLines={1}>
@@ -245,32 +278,68 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
                 </View>
               ) : null}
 
-              <View style={styles.inputRow}>
-                <TextInput
-                  testID="radio-custom-url-input"
-                  value={customStreamUrl}
-                  onChangeText={setCustomStreamUrl}
-                  placeholder="Custom HTTPS stream URL..."
-                  placeholderTextColor={theme.colors.textSecondary}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  style={[
-                    styles.input,
-                    { color: theme.colors.textPrimary, borderColor: theme.colors.border },
-                  ]}
-                />
-                <TouchableOpacity
-                  testID="radio-custom-url-play"
-                  onPress={handlePlayCustom}
-                  style={[styles.actionBtn, { borderColor: theme.colors.border }]}
-                >
-                  <Text style={[styles.actionBtnText, ts.text]}>STREAM</Text>
-                </TouchableOpacity>
+              <View style={styles.sectionBlock}>
+                <Text style={[styles.subLabel, ts.textMuted]}>
+                  REGIONAL WORKOUT &amp; ELECTRONIC PRESETS
+                </Text>
+                {filteredPresets.map((preset) => {
+                  const isSelected = activeStation?.name
+                    .toLowerCase()
+                    .includes(preset.searchName.toLowerCase());
+                  return (
+                    <TouchableOpacity
+                      key={preset.id}
+                      testID={`radio-preset-${preset.id}`}
+                      onPress={() => {
+                        setPickerOpen(false);
+                        void playPreset(preset);
+                      }}
+                      style={[
+                        styles.resultRow,
+                        {
+                          borderColor: isSelected ? theme.colors.primary : theme.colors.border,
+                          backgroundColor: isSelected ? theme.colors.checkedBg : 'transparent',
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.resultName, isSelected ? ts.accent : ts.text]}>
+                        [{preset.region}] {preset.label}
+                      </Text>
+                      <Text style={[styles.resultMeta, ts.accent]}>▶ TUNE</Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
-            </View>
-          ) : null}
+
+              <View style={styles.sectionBlock}>
+                <Text style={[styles.subLabel, ts.textMuted]}>CUSTOM STREAM URL</Text>
+                <View style={styles.inputRow}>
+                  <TextInput
+                    testID="radio-custom-url-input"
+                    value={customStreamUrl}
+                    onChangeText={setCustomStreamUrl}
+                    placeholder="Custom HTTPS stream URL..."
+                    placeholderTextColor={theme.colors.textSecondary}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    style={[
+                      styles.input,
+                      { color: theme.colors.textPrimary, borderColor: theme.colors.border },
+                    ]}
+                  />
+                  <TouchableOpacity
+                    testID="radio-custom-url-play"
+                    onPress={handlePlayCustom}
+                    style={[styles.actionBtn, { borderColor: theme.colors.border }]}
+                  >
+                    <Text style={[styles.actionBtnText, ts.text]}>STREAM</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
         </View>
-      ) : null}
+      </Modal>
     </View>
   );
 }
@@ -327,33 +396,63 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'monospace',
   },
-  presetScroll: {
-    flexGrow: 0,
+  launcherRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
-  presetChip: {
+  pickerBtn: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 6,
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginRight: 6,
+    paddingVertical: 6,
   },
-  presetText: {
+  pickerBtnText: {
     fontSize: 10,
-    fontFamily: 'monospace',
-    fontWeight: '600',
-  },
-  searchSection: {
-    gap: 6,
-  },
-  searchToggleRow: {
-    paddingTop: 2,
-  },
-  searchToggleText: {
-    fontSize: 10,
-    fontFamily: 'monospace',
     fontWeight: '700',
+    fontFamily: 'monospace',
   },
-  searchBox: {
+  quickFavBtn: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+  quickFavText: {
+    fontSize: 10,
+    fontFamily: 'monospace',
+  },
+  modalRoot: {
+    flex: 1,
+    paddingTop: 18,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+  },
+  modalTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    fontFamily: 'monospace',
+  },
+  modalBody: {
+    flex: 1,
+    padding: 16,
+    gap: 10,
+  },
+  listScroll: {
+    flex: 1,
+  },
+  listContent: {
+    gap: 14,
+    paddingBottom: 24,
+  },
+  sectionBlock: {
     gap: 6,
   },
   inputRow: {
@@ -366,7 +465,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 8,
-    paddingVertical: 5,
+    paddingVertical: 6,
     fontSize: 11,
     fontFamily: 'monospace',
   },
@@ -374,7 +473,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 7,
   },
   actionBtnText: {
     fontSize: 10,
@@ -386,9 +485,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
   },
   resultName: {
     flex: 1,
@@ -400,9 +499,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     fontFamily: 'monospace',
-  },
-  favBlock: {
-    gap: 4,
   },
   subLabel: {
     fontSize: 10,

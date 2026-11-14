@@ -8,7 +8,9 @@ interface StreamPlayer {
   volume: number;
   play: () => void;
   pause: () => void;
+  replace?: (source: { uri: string }) => void;
   remove?: () => void;
+  release?: () => void;
 }
 
 interface RadioState {
@@ -78,6 +80,7 @@ const safeStorage: StateStorage = {
 
 let streamPlayer: StreamPlayer | null = null;
 let isDucked = false;
+let playSeq = 0;
 
 function getExpoAudio(): typeof import('expo-audio') | null {
   try {
@@ -95,8 +98,10 @@ function applyEffectiveVolume(baseVolume: number): void {
 function teardownStreamPlayer(): void {
   if (streamPlayer) {
     try {
+      streamPlayer.volume = 0;
       streamPlayer.pause();
       streamPlayer.remove?.();
+      streamPlayer.release?.();
     } catch {
       // Ignore cleanup errors
     }
@@ -142,6 +147,7 @@ export const useRadioStore = create<RadioState>()(
         toggleRadio: () => {
           const next = !get().radioEnabled;
           if (!next) {
+            playSeq += 1;
             teardownStreamPlayer();
             set({ radioEnabled: false, isPlaying: false, isLoading: false, error: null });
           } else {
@@ -167,29 +173,54 @@ export const useRadioStore = create<RadioState>()(
             };
           }),
 
-        playStation: async (station) => {
+        playStation: async (station, expectedSeq?: number) => {
+          const seq = expectedSeq ?? (playSeq += 1);
+          // Pause current stream immediately so two streams can never overlap while tuning
+          if (streamPlayer) {
+            try {
+              streamPlayer.pause();
+            } catch {
+              // Ignore pause errors
+            }
+          }
           set({
             radioEnabled: true,
             activeStation: station,
+            isPlaying: false,
             isLoading: true,
             error: null,
           });
           await configureCyberAudioMode();
-          teardownStreamPlayer();
+          if (seq !== playSeq) return;
 
           const expoAudio = getExpoAudio();
           if (!expoAudio?.createAudioPlayer) {
+            teardownStreamPlayer();
             set({ isLoading: false, isPlaying: false, error: 'Audio player unavailable' });
             return;
           }
 
           try {
-            const player = expoAudio.createAudioPlayer({ uri: station.streamUrl }) as StreamPlayer;
-            streamPlayer = player;
-            applyEffectiveVolume(get().radioVolume);
-            player.play();
+            if (streamPlayer && typeof streamPlayer.replace === 'function') {
+              streamPlayer.replace({ uri: station.streamUrl });
+              applyEffectiveVolume(get().radioVolume);
+              streamPlayer.play();
+            } else {
+              teardownStreamPlayer();
+              const player = expoAudio.createAudioPlayer({
+                uri: station.streamUrl,
+              }) as StreamPlayer;
+              streamPlayer = player;
+              applyEffectiveVolume(get().radioVolume);
+              player.play();
+            }
+            if (seq !== playSeq) {
+              teardownStreamPlayer();
+              return;
+            }
             set({ isPlaying: true, isLoading: false, error: null });
           } catch (err) {
+            if (seq !== playSeq) return;
             set({
               isPlaying: false,
               isLoading: false,
@@ -199,14 +230,26 @@ export const useRadioStore = create<RadioState>()(
         },
 
         playPreset: async (preset) => {
+          const seq = (playSeq += 1);
+          if (streamPlayer) {
+            try {
+              streamPlayer.pause();
+            } catch {
+              // Ignore pause errors
+            }
+          }
           const cached = get().resolvedPresetCache[preset.id];
           if (cached) {
-            await get().playStation(cached);
+            await (get().playStation as (s: RadioStation, seq?: number) => Promise<void>)(
+              cached,
+              seq,
+            );
             return;
           }
-          set({ radioEnabled: true, isLoading: true, error: null });
+          set({ radioEnabled: true, isPlaying: false, isLoading: true, error: null });
           try {
             const resolved = await resolvePresetStation(preset);
+            if (seq !== playSeq) return;
             if (!resolved) {
               set({ isLoading: false, error: `No live stream found for ${preset.label}` });
               return;
@@ -214,8 +257,12 @@ export const useRadioStore = create<RadioState>()(
             set((s) => ({
               resolvedPresetCache: { ...s.resolvedPresetCache, [preset.id]: resolved },
             }));
-            await get().playStation(resolved);
+            await (get().playStation as (s: RadioStation, seq?: number) => Promise<void>)(
+              resolved,
+              seq,
+            );
           } catch (err) {
+            if (seq !== playSeq) return;
             set({
               isLoading: false,
               error: err instanceof Error ? err.message : 'Radio lookup failed',
@@ -241,6 +288,7 @@ export const useRadioStore = create<RadioState>()(
         },
 
         stopRadio: () => {
+          playSeq += 1;
           teardownStreamPlayer();
           set({ isPlaying: false, isLoading: false, error: null });
         },
