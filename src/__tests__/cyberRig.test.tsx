@@ -153,5 +153,8 @@ describe('M17-A: 2D Cyber-Skeleton Rig & Character Skins', () => {
     expect(getByText('⏸ PAUSE')).toBeTruthy();
     fireEvent.press(getByTestId('rig-animate-toggle'));
     expect(getByText('▶ ANIMATE')).toBeTruthy();
+
+    fireEvent.press(getByTestId('toggle-static-mode'));
+    expect(getByTestId('exercise-pose-images')).toBeTruthy();
   });
 });

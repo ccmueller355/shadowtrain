@@ -199,9 +199,29 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
               </View>
             </View>
 
-            {/* Start/End showcase poses; [STATIC] / [2D RIG] toggle or automatic 2D rig fallback */}
+            {/* Start/End showcase poses; segmented [STATIC] / [2D RIG] toggle or automatic 2D rig */}
             {hasStaticShowcase ? (
               <View style={styles.rigToggleRow}>
+                <TouchableOpacity
+                  testID="toggle-static-mode"
+                  onPress={() => setRigMode('static')}
+                  style={[
+                    styles.rigToggleBtn,
+                    {
+                      borderColor: theme.colors.primary,
+                      backgroundColor: rigMode === 'static' ? theme.colors.primary : 'transparent',
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.rigToggleText,
+                      { color: rigMode === 'static' ? '#050810' : theme.colors.primary },
+                    ]}
+                  >
+                    STATIC (START/END)
+                  </Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   testID="toggle-rig-mode"
                   onPress={() => setRigMode((m) => (m === 'static' ? 'rig' : 'static'))}
@@ -209,12 +229,17 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                     styles.rigToggleBtn,
                     {
                       borderColor: theme.colors.primary,
-                      backgroundColor: rigMode === 'rig' ? theme.colors.checkedBg : 'transparent',
+                      backgroundColor: rigMode === 'rig' ? theme.colors.primary : 'transparent',
                     },
                   ]}
                 >
-                  <Text style={[styles.rigToggleText, ts.accent]}>
-                    {rigMode === 'rig' ? '[2D RIG] ⇄ STATIC' : '[STATIC] ⇄ 2D RIG'}
+                  <Text
+                    style={[
+                      styles.rigToggleText,
+                      { color: rigMode === 'rig' ? '#050810' : theme.colors.primary },
+                    ]}
+                  >
+                    2D CYBER-RIG
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -798,6 +823,7 @@ const styles = StyleSheet.create({
   rigToggleRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    gap: 8,
     marginBottom: 8,
   },
   rigToggleBtn: {

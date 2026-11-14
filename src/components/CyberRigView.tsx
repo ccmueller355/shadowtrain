@@ -228,8 +228,19 @@ export function CyberRigView({
 
         {renderProp(pose, skin)}
 
+        {/* Armored Cyber-Cuirass / Torso Silhouette */}
+        <Polygon
+          points={`${pose.shoulderL.x},${pose.shoulderL.y} ${pose.shoulderR.x},${pose.shoulderR.y} ${pose.hip.x + 11},${pose.hip.y} ${pose.hip.x - 11},${pose.hip.y}`}
+          fill="#0f172a"
+          fillOpacity={0.92}
+          stroke={highlighted.has(0) ? activeColor : skin.limbColor}
+          strokeWidth={2}
+          strokeLinejoin="round"
+        />
+
         {segments.map(([a, b], idx) => {
           const isHot = highlighted.has(idx);
+          const edgeColor = isHot ? activeColor : skin.limbColor;
           return (
             <React.Fragment key={idx}>
               <Line
@@ -238,8 +249,8 @@ export function CyberRigView({
                 x2={b.x}
                 y2={b.y}
                 stroke={isHot ? activeColor : skin.glowColor}
-                strokeOpacity={isHot ? 0.5 : 1}
-                strokeWidth={skin.limbWidth + (isHot ? 6 : 4)}
+                strokeOpacity={isHot ? 0.55 : 0.9}
+                strokeWidth={skin.limbWidth + (isHot ? 9 : 7)}
                 strokeLinecap="round"
               />
               <Line
@@ -247,29 +258,64 @@ export function CyberRigView({
                 y1={a.y}
                 x2={b.x}
                 y2={b.y}
-                stroke={isHot ? activeColor : skin.limbColor}
+                stroke="#0f172a"
+                strokeWidth={skin.limbWidth + 4}
+                strokeLinecap="round"
+              />
+              <Line
+                x1={a.x}
+                y1={a.y}
+                x2={b.x}
+                y2={b.y}
+                stroke={edgeColor}
                 strokeWidth={skin.limbWidth}
+                strokeLinecap="round"
+              />
+              <Line
+                x1={a.x}
+                y1={a.y}
+                x2={b.x}
+                y2={b.y}
+                stroke={skin.jointColor}
+                strokeOpacity={0.75}
+                strokeWidth={1.3}
                 strokeLinecap="round"
               />
             </React.Fragment>
           );
         })}
 
+        {/* Cyber-Boots & Gauntlets */}
+        <Polygon
+          points={`${pose.ankleL.x - 5},${pose.ankleL.y} ${pose.ankleL.x + 8},${pose.ankleL.y} ${pose.ankleL.x + 10},${pose.ankleL.y + 5} ${pose.ankleL.x - 6},${pose.ankleL.y + 5}`}
+          fill={skin.accentColor}
+          stroke={skin.limbColor}
+          strokeWidth={1.5}
+        />
+        <Polygon
+          points={`${pose.ankleR.x - 5},${pose.ankleR.y} ${pose.ankleR.x + 8},${pose.ankleR.y} ${pose.ankleR.x + 10},${pose.ankleR.y + 5} ${pose.ankleR.x - 6},${pose.ankleR.y + 5}`}
+          fill={skin.accentColor}
+          stroke={skin.limbColor}
+          strokeWidth={1.5}
+        />
+
         {skin.shoulderArmor && (
           <>
             <Circle
               cx={pose.shoulderL.x}
               cy={pose.shoulderL.y}
-              r={skin.jointRadius + 3}
-              fill={skin.accentColor}
-              fillOpacity={0.35}
+              r={skin.jointRadius + 4}
+              fill="#0f172a"
+              stroke={skin.accentColor}
+              strokeWidth={2}
             />
             <Circle
               cx={pose.shoulderR.x}
               cy={pose.shoulderR.y}
-              r={skin.jointRadius + 3}
-              fill={skin.accentColor}
-              fillOpacity={0.35}
+              r={skin.jointRadius + 4}
+              fill="#0f172a"
+              stroke={skin.accentColor}
+              strokeWidth={2}
             />
           </>
         )}
