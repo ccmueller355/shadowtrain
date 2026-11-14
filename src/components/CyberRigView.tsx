@@ -94,10 +94,12 @@ function renderProp(pose: RigPose, skin: RigSkin): React.ReactNode {
     );
   }
   if (prop === 'rope') {
-    const arcY = pose.propPos?.y ?? 194;
+    const wristY = (pose.wristL.y + pose.wristR.y) / 2;
+    const apexY = pose.propPos?.y ?? 188;
+    const ctrlY = 2 * apexY - wristY;
     return (
       <Path
-        d={`M ${pose.wristL.x} ${pose.wristL.y} Q 100 ${arcY} ${pose.wristR.x} ${pose.wristR.y}`}
+        d={`M ${pose.wristL.x} ${pose.wristL.y} Q 100 ${ctrlY} ${pose.wristR.x} ${pose.wristR.y}`}
         stroke={skin.accentColor}
         strokeWidth={2}
         strokeDasharray="4,3"
