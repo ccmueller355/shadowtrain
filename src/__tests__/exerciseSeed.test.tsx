@@ -99,10 +99,10 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
   });
 
   describe('Seed Dataset & import-exercises.ts', () => {
-    it('contains all 37 core-kit movements across all 6 personal kit categories plus public gym dataset', () => {
-      expect(CORE_KIT_EXERCISES.length).toBe(37);
+    it('contains all 42 core-kit movements across all 6 personal kit categories plus public gym dataset', () => {
+      expect(CORE_KIT_EXERCISES.length).toBe(42);
       expect(PUBLIC_DATASET_EXERCISES.length).toBe(8);
-      expect(DEFAULT_SEED_EXERCISES.length).toBe(45);
+      expect(DEFAULT_SEED_EXERCISES.length).toBe(50);
 
       const coreEquipment = new Set(CORE_KIT_EXERCISES.map((e) => e.equipment));
       expect([...coreEquipment].sort()).toEqual([
@@ -160,13 +160,13 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       await initDatabase('test.db', fakeDb);
 
       const firstSeed = await importExercises();
-      expect(firstSeed).toEqual({ seeded: true, totalCount: 45 });
+      expect(firstSeed).toEqual({ seeded: true, totalCount: 50 });
 
       const secondSeed = await seedExercisesIfEmpty(fakeDb);
-      expect(secondSeed).toEqual({ seeded: false, totalCount: 45 });
+      expect(secondSeed).toEqual({ seeded: false, totalCount: 50 });
 
       const forcedSeed = await importExercises(fakeDb, { force: true });
-      expect(forcedSeed).toEqual({ seeded: true, totalCount: 45 });
+      expect(forcedSeed).toEqual({ seeded: true, totalCount: 50 });
     });
   });
 
@@ -174,21 +174,21 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
     it('hydrates exercises from SQLite and filters by equipment, muscle, and search query', async () => {
       const fakeDb = new SeedFakeDb();
       const loaded = await useExerciseStore.getState().hydrateFromDb(fakeDb);
-      expect(loaded).toHaveLength(45);
+      expect(loaded).toHaveLength(50);
       expect(useExerciseStore.getState().hydrated).toBe(true);
 
       // Filter by default personal kit (excludes barbell/dumbbell/cable/machine/bands)
       const kitOnly = filterExercises(loaded, {
         availableEquipment: DEFAULT_PROFILE.availableEquipment,
       });
-      expect(kitOnly).toHaveLength(37);
+      expect(kitOnly).toHaveLength(42);
 
       // Show all equipment
       const allGear = filterExercises(loaded, {
         availableEquipment: DEFAULT_PROFILE.availableEquipment,
         showAllEquipment: true,
       });
-      expect(allGear).toHaveLength(45);
+      expect(allGear).toHaveLength(50);
 
       // Filter by secondary muscle match and equipment search
       const obliquesMatches = filterExercises(loaded, {
@@ -210,23 +210,23 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       const onSelectExercise = jest.fn();
       render(<ExercisesScreen onSelectExercise={onSelectExercise} />);
 
-      // Default personal kit = 37 exercises
-      expect(screen.getByText('SHOWING 37 MOVEMENTS')).toBeTruthy();
+      // Default personal kit = 42 exercises
+      expect(screen.getByText('SHOWING 42 MOVEMENTS')).toBeTruthy();
       expect(screen.getByText('Two-Hand Kettlebell Swing')).toBeTruthy();
       expect(screen.queryByText('Barbell Back Squat')).toBeNull();
 
-      // Toggle Show All Equipment -> 45 exercises
+      // Toggle Show All Equipment -> 50 exercises
       fireEvent.press(screen.getByTestId('toggle-show-all-equipment'));
-      expect(screen.getByText('SHOWING 45 MOVEMENTS')).toBeTruthy();
+      expect(screen.getByText('SHOWING 50 MOVEMENTS')).toBeTruthy();
       expect(screen.getByText('Barbell Back Squat')).toBeTruthy();
 
       // Filter to Kettlebell only -> 9 KB exercises
       fireEvent.press(screen.getByTestId('equip-filter-kettlebell'));
       expect(screen.getByText('SHOWING 9 MOVEMENTS')).toBeTruthy();
 
-      // Tap ALL GEAR chip -> back to 45
+      // Tap ALL GEAR chip -> back to 50
       fireEvent.press(screen.getByTestId('equip-filter-all'));
-      expect(screen.getByText('SHOWING 45 MOVEMENTS')).toBeTruthy();
+      expect(screen.getByText('SHOWING 50 MOVEMENTS')).toBeTruthy();
 
       // Filter by muscle chip (forearms)
       fireEvent.press(screen.getByTestId('muscle-filter-forearms'));
@@ -256,7 +256,7 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       act(() => {
         useExerciseStore.getState().resetFilters();
       });
-      expect(screen.getByText('SHOWING 37 MOVEMENTS')).toBeTruthy();
+      expect(screen.getByText('SHOWING 42 MOVEMENTS')).toBeTruthy();
     });
 
     it('renders Exercise Detail view with specialist coach card and bundled start/end poses when unlocked', () => {

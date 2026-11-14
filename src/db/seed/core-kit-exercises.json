@@ -508,5 +508,85 @@
     "imageStart": "stretch-deep-squat-pry/start.webp",
     "imageEnd": "stretch-deep-squat-pry/end.webp",
     "instructions": ["Sink into bottom of squat", "Use elbows to gently pry knees apart"]
+  },
+  {
+    "id": "stretch-doorway-pec",
+    "name": "Doorway / Floor Pec Opener",
+    "primaryMuscles": ["chest", "shoulders"],
+    "secondaryMuscles": ["upper_back"],
+    "equipment": "stretching",
+    "category": "stretching",
+    "trackingType": "duration",
+    "tier": "beginner",
+    "nextProgressionId": "stretch-thoracic-hang",
+    "instructions": [
+      "Place forearms on doorframe at 90 degrees (or lie prone with one arm extended out)",
+      "Gently lean or rotate torso forward until chest and front shoulder open",
+      "Breathe slowly and keep ribs stacked over pelvis"
+    ]
+  },
+  {
+    "id": "stretch-thread-needle",
+    "name": "Thread-the-Needle Thoracic Twist",
+    "primaryMuscles": ["upper_back", "shoulders"],
+    "secondaryMuscles": ["lats", "core"],
+    "equipment": "stretching",
+    "category": "stretching",
+    "trackingType": "duration",
+    "tier": "beginner",
+    "nextProgressionId": "stretch-thoracic-hang",
+    "instructions": [
+      "Start on all fours with wrists under shoulders and knees under hips",
+      "Slide one arm underneath your torso palm-up, lowering shoulder and temple to the mat",
+      "Hold and breathe into the mid-back, then switch sides"
+    ]
+  },
+  {
+    "id": "stretch-cat-cow",
+    "name": "Cat-Cow Spinal Mobilization",
+    "primaryMuscles": ["lower_back", "upper_back"],
+    "secondaryMuscles": ["core", "shoulders"],
+    "equipment": "stretching",
+    "category": "stretching",
+    "trackingType": "reps",
+    "tier": "beginner",
+    "nextProgressionId": "stretch-thread-needle",
+    "instructions": [
+      "On hands and knees, inhale and drop belly while lifting chest and tailbone (Cow)",
+      "Exhale, press the floor away, tuck pelvis, and round spine toward ceiling (Cat)",
+      "Move smoothly segment-by-segment with your breath"
+    ]
+  },
+  {
+    "id": "stretch-figure-four",
+    "name": "Supine Figure-4 Glute & Piriformis",
+    "primaryMuscles": ["glutes", "hips"],
+    "secondaryMuscles": ["lower_back"],
+    "equipment": "stretching",
+    "category": "stretching",
+    "trackingType": "duration",
+    "tier": "beginner",
+    "nextProgressionId": "stretch-90-90-hip",
+    "instructions": [
+      "Lie on your back with knees bent and feet flat on the floor",
+      "Cross right ankle over left thigh just above the knee",
+      "Draw left thigh gently toward chest while keeping tailbone heavy on the mat"
+    ]
+  },
+  {
+    "id": "stretch-downward-dog-calf",
+    "name": "Downward Dog Calf & Shoulder Opener",
+    "primaryMuscles": ["calves", "hamstrings", "shoulders"],
+    "secondaryMuscles": ["upper_back", "lats"],
+    "equipment": "stretching",
+    "category": "stretching",
+    "trackingType": "duration",
+    "tier": "beginner",
+    "nextProgressionId": "stretch-pike-hamstring",
+    "instructions": [
+      "Press hips high into an inverted V with hands shoulder-width apart",
+      "Push chest gently toward thighs to lengthen lats and shoulders",
+      "Pedal heels slowly toward the deck to stretch calves and Achilles"
+    ]
   }
 ]

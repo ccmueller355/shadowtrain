@@ -3,7 +3,7 @@ import { Entry, Exercise, Profile, SetRecord } from '../types';
 import { PlannedWorkout } from './plan';
 import { formatSuggestionChip, Suggestion } from './suggest';
 
-export type ProgramCategory = 'kettlebell' | 'calisthenics' | 'hybrid' | 'rings';
+export type ProgramCategory = 'kettlebell' | 'calisthenics' | 'hybrid' | 'rings' | 'mobility';
 
 export interface ProgramExerciseTarget {
   exerciseId: string;
@@ -345,6 +345,159 @@ export const CULT_PROGRAMS: CultProgram[] = [
             sets: 4,
             durationSec: 20,
             notes: 'High-speed jump rope sprints for 20s',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'bio-hacker-desk-reset',
+    name: 'BIO-HACKER // DESK DECOMPRESSION',
+    cultOrigin: 'Sprawl Posture Protocol // Anti-Tech-Neck',
+    category: 'mobility',
+    difficulty: 'novice',
+    badge: 'POSTURE & UPPER BODY RESET',
+    description:
+      'Designed for bent-over desk workers and cyberdeck operators: opens tight pecs, unlocks thoracic rotation, decompresses the spine, and releases seated hip flexors.',
+    workouts: [
+      {
+        id: 'desk-posture-reset',
+        title: 'DESK WORKER · POSTURE RESET',
+        subtitle: '5 movements (~8 min): Pec opener, T-spine twist, Cat-Cow, Hang & Couch',
+        recommendedTimerMode: 'rounds',
+        timerConfig: {
+          workSec: 45,
+          restSec: 15,
+          rounds: 5,
+        },
+        targets: [
+          {
+            exerciseId: 'stretch-doorway-pec',
+            sets: 2,
+            durationSec: 45,
+            notes: 'Open anterior shoulders and chest after keyboard slump',
+          },
+          {
+            exerciseId: 'stretch-thread-needle',
+            sets: 2,
+            durationSec: 40,
+            notes: '40s per side — unlock thoracic rotation',
+          },
+          {
+            exerciseId: 'stretch-cat-cow',
+            sets: 2,
+            reps: 10,
+            notes: 'Slow segmental spinal flexion/extension with breath',
+          },
+          {
+            exerciseId: 'stretch-thoracic-hang',
+            sets: 2,
+            durationSec: 30,
+            notes: 'Passive spinal & lat decompression',
+          },
+          {
+            exerciseId: 'stretch-couch',
+            sets: 2,
+            durationSec: 45,
+            notes: '45s per side — reverse prolonged chair hip-flexion',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'full-body-cooldown',
+    name: 'NEURAL COOLDOWN // FULL-BODY FLUSH',
+    cultOrigin: 'Post-Session Recovery // Parasympathetic Downshift',
+    category: 'mobility',
+    difficulty: 'novice',
+    badge: 'OPTIONAL COOLDOWN // 5–10 MIN',
+    description:
+      'Easy, accessible full-body cooldown hitting every major chain after iron or calisthenics work: spine, calves, hamstrings, glutes, hips, and chest.',
+    workouts: [
+      {
+        id: 'cooldown-express',
+        title: 'EXPRESS COOLDOWN · 5 MIN FLUSH',
+        subtitle: '4 easy full-body stretches (Cat-Cow, Down-Dog Calf, Figure-4, Pec Opener)',
+        recommendedTimerMode: 'rounds',
+        timerConfig: {
+          workSec: 45,
+          restSec: 15,
+          rounds: 4,
+        },
+        targets: [
+          {
+            exerciseId: 'stretch-cat-cow',
+            sets: 1,
+            reps: 10,
+            notes: 'Gentle spine downshift',
+          },
+          {
+            exerciseId: 'stretch-downward-dog-calf',
+            sets: 2,
+            durationSec: 45,
+            notes: 'Pedal heels for calves, hamstrings & overhead shoulders',
+          },
+          {
+            exerciseId: 'stretch-figure-four',
+            sets: 2,
+            durationSec: 45,
+            notes: '45s per side — glutes & piriformis release',
+          },
+          {
+            exerciseId: 'stretch-doorway-pec',
+            sets: 2,
+            durationSec: 45,
+            notes: 'Open chest & reset upright posture',
+          },
+        ],
+      },
+      {
+        id: 'cooldown-deep',
+        title: 'DEEP FULL-BODY RESET · 10 MIN',
+        subtitle: 'Head-to-toe decompression: T-spine, hips, hamstrings, glutes & calves',
+        recommendedTimerMode: 'rounds',
+        timerConfig: {
+          workSec: 45,
+          restSec: 15,
+          rounds: 6,
+        },
+        targets: [
+          {
+            exerciseId: 'stretch-thread-needle',
+            sets: 2,
+            durationSec: 45,
+            notes: 'Upper back & shoulder capsule',
+          },
+          {
+            exerciseId: 'stretch-couch',
+            sets: 2,
+            durationSec: 45,
+            notes: 'Hip flexors & quads',
+          },
+          {
+            exerciseId: 'stretch-90-90-hip',
+            sets: 2,
+            durationSec: 45,
+            notes: 'Internal & external hip rotation',
+          },
+          {
+            exerciseId: 'stretch-pike-hamstring',
+            sets: 2,
+            durationSec: 45,
+            notes: 'Relaxed posterior chain fold',
+          },
+          {
+            exerciseId: 'stretch-figure-four',
+            sets: 2,
+            durationSec: 45,
+            notes: 'Deep glute release',
+          },
+          {
+            exerciseId: 'stretch-downward-dog-calf',
+            sets: 2,
+            durationSec: 45,
+            notes: 'Calves, Achilles & lat length',
           },
         ],
       },
