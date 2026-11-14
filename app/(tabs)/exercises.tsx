@@ -1,5 +1,5 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Modal,
   ImageSourcePropType,
   TouchableOpacity,
+  BackHandler,
 } from 'react-native';
 import { useAppTheme } from '../../src/theme/useTheme';
 import { useThemeStyles } from '../../src/theme/useThemeStyles';
@@ -80,6 +81,21 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
     image: ImageSourcePropType;
     title: string;
   } | null>(null);
+
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (fullViewModal) {
+        setFullViewModal(null);
+        return true;
+      }
+      if (detailExercise) {
+        setDetailExercise(null);
+        return true;
+      }
+      return false;
+    });
+    return () => subscription.remove();
+  }, [detailExercise, fullViewModal]);
 
   const equipmentOptions = showAllEquipment ? ALL_EQUIPMENT : availableEquipment;
 
@@ -298,10 +314,19 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
               testID="exercise-detail-next-tier"
               onPress={() => setDetailExercise(nextProgression)}
             >
-              <CyberpunkCard glow={false} style={styles.card}>
-                <Text style={[styles.badge, ts.accent]}>NEXT IN 3-LEVEL PROGRESSION LADDER ↗</Text>
+              <CyberpunkCard
+                glow
+                style={{
+                  ...styles.card,
+                  borderColor: theme.colors.secondary,
+                  borderWidth: 1.5,
+                }}
+              >
+                <Text style={[styles.badge, { color: theme.colors.secondary }]}>
+                  NEXT IN 3-LEVEL PROGRESSION LADDER ↗
+                </Text>
                 <Text style={[styles.exerciseName, ts.text]}>{nextProgression.name}</Text>
-                <Text style={[styles.musclesText, ts.textMuted]}>
+                <Text style={[styles.musclesText, { color: theme.colors.secondary }]}>
                   TIER: {(nextProgression.tier ?? 'advanced').toUpperCase()} · TAP TO INSPECT
                 </Text>
               </CyberpunkCard>
