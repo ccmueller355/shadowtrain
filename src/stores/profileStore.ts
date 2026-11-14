@@ -1,7 +1,18 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
 import { create } from 'zustand';
+import { createJSONStorage, persist, StateStorage } from 'zustand/middleware';
 import { getTrainerById, isTrainerUnlocked } from '../engine/trainers';
-import { Equipment, Goal, Profile, SessionDuration, ThemeName, TrainerId, Units } from '../types';
+import { LedgerReplayReport, reconcileProfileWithLedger } from '../engine/vault';
+import {
+  Equipment,
+  Goal,
+  Profile,
+  Session,
+  SessionDuration,
+  ThemeName,
+  TrainerId,
+  Units,
+} from '../types';
 
 export const DEFAULT_EQUIPMENT: Equipment[] = [
   'kettlebell',
@@ -60,100 +71,166 @@ interface ProfileState {
   addCreds: (amount: number) => void;
   claimReward: (claimId: string, amount: number) => boolean;
   unlockAndSelectTrainer: (trainerId: TrainerId) => boolean;
+  reconcileCredsFromLedger: (sessions: Session[]) => LedgerReplayReport;
 }
 
-export const useProfileStore = create<ProfileState>((set, get) => ({
-  profile: DEFAULT_PROFILE,
-  theme: 'fixer',
-  setTheme: (theme) => set({ theme }),
-  updateProfile: (patch) => set((state) => ({ profile: { ...state.profile, ...patch } })),
-  setGoal: (goal) =>
-    set((state) => ({
-      profile: {
-        ...state.profile,
-        goal,
-        repRange: GOAL_REP_RANGES[goal],
+const memoryFallback = new Map<string, string>();
+
+function getNativeAsyncStorage(): StateStorage | null {
+  try {
+    const mod = require('@react-native-async-storage/async-storage');
+    const storage = (mod?.default ?? mod) as StateStorage | undefined;
+    return storage && typeof storage.getItem === 'function' ? storage : null;
+  } catch {
+    return null;
+  }
+}
+
+const vaultStorage: StateStorage = {
+  getItem: async (name) => {
+    const storage = getNativeAsyncStorage();
+    if (!storage) return memoryFallback.get(name) ?? null;
+    try {
+      return await storage.getItem(name);
+    } catch {
+      return memoryFallback.get(name) ?? null;
+    }
+  },
+  setItem: async (name, value) => {
+    const storage = getNativeAsyncStorage();
+    if (!storage) {
+      memoryFallback.set(name, value);
+      return;
+    }
+    try {
+      await storage.setItem(name, value);
+    } catch {
+      memoryFallback.set(name, value);
+    }
+  },
+  removeItem: async (name) => {
+    const storage = getNativeAsyncStorage();
+    if (!storage) {
+      memoryFallback.delete(name);
+      return;
+    }
+    try {
+      await storage.removeItem(name);
+    } catch {
+      memoryFallback.delete(name);
+    }
+  },
+};
+
+export const useProfileStore = create<ProfileState>()(
+  persist(
+    (set, get) => ({
+      profile: DEFAULT_PROFILE,
+      theme: 'fixer',
+      setTheme: (theme) => set({ theme }),
+      updateProfile: (patch) => set((state) => ({ profile: { ...state.profile, ...patch } })),
+      setGoal: (goal) =>
+        set((state) => ({
+          profile: {
+            ...state.profile,
+            goal,
+            repRange: GOAL_REP_RANGES[goal],
+          },
+        })),
+      setUnits: (units) =>
+        set((state) => ({
+          profile: { ...state.profile, units },
+        })),
+      setFixedKettlebellWeight: (weight) =>
+        set((state) => ({
+          profile: { ...state.profile, fixedKettlebellWeight: weight },
+        })),
+      setWeeklyTargetDays: (days) =>
+        set((state) => ({
+          profile: { ...state.profile, weeklyTargetDays: Math.min(7, Math.max(1, days)) },
+        })),
+      setTargetDuration: (targetDuration) =>
+        set((state) => ({
+          profile: { ...state.profile, targetDuration },
+        })),
+      toggleEquipment: (equipment) =>
+        set((state) => {
+          const current = state.profile.availableEquipment;
+          const exists = current.includes(equipment);
+          if (exists && current.length <= 1) {
+            return state;
+          }
+          const next = exists ? current.filter((e) => e !== equipment) : [...current, equipment];
+          return {
+            profile: { ...state.profile, availableEquipment: next },
+          };
+        }),
+      addCreds: (amount) =>
+        set((state) => ({
+          profile: {
+            ...state.profile,
+            creds: Math.max(0, (state.profile.creds ?? 0) + amount),
+          },
+        })),
+      claimReward: (claimId, amount) => {
+        const { profile } = get();
+        const claimed = profile.claimedRewardIds ?? [];
+        if (claimed.includes(claimId)) return false;
+        set({
+          profile: {
+            ...profile,
+            creds: (profile.creds ?? 0) + amount,
+            claimedRewardIds: [...claimed, claimId],
+          },
+        });
+        return true;
       },
-    })),
-  setUnits: (units) =>
-    set((state) => ({
-      profile: { ...state.profile, units },
-    })),
-  setFixedKettlebellWeight: (weight) =>
-    set((state) => ({
-      profile: { ...state.profile, fixedKettlebellWeight: weight },
-    })),
-  setWeeklyTargetDays: (days) =>
-    set((state) => ({
-      profile: { ...state.profile, weeklyTargetDays: Math.min(7, Math.max(1, days)) },
-    })),
-  setTargetDuration: (targetDuration) =>
-    set((state) => ({
-      profile: { ...state.profile, targetDuration },
-    })),
-  toggleEquipment: (equipment) =>
-    set((state) => {
-      const current = state.profile.availableEquipment;
-      const exists = current.includes(equipment);
-      if (exists && current.length <= 1) {
-        return state;
-      }
-      const next = exists ? current.filter((e) => e !== equipment) : [...current, equipment];
-      return {
-        profile: { ...state.profile, availableEquipment: next },
-      };
+      unlockAndSelectTrainer: (trainerId) => {
+        const { profile } = get();
+        const trainer = getTrainerById(trainerId);
+        if (isTrainerUnlocked(profile, trainerId)) {
+          set({
+            profile: {
+              ...profile,
+              activeTrainerId: trainer.id,
+              activeProgramId: trainer.programId,
+            },
+          });
+          return true;
+        }
+
+        const currentCreds = profile.creds ?? 0;
+        if (currentCreds < trainer.unlockCost) {
+          return false;
+        }
+
+        const unlocked = Array.from(
+          new Set([...(profile.unlockedTrainerIds ?? ['drone-unit-0']), trainer.id]),
+        );
+        set({
+          profile: {
+            ...profile,
+            creds: currentCreds - trainer.unlockCost,
+            unlockedTrainerIds: unlocked,
+            activeTrainerId: trainer.id,
+            activeProgramId: trainer.programId,
+          },
+        });
+        return true;
+      },
+      reconcileCredsFromLedger: (sessions) => {
+        const { profile } = get();
+        const { profile: reconciled, report } = reconcileProfileWithLedger(sessions, profile);
+        if (!report.isConsistent) {
+          set({ profile: reconciled });
+        }
+        return report;
+      },
     }),
-  addCreds: (amount) =>
-    set((state) => ({
-      profile: {
-        ...state.profile,
-        creds: Math.max(0, (state.profile.creds ?? 0) + amount),
-      },
-    })),
-  claimReward: (claimId, amount) => {
-    const { profile } = get();
-    const claimed = profile.claimedRewardIds ?? [];
-    if (claimed.includes(claimId)) return false;
-    set({
-      profile: {
-        ...profile,
-        creds: (profile.creds ?? 0) + amount,
-        claimedRewardIds: [...claimed, claimId],
-      },
-    });
-    return true;
-  },
-  unlockAndSelectTrainer: (trainerId) => {
-    const { profile } = get();
-    const trainer = getTrainerById(trainerId);
-    if (isTrainerUnlocked(profile, trainerId)) {
-      set({
-        profile: {
-          ...profile,
-          activeTrainerId: trainer.id,
-          activeProgramId: trainer.programId,
-        },
-      });
-      return true;
-    }
-
-    const currentCreds = profile.creds ?? 0;
-    if (currentCreds < trainer.unlockCost) {
-      return false;
-    }
-
-    const unlocked = Array.from(
-      new Set([...(profile.unlockedTrainerIds ?? ['drone-unit-0']), trainer.id]),
-    );
-    set({
-      profile: {
-        ...profile,
-        creds: currentCreds - trainer.unlockCost,
-        unlockedTrainerIds: unlocked,
-        activeTrainerId: trainer.id,
-        activeProgramId: trainer.programId,
-      },
-    });
-    return true;
-  },
-}));
+    {
+      name: 'shadowtrain-profile-v1',
+      storage: createJSONStorage(() => vaultStorage),
+      partialize: (state) => ({ profile: state.profile, theme: state.theme }),
+    },
+  ),
+);
