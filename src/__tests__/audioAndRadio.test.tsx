@@ -105,6 +105,39 @@ describe('M14: Cyber-Audio Sound Pack & Workout Radio', () => {
       speakTrainerCue('orc-merc', 'session_finish', { enabled: false });
       expect(mockSpeak).toHaveBeenCalledTimes(1);
     });
+
+    it('selects male OS voice for orc-merc and female OS voice for human-decker', async () => {
+      const speechMod = require('expo-speech') as {
+        getAvailableVoicesAsync?: jest.Mock;
+      };
+      speechMod.getAvailableVoicesAsync = jest.fn().mockResolvedValue([
+        { identifier: 'en-us-x-sfg-local', name: 'en-us-x-sfg-local', language: 'en-US' },
+        { identifier: 'en-us-x-tpd-local', name: 'en-us-x-tpd-local', language: 'en-US' },
+      ]);
+
+      try {
+        speakTrainerCue('orc-merc', 'rest_done', { enabled: true, seed: 0 });
+        await waitFor(() => {
+          expect(mockSpeak).toHaveBeenCalledWith(
+            TRAINER_VOICE_PROFILES['orc-merc'].quips.rest_done[0],
+            expect.objectContaining({
+              voice: 'en-us-x-tpd-local',
+              pitch: TRAINER_VOICE_PROFILES['orc-merc'].pitch,
+            }),
+          );
+        });
+
+        speakTrainerCue('human-decker', 'rest_done', { enabled: true, seed: 0 });
+        expect(mockSpeak).toHaveBeenCalledWith(
+          TRAINER_VOICE_PROFILES['human-decker'].quips.rest_done[0],
+          expect.objectContaining({
+            voice: 'en-us-x-sfg-local',
+          }),
+        );
+      } finally {
+        delete speechMod.getAvailableVoicesAsync;
+      }
+    });
   });
 
   describe('radio discovery & presets', () => {

@@ -9,6 +9,7 @@ export type VoiceEvent = 'rest_done' | 'interval_work' | 'interval_rest' | 'sess
 export interface TrainerVoiceProfile {
   pitch: number;
   rate: number;
+  gender: 'male' | 'female';
   quips: Record<VoiceEvent, string[]>;
 }
 
@@ -22,8 +23,9 @@ const CUE_ASSETS: Record<CyberCueId, number> = {
 
 export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
   'drone-unit-0': {
-    pitch: 0.85,
+    pitch: 0.78,
     rate: 1.05,
+    gender: 'male',
     quips: {
       rest_done: ['Rest cycle complete. Engage next set.', 'Biometrics nominal. Resume output.'],
       interval_work: ['Work phase initiated. Execute.', 'Maximum output window active.'],
@@ -32,8 +34,9 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'orc-merc': {
-    pitch: 0.72,
-    rate: 0.92,
+    pitch: 0.56,
+    rate: 0.88,
+    gender: 'male',
     quips: {
       rest_done: ['Time is up, chummer. Back on the iron.', 'Rest over. Move that steel.'],
       interval_work: ['Push it! Leave nothing in the tank.', 'Work window! Hit it hard!'],
@@ -42,8 +45,9 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'human-decker': {
-    pitch: 1.12,
+    pitch: 1.1,
     rate: 1.08,
+    gender: 'female',
     quips: {
       rest_done: ['Timer zeroed. Jack back in, partner.', 'Green light on the deck. Next set.'],
       interval_work: ['Link hot! Run the sequence!', 'Execute now, stay sharp.'],
@@ -55,8 +59,9 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'human-soldier': {
-    pitch: 0.88,
+    pitch: 0.84,
     rate: 1.0,
+    gender: 'male',
     quips: {
       rest_done: ['Rest expired. Back on station.', 'Clock hit zero. Next set, move.'],
       interval_work: ['Go! Maintain form under load.', 'Engage! Crisp reps only.'],
@@ -68,8 +73,9 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'elf-wraith': {
-    pitch: 1.02,
+    pitch: 0.96,
     rate: 1.02,
+    gender: 'male',
     quips: {
       rest_done: ['Silence ends. Strike the next set.', 'The clock is zero. Flow again.'],
       interval_work: ['Move like smoke. Precision first.', 'Strike now. Zero wasted motion.'],
@@ -78,8 +84,9 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'elf-mage': {
-    pitch: 1.15,
+    pitch: 1.12,
     rate: 0.96,
+    gender: 'female',
     quips: {
       rest_done: ['Mana recharged. Channel the next set.', 'The weave is ready. Begin.'],
       interval_work: ['Surge! Hold the tension.', 'Channel full power now.'],
@@ -93,6 +100,67 @@ type DuckHandler = (ducked: boolean) => void;
 let duckHandler: DuckHandler | null = null;
 let audioModeConfigured = false;
 let activeCuePlayer: { remove?: () => void } | null = null;
+let cachedVoices: { identifier: string; name?: string; language?: string }[] | null = null;
+
+const MALE_VOICE_HINTS = [
+  'male',
+  'man',
+  '-tpd',
+  '-iom',
+  '-iol',
+  '-gbd',
+  '-rjs',
+  '-fis',
+  '-aub',
+  '-aud',
+  'daniel',
+  'aaron',
+  'arthur',
+  'alex',
+  'fred',
+  'oliver',
+  'gordon',
+  'rishi',
+  'lee',
+  'malcolm',
+];
+
+const FEMALE_VOICE_HINTS = [
+  'female',
+  'woman',
+  '-sfg',
+  '-tpc',
+  '-tpf',
+  '-iob',
+  '-iog',
+  '-gba',
+  '-gbc',
+  'samantha',
+  'karen',
+  'kate',
+  'serena',
+  'moira',
+  'tessa',
+  'fiona',
+  'nicky',
+  'victoria',
+  'ava',
+  'allison',
+];
+
+function pickVoiceForGender(
+  voices: { identifier: string; name?: string; language?: string }[],
+  gender: 'male' | 'female',
+): string | undefined {
+  const enVoices = voices.filter((v) => v.language?.toLowerCase().startsWith('en'));
+  const pool = enVoices.length > 0 ? enVoices : voices;
+  const hints = gender === 'male' ? MALE_VOICE_HINTS : FEMALE_VOICE_HINTS;
+  const match = pool.find((v) => {
+    const haystack = `${v.identifier} ${v.name ?? ''}`.toLowerCase();
+    return hints.some((h) => haystack.includes(h));
+  });
+  return match?.identifier;
+}
 
 export function registerRadioDuckHandler(handler: DuckHandler | null): void {
   duckHandler = handler;
@@ -182,23 +250,48 @@ export function speakTrainerCue(
   const profile = TRAINER_VOICE_PROFILES[trainerId] ?? TRAINER_VOICE_PROFILES['drone-unit-0'];
   const text = pickTrainerQuip(trainerId, event, options?.seed ?? Date.now());
 
-  try {
-    duckHandler?.(true);
-    speech.stop?.();
-    speech.speak(text, {
-      pitch: profile.pitch,
-      rate: profile.rate,
-      onDone: () => duckHandler?.(false),
-      onStopped: () => duckHandler?.(false),
-      onError: () => duckHandler?.(false),
-    });
-  } catch {
-    duckHandler?.(false);
+  const speakNow = (voice?: string) => {
+    try {
+      duckHandler?.(true);
+      speech.stop?.();
+      speech.speak(text, {
+        language: 'en-US',
+        voice,
+        pitch: profile.pitch,
+        rate: profile.rate,
+        onDone: () => duckHandler?.(false),
+        onStopped: () => duckHandler?.(false),
+        onError: () => duckHandler?.(false),
+      });
+    } catch {
+      duckHandler?.(false);
+    }
+  };
+
+  if (cachedVoices) {
+    speakNow(pickVoiceForGender(cachedVoices, profile.gender));
+    return;
   }
+
+  if (typeof speech.getAvailableVoicesAsync === 'function') {
+    void speech
+      .getAvailableVoicesAsync()
+      .then((voices) => {
+        cachedVoices = Array.isArray(voices) ? voices : [];
+        speakNow(pickVoiceForGender(cachedVoices, profile.gender));
+      })
+      .catch(() => {
+        speakNow();
+      });
+    return;
+  }
+
+  speakNow();
 }
 
 export function resetAudioStateForTests(): void {
   audioModeConfigured = false;
   duckHandler = null;
   activeCuePlayer = null;
+  cachedVoices = null;
 }
