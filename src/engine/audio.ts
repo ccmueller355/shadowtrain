@@ -23,14 +23,20 @@ const CUE_ASSETS: Record<CyberCueId, number> = {
 
 export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
   'drone-unit-0': {
-    pitch: 0.72,
-    rate: 1.14,
+    pitch: 0.8,
+    rate: 0.82,
     gender: 'male',
     quips: {
-      rest_done: ['Rest cycle complete. Engage next set.', 'Biometrics nominal. Resume output.'],
-      interval_work: ['Work phase initiated. Execute.', 'Maximum output window active.'],
-      interval_rest: ['Recovery window open. Stand by.', 'Cool-down cycle active.'],
-      session_finish: ['Telemetry logged. Session complete.', 'Unit zero calibration complete.'],
+      rest_done: [
+        'Rest cycle. Complete. Engage. Next set.',
+        'Biometrics. Nominal. Resume. Output.',
+      ],
+      interval_work: ['Work phase. Initiated. Execute.', 'Maximum output. Window. Active.'],
+      interval_rest: ['Recovery window. Open. Stand by.', 'Cool-down cycle. Active.'],
+      session_finish: [
+        'Telemetry. Logged. Session. Complete.',
+        'Unit zero. Calibration. Complete.',
+      ],
     },
   },
   'orc-merc': {
