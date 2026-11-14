@@ -10,6 +10,7 @@ import {
   serializeSessionsCsv,
 } from '../engine/portability';
 import {
+  ALL_TRAINERS,
   canUnlockTrainer,
   getCoachDisplayForExercise,
   getSpecialistTrainerForExercise,
@@ -56,14 +57,26 @@ describe('M7 Settings, 5 Shadow Trainers Dossier, Creds & Data Portability', () 
   });
 
   describe('SHADOW_TRAINERS & Trainer Helpers', () => {
-    it('provides all 5 Shadow Trainers and evaluates unlock status & affordability', () => {
+    it('provides UNIT-0 as starter and 5 Shadow Trainers in progression order', () => {
       expect(SHADOW_TRAINERS).toHaveLength(5);
+      expect(ALL_TRAINERS).toHaveLength(6);
+      expect(ALL_TRAINERS.map((t) => t.id)).toEqual([
+        'drone-unit-0',
+        'orc-merc',
+        'human-decker',
+        'human-soldier',
+        'elf-wraith',
+        'elf-mage',
+      ]);
       expect(getTrainerById('human-decker').callsign).toBe('GLITCH');
-      expect(getTrainerById(undefined).id).toBe('orc-merc');
+      expect(getTrainerById(undefined).id).toBe('drone-unit-0');
 
-      expect(isTrainerUnlocked(DEFAULT_PROFILE, 'orc-merc')).toBe(true);
+      expect(isTrainerUnlocked(DEFAULT_PROFILE, 'drone-unit-0')).toBe(true);
+      expect(isTrainerUnlocked(DEFAULT_PROFILE, 'orc-merc')).toBe(false);
       expect(isTrainerUnlocked(DEFAULT_PROFILE, 'human-decker')).toBe(false);
-      expect(canUnlockTrainer(DEFAULT_PROFILE, 'orc-merc')).toBe(true);
+      expect(canUnlockTrainer(DEFAULT_PROFILE, 'drone-unit-0')).toBe(true);
+      expect(canUnlockTrainer(DEFAULT_PROFILE, 'orc-merc')).toBe(false);
+      expect(canUnlockTrainer({ ...DEFAULT_PROFILE, creds: 150 }, 'orc-merc')).toBe(true);
       expect(canUnlockTrainer(DEFAULT_PROFILE, 'human-decker')).toBe(false);
       expect(canUnlockTrainer({ ...DEFAULT_PROFILE, creds: 300 }, 'human-decker')).toBe(true);
     });
@@ -138,7 +151,7 @@ describe('M7 Settings, 5 Shadow Trainers Dossier, Creds & Data Portability', () 
 
       expect(screen.getByTestId('screen-settings')).toBeTruthy();
       expect(screen.getByTestId('creds-balance-badge')).toBeTruthy();
-      expect(screen.getByTestId('trainer-dossier-name').props.children).toBe('Kaelen "Tusk" Vorga');
+      expect(screen.getByTestId('trainer-dossier-name').props.children).toBe('UNIT-0 // SPAR-0');
 
       // Select Valerie (human-decker, 250 Creds)
       fireEvent.press(screen.getByTestId('trainer-card-human-decker'));
@@ -160,10 +173,10 @@ describe('M7 Settings, 5 Shadow Trainers Dossier, Creds & Data Portability', () 
       expect(useProfileStore.getState().profile.activeTrainerId).toBe('human-decker');
       expect(useProfileStore.getState().profile.creds).toBe(50);
 
-      // Switch back to Tusk (already unlocked) and deploy
-      fireEvent.press(screen.getByTestId('trainer-card-orc-merc'));
-      fireEvent.press(screen.getByTestId('trainer-action-btn-orc-merc'));
-      expect(useProfileStore.getState().profile.activeTrainerId).toBe('orc-merc');
+      // Switch back to UNIT-0 (starter, always unlocked) and deploy
+      fireEvent.press(screen.getByTestId('trainer-card-drone-unit-0'));
+      fireEvent.press(screen.getByTestId('trainer-action-btn-drone-unit-0'));
+      expect(useProfileStore.getState().profile.activeTrainerId).toBe('drone-unit-0');
 
       // Update goal, units, fixed KB weight, and equipment toggle
       fireEvent.press(screen.getByTestId('goal-btn-strength'));

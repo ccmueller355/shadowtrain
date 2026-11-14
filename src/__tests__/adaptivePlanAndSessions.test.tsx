@@ -36,7 +36,7 @@ describe('M10 Adaptive Workout Plan, Weekly Streaks, Session Edit/Delete & Logge
         nowMs: NOW_MS,
       });
       expect(standard.adaptationMode).toBe('standard');
-      expect(standard.title).toContain('TUSK · SPLIT A // PRIMARY');
+      expect(standard.title).toContain('UNIT-0 · SPLIT A // PRIMARY');
       expect(standard.items.length).toBeGreaterThanOrEqual(3);
 
       // 2. Rotated plan when last session used Split A (2 days ago, moderate sets)
@@ -60,8 +60,14 @@ describe('M10 Adaptive Workout Plan, Weekly Streaks, Session Edit/Delete & Logge
         ],
       };
 
+      const tuskProfile = {
+        ...DEFAULT_PROFILE,
+        activeTrainerId: 'orc-merc' as const,
+        unlockedTrainerIds: ['drone-unit-0' as const, 'orc-merc' as const],
+      };
+
       const rotated = generateAdaptivePlan({
-        profile: DEFAULT_PROFILE,
+        profile: tuskProfile,
         exercises: DEFAULT_SEED_EXERCISES,
         recentSessions: [rotatedSession],
         nowMs: NOW_MS,
@@ -71,7 +77,7 @@ describe('M10 Adaptive Workout Plan, Weekly Streaks, Session Edit/Delete & Logge
 
       // Refreshing cycles back to Split A where kb-swing-two-hand was mastered (5x12) -> upgrades to kb-swing-one-arm!
       const refreshedToSplitA = generateAdaptivePlan({
-        profile: DEFAULT_PROFILE,
+        profile: tuskProfile,
         exercises: DEFAULT_SEED_EXERCISES,
         recentSessions: [rotatedSession],
         refreshIndex: 2,

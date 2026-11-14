@@ -32,7 +32,7 @@ export const SHADOW_TRAINERS: TrainerDossier[] = [
     name: 'Kaelen "Tusk" Vorga',
     callsign: 'TUSK',
     raceClass: 'Orc Male // Bodybuilder & Heavy Weapons Merc',
-    unlockCost: 0,
+    unlockCost: 150,
     specialty: 'Heavy Iron & Raw Mass (Kettlebell Power, Barbell/Dumbbell, Grip)',
     lore: 'Former corporate heavy-weapons specialist turned underground pit boss. Chrome-plated left arm, orange ballistic visor, zero tolerance for half-reps.',
     programId: 'heavy-iron-pit',
@@ -83,11 +83,26 @@ export const SHADOW_TRAINERS: TrainerDossier[] = [
     portrait: require('../../assets/trainers/human-soldier.webp') as ImageSourcePropType,
   },
   {
+    id: 'elf-wraith',
+    name: 'Soren "Wraith" Kael',
+    callsign: 'WRAITH',
+    raceClass: 'Elf Male // Wraith Assassin & Calisthenics Acrobat',
+    unlockCost: 750,
+    specialty: 'Convict Calisthenics & Gymnastic Rings Mastery (Rings + Bodyweight Lv1–3)',
+    lore: 'High-altitude corporate infiltrator and silent assassin. Zero clanking iron — masters pure leverage (Ring L-Sits, Ring Dips, Pistol Squats) in dead silence.',
+    programId: 'wraith-zero-iron-rings',
+    programName: 'SILENT LEVERAGE // RINGS & CALISTHENICS',
+    programFocus: 'Ring dips, ring pull-ups, ring L-sit holds & single-leg pistol squats',
+    signatureExerciseIds: ['ring-dip', 'ring-pull-up', 'ring-l-sit-hold', 'bw-pistol-squat'],
+    skills: { strength: 8, conditioning: 9, mobility: 9, calisthenics: 10, tech: 7 },
+    portrait: require('../../assets/trainers/elf-wraith.webp') as ImageSourcePropType,
+  },
+  {
     id: 'elf-mage',
     name: 'Lyra "Aether" Vael',
     callsign: 'AETHER',
     raceClass: 'Elf Female // Hermetic Mage & Astral Adept',
-    unlockCost: 750,
+    unlockCost: 1000,
     specialty: 'Mobility Flow, Turkish Get-Ups & Isometric Control (Stretching + KB TGU)',
     lore: 'Neon-lit astral adept who channels mana through structural alignment, deep joint decompression, slow-eccentric control, and active recovery shields.',
     programId: 'aether-mobility-tgu',
@@ -101,21 +116,6 @@ export const SHADOW_TRAINERS: TrainerDossier[] = [
     ],
     skills: { strength: 6, conditioning: 8, mobility: 10, calisthenics: 8, tech: 9 },
     portrait: require('../../assets/trainers/elf-mage.webp') as ImageSourcePropType,
-  },
-  {
-    id: 'elf-wraith',
-    name: 'Soren "Wraith" Kael',
-    callsign: 'WRAITH',
-    raceClass: 'Elf Male // Wraith Assassin & Calisthenics Acrobat',
-    unlockCost: 1000,
-    specialty: 'Convict Calisthenics & Gymnastic Rings Mastery (Rings + Bodyweight Lv1–3)',
-    lore: 'High-altitude corporate infiltrator and silent assassin. Zero clanking iron — masters pure leverage (Ring L-Sits, Ring Dips, Pistol Squats) in dead silence.',
-    programId: 'wraith-zero-iron-rings',
-    programName: 'SILENT LEVERAGE // RINGS & CALISTHENICS',
-    programFocus: 'Ring dips, ring pull-ups, ring L-sit holds & single-leg pistol squats',
-    signatureExerciseIds: ['ring-dip', 'ring-pull-up', 'ring-l-sit-hold', 'bw-pistol-squat'],
-    skills: { strength: 8, conditioning: 9, mobility: 9, calisthenics: 10, tech: 7 },
-    portrait: require('../../assets/trainers/elf-wraith.webp') as ImageSourcePropType,
   },
 ];
 
@@ -135,14 +135,16 @@ export const TRAINING_DRONE: TrainerDossier = {
   portrait: require('../../assets/trainers/spar-drone.webp') as ImageSourcePropType,
 };
 
+export const ALL_TRAINERS: TrainerDossier[] = [TRAINING_DRONE, ...SHADOW_TRAINERS];
+
 export function getTrainerById(trainerId?: TrainerId): TrainerDossier {
-  if (trainerId === 'drone-unit-0') return TRAINING_DRONE;
-  return SHADOW_TRAINERS.find((t) => t.id === trainerId) ?? SHADOW_TRAINERS[0];
+  if (!trainerId || trainerId === 'drone-unit-0') return TRAINING_DRONE;
+  return SHADOW_TRAINERS.find((t) => t.id === trainerId) ?? TRAINING_DRONE;
 }
 
 export function isTrainerUnlocked(profile: Profile, trainerId: TrainerId): boolean {
-  if (trainerId === 'orc-merc' || trainerId === 'drone-unit-0') return true;
-  const unlocked = profile.unlockedTrainerIds ?? ['orc-merc'];
+  if (trainerId === 'drone-unit-0') return true;
+  const unlocked = profile.unlockedTrainerIds ?? ['drone-unit-0'];
   return unlocked.includes(trainerId);
 }
 

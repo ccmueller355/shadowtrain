@@ -19,10 +19,10 @@ import {
   serializeSessionsCsv,
 } from '../../src/engine/portability';
 import {
+  ALL_TRAINERS,
   canUnlockTrainer,
   getTrainerById,
   isTrainerUnlocked,
-  SHADOW_TRAINERS,
 } from '../../src/engine/trainers';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
 import { useProfileStore } from '../../src/stores/profileStore';
@@ -79,7 +79,7 @@ export default function SettingsScreen() {
   const exercises = useExerciseStore((s) => s.exercises);
 
   const [selectedTrainerId, setSelectedTrainerId] = useState<TrainerId>(
-    profile.activeTrainerId ?? 'orc-merc',
+    profile.activeTrainerId ?? 'drone-unit-0',
   );
   const [payloadText, setPayloadText] = useState('');
   const [portabilityStatus, setPortabilityStatus] = useState<string | null>(null);
@@ -88,7 +88,7 @@ export default function SettingsScreen() {
 
   const selectedTrainer = getTrainerById(selectedTrainerId);
   const selectedUnlocked = isTrainerUnlocked(profile, selectedTrainer.id);
-  const selectedActive = (profile.activeTrainerId ?? 'orc-merc') === selectedTrainer.id;
+  const selectedActive = (profile.activeTrainerId ?? 'drone-unit-0') === selectedTrainer.id;
   const selectedAffordable = canUnlockTrainer(profile, selectedTrainer.id);
 
   const allSessions = activeSession ? [activeSession, ...recentSessions] : recentSessions;
@@ -165,11 +165,13 @@ export default function SettingsScreen() {
         </View>
       </View>
 
-      <Text style={[styles.section, ts.sectionHeader]}>SHADOW TRAINER ROSTER (5 DOSSIERS)</Text>
+      <Text style={[styles.section, ts.sectionHeader]}>
+        TRAINER ROSTER (UNIT-0 + 5 SPECIALISTS)
+      </Text>
       <View style={styles.trainerRosterRow}>
-        {SHADOW_TRAINERS.map((trainer) => {
+        {ALL_TRAINERS.map((trainer) => {
           const isSelected = trainer.id === selectedTrainer.id;
-          const isActive = (profile.activeTrainerId ?? 'orc-merc') === trainer.id;
+          const isActive = (profile.activeTrainerId ?? 'drone-unit-0') === trainer.id;
           const unlocked = isTrainerUnlocked(profile, trainer.id);
 
           return (
