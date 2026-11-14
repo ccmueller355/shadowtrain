@@ -107,12 +107,40 @@ describe('M14: Cyber-Audio Sound Pack & Workout Radio', () => {
   });
 
   describe('radio discovery & presets', () => {
-    it('includes regional workout presets for DACH, EU, UK, FR, ES, NL, US, JP, CN, ME, IN', () => {
+    it('includes regional workout presets for DACH, Europe, UK, US, JP, CN, ME, IN', () => {
       const regions = new Set(RADIO_PRESETS.map((p) => p.region));
-      expect(regions).toEqual(
-        new Set(['DE', 'EU', 'UK', 'FR', 'ES', 'NL', 'US', 'JP', 'CN', 'ME', 'IN']),
-      );
+      for (const r of [
+        'DE',
+        'EU',
+        'UK',
+        'FR',
+        'ES',
+        'NL',
+        'AT',
+        'CH',
+        'IT',
+        'PL',
+        'BE',
+        'SE',
+        'NO',
+        'DK',
+        'FI',
+        'PT',
+        'IE',
+        'CZ',
+        'GR',
+        'HU',
+        'RO',
+        'US',
+        'JP',
+        'CN',
+        'ME',
+        'IN',
+      ]) {
+        expect(regions.has(r)).toBe(true);
+      }
       expect(RADIO_PRESETS.some((p) => p.label === 'Sunshine Live')).toBe(true);
+      expect(RADIO_PRESETS.some((p) => p.label === 'Sunshine Live Workout')).toBe(true);
       expect(RADIO_PRESETS.some((p) => p.label === 'ENERGY Live')).toBe(true);
       expect(RADIO_PRESETS.some((p) => p.label === 'DASDING')).toBe(true);
     });
