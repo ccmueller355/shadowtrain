@@ -10,6 +10,7 @@ export interface ExerciseShowcase {
 export const EXERCISE_SHOWCASES: Record<string, ExerciseShowcase> = {
   'bw-hollow-body-hold': {
     start: require('../../assets/exercises/bw-hollow-body-hold/start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/bw-hollow-body-hold/end.webp') as ImageSourcePropType,
   },
   'bw-pistol-squat': {
     start: require('../../assets/exercises/bw-pistol-squat/start.webp') as ImageSourcePropType,
@@ -57,6 +58,7 @@ export const EXERCISE_SHOWCASES: Record<string, ExerciseShowcase> = {
   },
   'stretch-90-90-hip': {
     start: require('../../assets/exercises/stretch-90-90-hip/start.webp') as ImageSourcePropType,
+    end: require('../../assets/exercises/stretch-90-90-hip/end.webp') as ImageSourcePropType,
   },
   'stretch-couch': {
     start: require('../../assets/exercises/stretch-couch/start.webp') as ImageSourcePropType,

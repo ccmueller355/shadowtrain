@@ -7,11 +7,14 @@ hero:
   tagline: Offline-first. Fixed-kettlebell & calisthenics step-loading. Plan-aware streaks & achievements. Zero cloud.
   actions:
     - theme: brand
+      text: Field Operator Manual
+      link: /manual
+    - theme: alt
+      text: Shadow Dossier
+      link: /trainers/
+    - theme: alt
       text: Read MVP Spec
       link: /spec
-    - theme: alt
-      text: 5 Shadow Trainers
-      link: /image-prompts
     - theme: alt
       text: CI & Testing
       link: /ci-and-testing

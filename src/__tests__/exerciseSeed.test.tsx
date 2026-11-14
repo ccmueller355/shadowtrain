@@ -260,6 +260,13 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
     });
 
     it('renders Exercise Detail view with specialist coach card and bundled start/end poses when unlocked', () => {
+      useProfileStore.setState({
+        profile: {
+          ...DEFAULT_PROFILE,
+          activeTrainerId: 'orc-merc',
+          unlockedTrainerIds: ['drone-unit-0', 'orc-merc'],
+        },
+      });
       render(<ExercisesScreen />);
 
       fireEvent.press(screen.getByTestId('exercise-item-kb-swing-two-hand'));
@@ -270,20 +277,20 @@ describe('M2 Exercise Seed, Import Script, Store & Equipment Picker', () => {
       expect(screen.getByTestId('exercise-pose-start')).toBeTruthy();
       expect(screen.getByTestId('exercise-pose-end')).toBeTruthy();
       expect(screen.queryByTestId('exercise-pose-fallback-card')).toBeNull();
-      // Starter coach Tusk is unlocked by default -> no encryption overlay
+      // Unlocked specialist Tusk -> no encryption overlay
       expect(screen.queryByTestId('coach-encrypted-overlay')).toBeNull();
     });
 
     it('renders training drone UNIT-0 with upgrade banner when specialist coach is locked', () => {
       render(<ExercisesScreen />);
 
-      // Ring Dip specialist is Soren Wraith (locked by default, requires 1,000 ¥)
+      // Ring Dip specialist is Soren Wraith (locked by default, requires 750 ¥)
       fireEvent.press(screen.getByTestId('exercise-item-ring-dip'));
       expect(screen.getByTestId('exercise-specialist-card')).toBeTruthy();
       expect(screen.getByText('TRAINING DRONE // UNIT-0')).toBeTruthy();
       expect(screen.getByText('UNIT-0 // SPAR-0')).toBeTruthy();
       expect(screen.getByTestId('coach-locked-badge')).toBeTruthy();
-      expect(screen.getByText('LOCKED SPECIALIST // 1000 ¥')).toBeTruthy();
+      expect(screen.getByText('LOCKED SPECIALIST // 750 ¥')).toBeTruthy();
       expect(screen.getByTestId('coach-encrypted-overlay')).toBeTruthy();
       expect(screen.getByText('[DEFAULT SYNTH DRONE // UPGRADE AVAILABLE]')).toBeTruthy();
     });

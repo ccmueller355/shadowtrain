@@ -1,6 +1,17 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Image,
+  Modal,
+  ImageSourcePropType,
+  TouchableOpacity,
+} from 'react-native';
 import { useAppTheme } from '../../src/theme/useTheme';
 import { useThemeStyles } from '../../src/theme/useThemeStyles';
 import { useProfileStore } from '../../src/stores/profileStore';
@@ -65,6 +76,10 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
   const setShowAllEquipment = useExerciseStore((s) => s.setShowAllEquipment);
   const setSelectedEquipment = useExerciseStore((s) => s.setSelectedEquipment);
   const setSelectedMuscle = useExerciseStore((s) => s.setSelectedMuscle);
+  const [fullViewModal, setFullViewModal] = useState<{
+    image: ImageSourcePropType;
+    title: string;
+  } | null>(null);
 
   const equipmentOptions = showAllEquipment ? ALL_EQUIPMENT : availableEquipment;
 
@@ -115,11 +130,22 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
           {/* M11: Adaptive Coach & Drone Showcase Card */}
           <CyberpunkCard style={styles.card}>
             <View style={styles.specialistRow} testID="exercise-specialist-card">
-              <Image
-                source={coach.portrait}
-                style={styles.specialistThumb}
-                testID="exercise-coach-portrait"
-              />
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() =>
+                  setFullViewModal({
+                    image: coach.portrait,
+                    title: `${coach.name.toUpperCase()} // SPECIALIST RENDER`,
+                  })
+                }
+              >
+                <Image
+                  source={coach.portrait}
+                  style={styles.specialistThumb}
+                  resizeMode="contain"
+                  testID="exercise-coach-portrait"
+                />
+              </TouchableOpacity>
               <View style={styles.specialistInfo}>
                 <View style={styles.specialistBadgeRow}>
                   <Text style={[styles.badge, ts.accent]}>
@@ -158,26 +184,46 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                   testID="exercise-pose-images"
                 >
                   {showcase.start ? (
-                    <View style={styles.poseCol}>
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      onPress={() =>
+                        showcase.start &&
+                        setFullViewModal({
+                          image: showcase.start,
+                          title: `${detailExercise.name.toUpperCase()} // START POSE`,
+                        })
+                      }
+                      style={styles.poseCol}
+                    >
                       <Image
                         source={showcase.start}
                         style={[styles.poseImage, !isSpecialistUnlocked && styles.poseImageLocked]}
                         resizeMode="contain"
                         testID="exercise-pose-start"
                       />
-                      <Text style={[styles.poseCaption, ts.textMuted]}>START</Text>
-                    </View>
+                      <Text style={[styles.poseCaption, ts.textMuted]}>START [🔍 FULL]</Text>
+                    </TouchableOpacity>
                   ) : null}
                   {showcase.end ? (
-                    <View style={styles.poseCol}>
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      onPress={() =>
+                        showcase.end &&
+                        setFullViewModal({
+                          image: showcase.end,
+                          title: `${detailExercise.name.toUpperCase()} // END POSE`,
+                        })
+                      }
+                      style={styles.poseCol}
+                    >
                       <Image
                         source={showcase.end}
                         style={[styles.poseImage, !isSpecialistUnlocked && styles.poseImageLocked]}
                         resizeMode="contain"
                         testID="exercise-pose-end"
                       />
-                      <Text style={[styles.poseCaption, ts.textMuted]}>END</Text>
-                    </View>
+                      <Text style={[styles.poseCaption, ts.textMuted]}>END [🔍 FULL]</Text>
+                    </TouchableOpacity>
                   ) : null}
                 </View>
 
@@ -276,6 +322,54 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
             </CyberpunkCard>
           )}
         </ScrollView>
+
+        {/* Full-view modal for exercise pose or specialist render */}
+        <Modal
+          visible={!!fullViewModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setFullViewModal(null)}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => setFullViewModal(null)}
+            style={styles.modalBackdrop}
+          >
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={(e) => e.stopPropagation()}
+              style={[styles.modalCard, { borderColor: theme.colors.primary }]}
+            >
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, ts.accent]} numberOfLines={1} ellipsizeMode="tail">
+                  {fullViewModal?.title}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setFullViewModal(null)}
+                  style={styles.modalCloseBtn}
+                  testID="close-exercise-fullview-modal"
+                >
+                  <Text style={styles.modalCloseText}>✕ CLOSE</Text>
+                </TouchableOpacity>
+              </View>
+              {fullViewModal && (
+                <Image
+                  source={fullViewModal.image}
+                  style={styles.modalFullImage}
+                  resizeMode="contain"
+                />
+              )}
+              <TouchableOpacity
+                onPress={() => setFullViewModal(null)}
+                style={styles.modalBottomDismissBtn}
+              >
+                <Text style={[styles.modalBottomDismissText, ts.textMuted]}>
+                  [ TAP ANYWHERE OR PRESS TO CLOSE ]
+                </Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </Modal>
       </View>
     );
   }
@@ -522,7 +616,14 @@ const styles = StyleSheet.create({
   instructionText: { fontSize: 12, fontFamily: 'monospace', marginTop: 6 },
   emptyText: { fontSize: 13, fontFamily: 'monospace' },
   specialistRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  specialistThumb: { width: 56, height: 56, borderRadius: 8, borderWidth: 1, marginRight: 12 },
+  specialistThumb: {
+    width: 56,
+    height: 64,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginRight: 12,
+    backgroundColor: '#0c0914',
+  },
   specialistInfo: { flex: 1 },
   specialistName: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 2 },
   specialistSpecialty: { fontSize: 10, fontFamily: 'monospace', marginTop: 2 },
@@ -546,7 +647,7 @@ const styles = StyleSheet.create({
   poseRowEncrypted: { opacity: 0.35 },
   poseImageLocked: { opacity: 0.6 },
   poseCol: { flex: 1, maxWidth: 170, alignItems: 'center' },
-  poseImage: { width: '100%', height: 160, borderRadius: 8 },
+  poseImage: { width: '100%', height: 180, borderRadius: 8, backgroundColor: '#0c0914' },
   poseCaption: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace', marginTop: 4 },
   specialistBadgeRow: {
     flexDirection: 'row',
@@ -591,4 +692,69 @@ const styles = StyleSheet.create({
   poseCode: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   poseTitle: { fontSize: 13, fontWeight: 'bold', fontFamily: 'monospace', marginVertical: 4 },
   poseMeta: { fontSize: 9, fontFamily: 'monospace' },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(5, 3, 10, 0.94)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  modalCard: {
+    width: '100%',
+    maxHeight: '90%',
+    backgroundColor: '#14101c',
+    borderRadius: 12,
+    borderWidth: 1.5,
+    padding: 14,
+    alignItems: 'center',
+  },
+  modalHeader: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2a2236',
+    paddingBottom: 8,
+    gap: 8,
+  },
+  modalTitle: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    letterSpacing: 0.5,
+    paddingRight: 4,
+  },
+  modalCloseBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ff4444',
+    backgroundColor: 'rgba(255, 68, 68, 0.15)',
+    flexShrink: 0,
+  },
+  modalCloseText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    color: '#ff5555',
+  },
+  modalFullImage: {
+    width: '100%',
+    height: 440,
+    maxHeight: '80%',
+  },
+  modalBottomDismissBtn: {
+    marginTop: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  modalBottomDismissText: {
+    fontSize: 10,
+    fontFamily: 'monospace',
+    letterSpacing: 0.5,
+  },
 });

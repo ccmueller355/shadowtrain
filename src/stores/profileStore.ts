@@ -37,10 +37,10 @@ export const DEFAULT_PROFILE: Profile = {
   },
   availableEquipment: DEFAULT_EQUIPMENT,
   fixedKettlebellWeight: 16,
-  activeTrainerId: 'orc-merc',
-  unlockedTrainerIds: ['orc-merc'],
+  activeTrainerId: 'drone-unit-0',
+  unlockedTrainerIds: ['drone-unit-0'],
   creds: 0,
-  activeProgramId: 'heavy-iron-pit',
+  activeProgramId: 'stock-calibration',
   weeklyTargetDays: 4,
   targetDuration: 'standard',
   claimedRewardIds: [],
@@ -143,7 +143,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     }
 
     const unlocked = Array.from(
-      new Set([...(profile.unlockedTrainerIds ?? ['orc-merc']), trainer.id]),
+      new Set([...(profile.unlockedTrainerIds ?? ['drone-unit-0']), trainer.id]),
     );
     set({
       profile: {

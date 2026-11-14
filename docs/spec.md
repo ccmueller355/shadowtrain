@@ -496,8 +496,10 @@ Each milestone = **one issue**, one coding-agent session, one PR.
 | **M10** | Trainer Plans, Edit/Delete, Creds & Streaks | Trainer+Goal Workout Plan blueprint (`Start Planned Workout`), edit/delete past sessions + Logger Back/Cancel, Creds (`¥`) missions & streaks      | M    |
 | **M11** | Æ Training Drone & Specialist Unlock Skins  | Generic stock Wireframe Training Drone for base movements; unlocking Trainers dynamically skins exercises with elite Specialist poses & cues       | S    |
 | **M12** | Program Templates & Round-Based Timer       | Cult programs (Simple & Sinister, Rite of Passage, Convict Calisthenics) + interval/round-based timer (EMOM/Tabata/Rounds) with extensible catalog | M    |
-| **M13** | Visual Overhaul: Seductive Shadow Roster    | Re-render female trainers & operatives with high-glam cyberpunk aesthetic, intense visual charisma & seductive edge                                | M    |
+| **M13** | Visual Overhaul: Seductive Shadow Roster    | High-glam cyberpunk revamp, 5 Trainer editorial dossiers in VitePress + 100% complete START/END WebP exercise frames                               | M    |
 | **M14** | Offline Cyberpunk Audio Sound Pack          | Cybernetic voice cues, countdown beeps, interval bells, and coach quips on rest timer expiration                                                   | S    |
+| **M15** | Cryptographic Vault & Ledger Integrity      | AsyncStorage Profile persistence, SQLite ledger replay/reconciliation, and HMAC-SHA256 tamper-proof backup checksum                                | S    |
+| **M16** | Atelier Vael Batch 2: Titan Pit & Unit-0    | Kaelen 8K core trio + Soren Pistol Squat 8K + UNIT-0 Spar-Drone robot dummies for locked trainers + dynamic unlock skinning                        | M    |
 
 ### 7.1 Build Phases
 
@@ -528,8 +530,17 @@ Each milestone = **one issue**, one coding-agent session, one PR.
      - _Rite of Passage (ROP)_ (Clean & Press ladders + Snatch cadence).
      - _Convict Calisthenics Progression Trees_ (Step 1 ➔ 10).
      - Configurable Round & Interval Timer in Session Logger: EMOM, Tabata, round count, work/rest interval beepers.
-   - **M13 (Visual Overhaul: Seductive Shadow Roster)**: High-voltage visual revamp of the female and elven operatives in `assets/trainers/` and `docs/image-prompts.md`. Infuse raw cyberpunk allure, form-fitting tactical cyberware, lethal elegance, and provocative aesthetic charisma (Valerie "Glitch", Lyra "Aether", and new shadow trainers).
+   - **M13 (Visual Overhaul: Seductive Shadow Roster) [COMPLETED]**: High-voltage visual revamp of the female and elven operatives in `assets/trainers/`, `assets/exercises/`, and `docs/trainers/`. Infuse raw cyberpunk allure, form-fitting tactical cyberware, lethal elegance, and provocative aesthetic charisma (Valerie "Glitch", Lyra "Aether", Kaelen "Titan", Marcus "Vanguard", Soren "Wraith", and UNIT-0 Spar-Drone). Includes 100% complete START/END WebP exercise frames for all 14 core movements and full VitePress editorial dossiers.
    - **M14 (Offline Cyberpunk Audio Sound Pack)**: Offline synthesized voice cues, countdown beeps, interval bells, and trainer completion quips when timers expire or sets finish.
+   - **M15 (Cryptographic Vault & Ledger Integrity)**: Dual-ledger persistence & anti-tampering:
+     - Wire `@react-native-async-storage/async-storage` via `zustand/middleware/persist` to `useProfileStore` so profile and Creds survive app termination.
+     - Implement a deterministic ledger replay engine (`src/engine/vault.ts` or `analytics.ts`): reconstruct and reconcile Cred balances directly from the SQLite session ledger and claimed achievement records.
+     - Introduce cryptographic payload signatures (HMAC-SHA256 checksum) in `src/engine/portability.ts` backup envelopes (`meta.checksum`) to reject manually edited or forged backup files.
+     - Add unit tests for anti-tamper rejection and ledger reconciliation.
+   - **M16 (Atelier Vael Batch 2: Titan Pit & Unit-0 Sparring Matrix)**: Visual unification & dynamic unlock skins:
+     - Ingest 8K Atelier Vael START & END frames for Kaelen Vorga's heavy iron trio (`kb-swing-two-hand`, `kb-goblet-squat`, `kb-clean-and-press`) and Soren's `bw-pistol-squat`.
+     - Ingest UNIT-0 Spar-Drone biomechanical dummy START & END frames for all movements taught by locked trainers (Valerie, Marcus, Lyra, Soren).
+     - Wire dynamic exercise skinning in `src/engine/exerciseShowcases.ts`: movements taught by locked specialists display UNIT-0; upon Cred unlock, they automatically transform into the elite 8K Specialist illustrations.
 
 **Definition of done (every milestone):**
 

@@ -85,13 +85,109 @@ Instead of generating 5 duplicate icon sets for every exercise, each movement in
 
 ---
 
-## 4. Showcase Bundle Status
+## 4. Showcase Bundle Status (Current State)
 
-14 core-kit exercises are bundled under `assets/exercises/<exercise_id>/{start,end}.webp` (768×768), mapped in `src/engine/exerciseShowcases.ts`. Exercises without images (or with a missing pose) fall back to the themed placeholder card.
+All 14 core-kit exercises are bundled under `assets/exercises/<exercise_id>/{start,end}.webp` (768×768 WebP, <35KB each), mapped in `src/engine/exerciseShowcases.ts`.
 
-**Pending poses** (image quota exhausted during M8; follow-up batch):
+- **10 Movements on 8K Atelier Vael Standard**: Turkish Get-Up, Couch Stretch, 90/90 Hip, Jump Rope, Halo, Hollow Body, Push-Up (Unit-0), Squat, Ring Dip, Ring L-Sit.
+- **4 Movements Pending 8K Revamp**: Two-Hand Swing, Goblet Squat, Clean & Press, Pistol Squat.
+- **Locked Trainer Fallback**: Movements taught by locked specialists currently show the specialist rather than the synthetic Sparring Dummy.
 
-- `bw-hollow-body-hold` — `end`
-- `stretch-90-90-hip` — `end`
+---
 
-**Needs a re-roll for pose accuracy**: `ring-dip` `start` (should be arms-locked support), `bw-pistol-squat` `start` (should be standing on one leg), `bw-push-up` `start` (should be high plank).
+## 5. Milestone M16: AI Studio Generation Queue (Batch 2 Prompts)
+
+Copy-pasteable prompts formulated for **Google AI Studio (Imagen 3 / 8K Editorial Standard)**.
+
+### Global Atelier Style Anchor for Batch 2:
+
+> `Hyper-realistic 8K studio fitness plate, matte obsidian studio background (#14101c), subtle geometric cyan (#00f0ff) holographic wireframe accents and amber (#ff8c00) telemetry rim-lighting, 50mm lens f/1.8, razor-sharp anatomical definition, volumetric lighting, zero blur, cinematic cyberpunk aesthetic.`
+
+---
+
+### Batch 2A: The 4 Missing Specialist 8K Poses
+
+#### 1. `kb-swing-two-hand` — Kaelen "Tusk" Vorga (Orc Merc)
+
+- **START (Hike Pass)**:
+  > Hyper-detailed 8K studio fitness plate of Kaelen Vorga, massive heavily-muscled Shadowrun Orc with chrome cybernetic arm and glowing amber visor. Positioned in a deep, athletic kettlebell swing hike pass: hips pushed back into a deep hinge, shins vertical, neutral flat spine, dual hands gripping a heavy 32kg cast-iron kettlebell tilted back between his muscular thighs. Matte obsidian studio background (#14101c), volumetric cyan (#00f0ff) and amber (#ff8c00) rim-lighting, 50mm lens, sharp anatomy.
+- **END (Standing Lockout)**:
+  > Hyper-detailed 8K studio fitness plate of Kaelen Vorga, massive Shadowrun Orc bodybuilder with glowing amber visor and chrome cyberarm. Standing tall at the peak apex of an explosive two-hand kettlebell swing: glutes clenched, hips fully snapped into lockout, abs braced, standing vertical like a plank. The 32kg kettlebell floats weightless at chest/sternum height, arms extended forward like relaxed ropes with straight wrists. Matte obsidian studio background (#14101c), volumetric cyan rim-lighting (#00f0ff), 50mm lens.
+
+#### 2. `kb-goblet-squat` — Kaelen "Tusk" Vorga (Orc Merc)
+
+- **START (Rack Setup)**:
+  > Hyper-detailed 8K studio fitness plate of Kaelen Vorga standing tall holding a heavy 32kg cast-iron kettlebell in the goblet position: both hands grasping the horns tightly against the sternum, elbows tucked in close against the ribs, shoulders packed down, feet shoulder-width apart, chest upright. Matte obsidian studio background (#14101c), glowing amber visor and cyberarm plasma conduits (#ff8c00), cyan rim-lighting (#00f0ff), 50mm lens.
+- **END (Deep Squat Bottom)**:
+  > Hyper-detailed 8K studio fitness plate of Kaelen Vorga in the bottom hole of a deep, rock-solid goblet squat: hips descended well below the knees, spine rigid and upright, heels flat on the floor, elbows tracking just inside the knees prying the hips open while holding the 32kg kettlebell against the chest. Matte obsidian studio background (#14101c), dramatic cyan/amber rim-lighting, 50mm lens.
+
+#### 3. `kb-clean-and-press` — Kaelen "Tusk" Vorga (Orc Merc)
+
+- **START (Clean Rack)**:
+  > Hyper-detailed 8K studio fitness plate of Kaelen Vorga with a heavy 28kg kettlebell locked in a tight single-arm rack position: bell resting in the triangle crook between his cybernetic bicep and forearm against the ribcage, wrist perfectly straight, vertical torso, braced core. Matte obsidian studio background (#14101c), amber visor glow (#ff8c00), cyan rim-lighting (#00f0ff), 50mm lens.
+- **END (Overhead Lockout)**:
+  > Hyper-detailed 8K studio fitness plate of Kaelen Vorga in a strict overhead kettlebell press lockout: single arm punched vertically towards the ceiling, bicep grazing the ear, elbow completely locked out directly above the shoulder joint, legs straight, glutes clenched, completely motionless and stable. Matte obsidian studio background (#14101c), dramatic cyan and amber volumetric lighting, 50mm lens.
+
+#### 4. `bw-pistol-squat` — Soren "Wraith" Kael (Elf Wraith)
+
+- **START (Single-Leg Stand)**:
+  > Hyper-detailed 8K studio fitness plate of Soren Kael, lean shredded Shadowrun Elf assassin with stealth half-mask and pointed elven ears. Standing balanced on his right leg, left leg extended straight out in front hovering a few inches off the deck, arms reaching forward for counter-balance, core tense. Matte obsidian studio background (#14101c), cyan rim-lighting (#00f0ff), amber eye implant glow (#ff8c00), 50mm lens.
+- **END (Full Pistol Bottom)**:
+  > Hyper-detailed 8K studio fitness plate of Soren Kael in the deep bottom position of a single-leg pistol squat: working right leg fully compressed with hamstring against calf, non-working left leg held perfectly straight and parallel to the floor, upright torso, acrobatic zero-gravity balance. Matte obsidian studio background (#14101c), volumetric cyan rim-lighting, 50mm lens.
+
+---
+
+### Batch 2B: The UNIT-0 Spar-Drone Fallback Dummy Matrix
+
+> **Core Persona Anchor // UNIT-0**:
+> `Sleek biomechanical sparring automaton and android dummy chassis, matte dark carbon-fiber plates with exposed titanium joints, blank sensory faceplate with a horizontal glowing cyan sensor strip (#00f0ff), neutral anatomical proportions, athletic humanoid silhouette, matte obsidian studio background (#14101c), volumetric cyan rim-lighting.`
+
+#### 1. `rope-basic-bounce` (Dummy for Valerie)
+
+- **START**: UNIT-0 dummy standing upright, elbows tucked against mechanical ribs, hands holding handles of a glowing neon speed rope resting on floor behind heels.
+- **END**: UNIT-0 dummy hovering 2 inches off the ground in a crisp mid-air jump, speed rope blurred beneath its carbon-fiber feet, flawless vertical posture.
+
+#### 2. `kb-halo` (Dummy for Valerie)
+
+- **START**: UNIT-0 dummy holding an inverted kettlebell by the horns at chest height, elbows tucked, sensor strip glowing cyan.
+- **END**: UNIT-0 dummy circling the kettlebell tightly behind its titanium neck/head, elbows flaring and folding without moving the torso.
+
+#### 3. `bw-hollow-body-hold` (Dummy for Valerie)
+
+- **START**: UNIT-0 dummy lying flat on its back on the obsidian deck, arms reaching overhead, legs together.
+- **END**: UNIT-0 dummy in a textbook hollow-body "banana" hold: lumbar spine pinned flat against the floor, shoulder blades and straight legs elevated 6 inches off the deck, arms locked overhead.
+
+#### 4. `bw-squat` (Dummy for Marcus)
+
+- **START**: UNIT-0 dummy standing at military attention, feet shoulder-width, arms relaxed at sides.
+- **END**: UNIT-0 dummy in a deep parallel calisthenics squat, thighs parallel to floor, arms extended forward, neutral spine.
+
+#### 5. `kb-turkish-get-up` (Dummy for Lyra)
+
+- **START**: UNIT-0 dummy lying on its back, right arm locked vertically pointing to ceiling holding kettlebell, right knee bent, left arm out at 45 degrees.
+- **END**: UNIT-0 dummy standing tall at the top lockout of the Turkish Get-Up, kettlebell pressed overhead, feet together, neutral hips.
+
+#### 6. `stretch-90-90-hip` (Dummy for Lyra)
+
+- **START**: UNIT-0 dummy seated on floor with lead leg bent 90 degrees in front and trail leg bent 90 degrees to the side, upright mechanical torso.
+- **END**: UNIT-0 dummy hinging forward over the lead knee with a flat chest, deep hip decompression, cyan wireframe ground reflections.
+
+#### 7. `stretch-couch` (Dummy for Lyra)
+
+- **START**: UNIT-0 dummy in a kneeling lunge with back knee against a studio pillar, back shin vertical against the surface.
+- **END**: UNIT-0 dummy pressing hips forward and torso upright into a deep hip flexor / quad opening, glute engaged.
+
+#### 8. `ring-dip` (Dummy for Soren)
+
+- **START**: UNIT-0 dummy in full straight-arm support lockout on suspended gymnastic rings, elbows locked, rings turned slightly outward.
+- **END**: UNIT-0 dummy lowered into deep ring dip bottom: shoulders below elbows, forearms vertical, stable mechanical control.
+
+#### 9. `ring-l-sit-hold` (Dummy for Soren)
+
+- **START**: UNIT-0 dummy in top ring support with straight legs hanging down.
+- **END**: UNIT-0 dummy holding a crisp 90-degree L-Sit on the rings: legs extended straight forward parallel to the deck, core compressed.
+
+#### 10. `bw-pistol-squat` (Dummy for Soren)
+
+- **START**: UNIT-0 dummy balanced on single titanium foot, opposite leg held forward off deck.
+- **END**: UNIT-0 dummy in bottom single-leg pistol squat, non-working leg parallel to the floor, robotic balance.

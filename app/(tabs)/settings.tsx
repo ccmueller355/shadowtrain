@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import {
   Image,
+  ImageSourcePropType,
+  Modal,
   ScrollView,
   Share,
   StyleSheet,
@@ -17,10 +19,10 @@ import {
   serializeSessionsCsv,
 } from '../../src/engine/portability';
 import {
+  ALL_TRAINERS,
   canUnlockTrainer,
   getTrainerById,
   isTrainerUnlocked,
-  SHADOW_TRAINERS,
 } from '../../src/engine/trainers';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
 import { useProfileStore } from '../../src/stores/profileStore';
@@ -77,14 +79,16 @@ export default function SettingsScreen() {
   const exercises = useExerciseStore((s) => s.exercises);
 
   const [selectedTrainerId, setSelectedTrainerId] = useState<TrainerId>(
-    profile.activeTrainerId ?? 'orc-merc',
+    profile.activeTrainerId ?? 'drone-unit-0',
   );
   const [payloadText, setPayloadText] = useState('');
   const [portabilityStatus, setPortabilityStatus] = useState<string | null>(null);
+  const [fullViewImage, setFullViewImage] = useState<ImageSourcePropType | null>(null);
+  const [fullViewTitle, setFullViewTitle] = useState('');
 
   const selectedTrainer = getTrainerById(selectedTrainerId);
   const selectedUnlocked = isTrainerUnlocked(profile, selectedTrainer.id);
-  const selectedActive = (profile.activeTrainerId ?? 'orc-merc') === selectedTrainer.id;
+  const selectedActive = (profile.activeTrainerId ?? 'drone-unit-0') === selectedTrainer.id;
   const selectedAffordable = canUnlockTrainer(profile, selectedTrainer.id);
 
   const allSessions = activeSession ? [activeSession, ...recentSessions] : recentSessions;
@@ -161,11 +165,13 @@ export default function SettingsScreen() {
         </View>
       </View>
 
-      <Text style={[styles.section, ts.sectionHeader]}>SHADOW TRAINER ROSTER (5 DOSSIERS)</Text>
+      <Text style={[styles.section, ts.sectionHeader]}>
+        TRAINER ROSTER (UNIT-0 + 5 SPECIALISTS)
+      </Text>
       <View style={styles.trainerRosterRow}>
-        {SHADOW_TRAINERS.map((trainer) => {
+        {ALL_TRAINERS.map((trainer) => {
           const isSelected = trainer.id === selectedTrainer.id;
-          const isActive = (profile.activeTrainerId ?? 'orc-merc') === trainer.id;
+          const isActive = (profile.activeTrainerId ?? 'drone-unit-0') === trainer.id;
           const unlocked = isTrainerUnlocked(profile, trainer.id);
 
           return (
@@ -181,7 +187,7 @@ export default function SettingsScreen() {
               ]}
               onPress={() => setSelectedTrainerId(trainer.id)}
             >
-              <Image source={trainer.portrait} style={styles.trainerThumb} />
+              <Image source={trainer.portrait} style={styles.trainerThumb} resizeMode="contain" />
               <Text style={[styles.trainerCallsign, isSelected ? ts.accent : ts.text]}>
                 {trainer.callsign}
               </Text>
@@ -196,11 +202,23 @@ export default function SettingsScreen() {
       <CyberpunkCard style={styles.dossierCard}>
         <View testID="trainer-dossier-card">
           <View style={styles.dossierHeader}>
-            <Image
-              source={selectedTrainer.portrait}
-              style={[styles.dossierPortrait, { borderColor: theme.colors.primary }]}
-              testID="trainer-dossier-image"
-            />
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                setFullViewImage(selectedTrainer.portrait);
+                setFullViewTitle(`${selectedTrainer.name.toUpperCase()} // FULL DOSSIER RENDER`);
+              }}
+              style={styles.dossierPortraitWrapper}
+              testID="trainer-dossier-image-btn"
+            >
+              <Image
+                source={selectedTrainer.portrait}
+                style={[styles.dossierPortrait, { borderColor: theme.colors.primary }]}
+                resizeMode="contain"
+                testID="trainer-dossier-image"
+              />
+              <Text style={[styles.dossierExpandHint, ts.textMuted]}>🔍 FULL VIEW</Text>
+            </TouchableOpacity>
             <View style={styles.dossierTitleCol}>
               <Text style={[styles.dossierName, ts.accent]} testID="trainer-dossier-name">
                 {selectedTrainer.name}
@@ -496,6 +514,50 @@ export default function SettingsScreen() {
           onChangeText={setPayloadText}
         />
       </CyberpunkCard>
+
+      {/* Full-view modal for trainer portrait render */}
+      <Modal
+        visible={!!fullViewImage}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setFullViewImage(null)}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setFullViewImage(null)}
+          style={styles.modalBackdrop}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+            style={[styles.modalCard, { borderColor: theme.colors.primary }]}
+          >
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, ts.accent]} numberOfLines={1} ellipsizeMode="tail">
+                {fullViewTitle}
+              </Text>
+              <TouchableOpacity
+                onPress={() => setFullViewImage(null)}
+                style={styles.modalCloseBtn}
+                testID="close-fullview-modal"
+              >
+                <Text style={styles.modalCloseText}>✕ CLOSE</Text>
+              </TouchableOpacity>
+            </View>
+            {fullViewImage && (
+              <Image source={fullViewImage} style={styles.modalFullImage} resizeMode="contain" />
+            )}
+            <TouchableOpacity
+              onPress={() => setFullViewImage(null)}
+              style={styles.modalBottomDismissBtn}
+            >
+              <Text style={[styles.modalBottomDismissText, ts.textMuted]}>
+                [ TAP ANYWHERE OR PRESS TO CLOSE ]
+              </Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
     </ScrollView>
   );
 }
@@ -531,17 +593,33 @@ const styles = StyleSheet.create({
     padding: 6,
     alignItems: 'center',
   },
-  trainerThumb: { width: 44, height: 44, borderRadius: 6, marginBottom: 4 },
+  trainerThumb: {
+    width: 44,
+    height: 48,
+    borderRadius: 6,
+    marginBottom: 4,
+    backgroundColor: '#0c0914',
+  },
   trainerCallsign: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
   trainerStatus: { fontSize: 9, fontFamily: 'monospace', marginTop: 2 },
   dossierCard: { marginBottom: 20, padding: 12 },
   dossierHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  dossierPortraitWrapper: {
+    alignItems: 'center',
+    marginRight: 12,
+  },
   dossierPortrait: {
-    width: 84,
-    height: 84,
+    width: 90,
+    height: 110,
     borderRadius: 8,
     borderWidth: 1,
-    marginRight: 12,
+    backgroundColor: '#0c0914',
+  },
+  dossierExpandHint: {
+    fontSize: 9,
+    fontFamily: 'monospace',
+    marginTop: 4,
+    letterSpacing: 0.5,
   },
   dossierTitleCol: { flex: 1 },
   dossierName: { fontSize: 15, fontWeight: 'bold', fontFamily: 'monospace' },
@@ -598,5 +676,70 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'monospace',
     textAlignVertical: 'top',
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(5, 3, 10, 0.94)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  modalCard: {
+    width: '100%',
+    maxHeight: '90%',
+    backgroundColor: '#14101c',
+    borderRadius: 12,
+    borderWidth: 1.5,
+    padding: 14,
+    alignItems: 'center',
+  },
+  modalHeader: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2a2236',
+    paddingBottom: 8,
+    gap: 8,
+  },
+  modalTitle: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    letterSpacing: 0.5,
+    paddingRight: 4,
+  },
+  modalCloseBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ff4444',
+    backgroundColor: 'rgba(255, 68, 68, 0.15)',
+    flexShrink: 0,
+  },
+  modalCloseText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    color: '#ff5555',
+  },
+  modalFullImage: {
+    width: '100%',
+    height: 440,
+    maxHeight: '80%',
+  },
+  modalBottomDismissBtn: {
+    marginTop: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  modalBottomDismissText: {
+    fontSize: 10,
+    fontFamily: 'monospace',
+    letterSpacing: 0.5,
   },
 });

@@ -24,8 +24,21 @@ export default withMermaid(
 
       nav: [
         { text: 'Home', link: '/' },
+        { text: 'Operator Manual', link: '/manual' },
         { text: 'MVP Spec', link: '/spec' },
-        { text: '5 Shadow Trainers', link: '/image-prompts' },
+        {
+          text: 'Shadow Dossier',
+          items: [
+            { text: 'Roster Overview', link: '/trainers/' },
+            { text: '00 // UNIT-0 Spar-Drone', link: '/trainers/drone' },
+            { text: '01 // Kaelen "Tusk" Vorga', link: '/trainers/kaelen' },
+            { text: '02 // Valerie "Glitch" Vance', link: '/trainers/valerie' },
+            { text: '03 // Marcus "Vanguard" Kade', link: '/trainers/marcus' },
+            { text: '04 // Soren "Wraith" Kael', link: '/trainers/soren' },
+            { text: '05 // Lyra "Aether" Vael', link: '/trainers/lyra' },
+          ],
+        },
+        { text: 'Art Prompts', link: '/image-prompts' },
         { text: 'CI & Testing', link: '/ci-and-testing' },
         { text: 'Coverage', link: '/coverage' },
       ],
@@ -36,10 +49,23 @@ export default withMermaid(
             text: 'ShadowTrain Deck',
             items: [
               { text: 'Overview & Roadmap', link: '/' },
+              { text: 'Field Operator Manual', link: '/manual' },
               { text: 'MVP Plan & Spec (M0–M10)', link: '/spec' },
-              { text: '5 Shadow Trainers & Art Prompts', link: '/image-prompts' },
               { text: 'CI, Pre-Commit & CT Tests', link: '/ci-and-testing' },
               { text: 'Code Coverage', link: '/coverage' },
+            ],
+          },
+          {
+            text: 'Shadow Dossier // Specialists',
+            items: [
+              { text: 'Roster Overview', link: '/trainers/' },
+              { text: '00 // UNIT-0 Spar-Drone', link: '/trainers/drone' },
+              { text: '01 // Kaelen "Tusk" Vorga', link: '/trainers/kaelen' },
+              { text: '02 // Valerie "Glitch" Vance', link: '/trainers/valerie' },
+              { text: '03 // Marcus "Vanguard" Kade', link: '/trainers/marcus' },
+              { text: '04 // Soren "Wraith" Kael', link: '/trainers/soren' },
+              { text: '05 // Lyra "Aether" Vael', link: '/trainers/lyra' },
+              { text: 'Generative Art Prompts', link: '/image-prompts' },
             ],
           },
         ],
