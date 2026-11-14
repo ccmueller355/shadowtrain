@@ -31,6 +31,7 @@ interface RadioState {
   setRadioVolume: (vol: number) => void;
   setCustomStreamUrl: (url: string) => void;
   toggleFavorite: (station: RadioStation) => void;
+  togglePresetFavorite: (preset: RadioPreset) => Promise<void>;
   playStation: (station: RadioStation) => Promise<void>;
   playPreset: (preset: RadioPreset) => Promise<void>;
   togglePlayPause: () => void;
@@ -135,7 +136,9 @@ export const useRadioStore = create<RadioState>()(
         radioEnabled: false,
         radioVolume: 0.7,
         favorites: DEFAULT_FAVORITE_STATIONS,
-        resolvedPresetCache: {},
+        resolvedPresetCache: {
+          'de-sunshine-workout': DEFAULT_FAVORITE_STATIONS[0],
+        },
         customStreamUrl: '',
         activeStation: null,
         isPlaying: false,
@@ -172,6 +175,23 @@ export const useRadioStore = create<RadioState>()(
                 : [station, ...s.favorites],
             };
           }),
+
+        togglePresetFavorite: async (preset) => {
+          let station = get().resolvedPresetCache[preset.id];
+          if (!station) {
+            try {
+              const resolved = await resolvePresetStation(preset);
+              if (!resolved) return;
+              station = resolved;
+              set((s) => ({
+                resolvedPresetCache: { ...s.resolvedPresetCache, [preset.id]: resolved },
+              }));
+            } catch {
+              return;
+            }
+          }
+          get().toggleFavorite(station);
+        },
 
         playStation: async (station, expectedSeq?: number) => {
           const seq = expectedSeq ?? (playSeq += 1);

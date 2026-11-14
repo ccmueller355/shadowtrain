@@ -9,13 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {
-  RADIO_PRESETS,
-  RadioPreset,
-  RadioStation,
-  resolvePresetStation,
-  searchRadioStations,
-} from '../engine/radio';
+import { RADIO_PRESETS, RadioStation, searchRadioStations } from '../engine/radio';
 import { useRadioStore } from '../stores/radioStore';
 import { useAppTheme } from '../theme/useTheme';
 import { useThemeStyles } from '../theme/useThemeStyles';
@@ -43,6 +37,7 @@ export function RadioPlayerBar(_props: RadioPlayerBarProps) {
   const stopRadio = useRadioStore((s) => s.stopRadio);
   const setRadioVolume = useRadioStore((s) => s.setRadioVolume);
   const toggleFavorite = useRadioStore((s) => s.toggleFavorite);
+  const togglePresetFavorite = useRadioStore((s) => s.togglePresetFavorite);
   const setCustomStreamUrl = useRadioStore((s) => s.setCustomStreamUrl);
 
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -90,29 +85,6 @@ export function RadioPlayerBar(_props: RadioPlayerBarProps) {
       tags: 'custom',
       streamUrl: uri,
     });
-  };
-
-  const handleTogglePresetFavorite = async (preset: RadioPreset) => {
-    const existingFav = favorites.find(
-      (f) =>
-        f.id === resolvedPresetCache[preset.id]?.id ||
-        f.name.toLowerCase().includes(preset.searchName.toLowerCase()),
-    );
-    if (existingFav) {
-      toggleFavorite(existingFav);
-      return;
-    }
-    const cached = resolvedPresetCache[preset.id];
-    if (cached) {
-      toggleFavorite(cached);
-      return;
-    }
-    try {
-      const resolved = await resolvePresetStation(preset);
-      if (resolved) toggleFavorite(resolved);
-    } catch {
-      // Ignore lookup failures when toggling favorite
-    }
   };
 
   return (
@@ -331,14 +303,10 @@ export function RadioPlayerBar(_props: RadioPlayerBarProps) {
                   REGIONAL WORKOUT &amp; ELECTRONIC PRESETS
                 </Text>
                 {filteredPresets.map((preset) => {
-                  const isSelected = activeStation?.name
-                    .toLowerCase()
-                    .includes(preset.searchName.toLowerCase());
-                  const isPresetFav = favorites.some(
-                    (f) =>
-                      f.id === resolvedPresetCache[preset.id]?.id ||
-                      f.name.toLowerCase().includes(preset.searchName.toLowerCase()),
-                  );
+                  const cachedStation = resolvedPresetCache[preset.id];
+                  const isSelected = !!cachedStation && activeStation?.id === cachedStation.id;
+                  const isPresetFav =
+                    !!cachedStation && favorites.some((f) => f.id === cachedStation.id);
                   return (
                     <View
                       key={preset.id}
@@ -352,7 +320,7 @@ export function RadioPlayerBar(_props: RadioPlayerBarProps) {
                     >
                       <TouchableOpacity
                         testID={`radio-preset-fav-${preset.id}`}
-                        onPress={() => void handleTogglePresetFavorite(preset)}
+                        onPress={() => void togglePresetFavorite(preset)}
                         style={styles.rowStarBtn}
                       >
                         <Text

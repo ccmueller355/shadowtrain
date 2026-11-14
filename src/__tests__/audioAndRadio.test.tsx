@@ -352,6 +352,27 @@ describe('M14: Cyber-Audio Sound Pack & Workout Radio', () => {
       fireEvent.press(getByTestId(`radio-preset-fav-${RADIO_PRESETS[0].id}`));
       expect(useRadioStore.getState().favorites).toHaveLength(0);
 
+      // Starring de-sunshine-workout must only star de-sunshine-workout (not Sunshine Live or I ♥ Workout)
+      fireEvent.press(getByTestId('radio-preset-fav-de-sunshine-workout'));
+      await waitFor(() => {
+        expect(useRadioStore.getState().favorites).toHaveLength(1);
+        expect(
+          getByTestId('radio-preset-fav-de-sunshine-workout').findAll(
+            (n) => n.props.children === '★',
+          ).length,
+        ).toBeGreaterThan(0);
+      });
+      expect(
+        getByTestId('radio-preset-fav-de-sunshine-live').findAll((n) => n.props.children === '★'),
+      ).toHaveLength(0);
+      expect(
+        getByTestId('radio-preset-fav-eu-iloveworkout').findAll((n) => n.props.children === '★'),
+      ).toHaveLength(0);
+      fireEvent.press(getByTestId('radio-preset-fav-de-sunshine-workout'));
+      await waitFor(() => {
+        expect(useRadioStore.getState().favorites).toHaveLength(0);
+      });
+
       fireEvent.changeText(getByTestId('radio-search-input'), 'synthwave');
       fireEvent.press(getByTestId('radio-search-submit'));
 
