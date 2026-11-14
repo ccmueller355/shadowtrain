@@ -420,6 +420,7 @@ export const RIG_KEYFRAMES: Record<string, ExerciseRigKeyframes> = {
       wristL: { x: 58, y: 98 },
       wristR: { x: 142, y: 98 },
       prop: 'rope',
+      propPos: { x: 100, y: 196 },
     },
     end: {
       ...STAND_BASE,
@@ -437,6 +438,7 @@ export const RIG_KEYFRAMES: Record<string, ExerciseRigKeyframes> = {
       ankleL: { x: 84, y: 164 },
       ankleR: { x: 116, y: 164 },
       prop: 'rope',
+      propPos: { x: 100, y: 4 },
     },
   },
   'ring-pull-up': {
