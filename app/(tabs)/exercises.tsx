@@ -25,6 +25,9 @@ import {
   isTrainerUnlocked,
 } from '../../src/engine/trainers';
 import { getExerciseShowcase } from '../../src/engine/exerciseShowcases';
+import { getRigKeyframesForExercise } from '../../src/engine/cyberRig';
+import { getRigSkinForTrainer } from '../../src/engine/rigSkins';
+import { CyberRigView } from '../../src/components/CyberRigView';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { Equipment, Exercise } from '../../src/types';
 
@@ -67,6 +70,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
   const availableEquipment = profile.availableEquipment;
   const getLastWorkingSets = useSessionStore((s) => s.getLastWorkingSets);
   const [detailExercise, setDetailExercise] = useState<Exercise | null>(null);
+  const [rigMode, setRigMode] = useState<'static' | 'rig'>('static');
 
   const exercises = useExerciseStore((s) => s.exercises);
   const searchQuery = useExerciseStore((s) => s.searchQuery);
@@ -116,6 +120,9 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
     const { coach, isSpecialist, specialist, coachingCue } = coachDisplay;
     const isSpecialistUnlocked = isTrainerUnlocked(profile, specialist.id);
     const showcase = getExerciseShowcase(detailExercise.id, !isSpecialistUnlocked);
+    const hasStaticShowcase = Boolean(showcase?.start || showcase?.end);
+    const rigKeyframes = getRigKeyframesForExercise(detailExercise);
+    const rigSkin = getRigSkinForTrainer(coach.id);
     const nextProgression = detailExercise.nextProgressionId
       ? exercises.find((e) => e.id === detailExercise.nextProgressionId)
       : undefined;
@@ -192,11 +199,31 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
               </View>
             </View>
 
-            {/* Start/End showcase poses; themed fallback card when none bundled */}
-            {showcase?.start || showcase?.end ? (
+            {/* Start/End showcase poses; [STATIC] / [2D RIG] toggle or automatic 2D rig fallback */}
+            {hasStaticShowcase ? (
+              <View style={styles.rigToggleRow}>
+                <TouchableOpacity
+                  testID="toggle-rig-mode"
+                  onPress={() => setRigMode((m) => (m === 'static' ? 'rig' : 'static'))}
+                  style={[
+                    styles.rigToggleBtn,
+                    {
+                      borderColor: theme.colors.primary,
+                      backgroundColor: rigMode === 'rig' ? theme.colors.checkedBg : 'transparent',
+                    },
+                  ]}
+                >
+                  <Text style={[styles.rigToggleText, ts.accent]}>
+                    {rigMode === 'rig' ? '[2D RIG] ⇄ STATIC' : '[STATIC] ⇄ 2D RIG'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
+
+            {hasStaticShowcase && rigMode === 'static' ? (
               <View style={styles.poseRowContainer}>
                 <View style={styles.poseRow} testID="exercise-pose-images">
-                  {showcase.start ? (
+                  {showcase?.start ? (
                     <TouchableOpacity
                       activeOpacity={0.8}
                       onPress={() =>
@@ -217,7 +244,7 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
                       <Text style={[styles.poseCaption, ts.textMuted]}>START [🔍 FULL]</Text>
                     </TouchableOpacity>
                   ) : null}
-                  {showcase.end ? (
+                  {showcase?.end ? (
                     <TouchableOpacity
                       activeOpacity={0.8}
                       onPress={() =>
@@ -264,22 +291,28 @@ export default function ExercisesScreen({ onSelectExercise }: ExercisesScreenPro
               </View>
             ) : (
               <View
-                testID="exercise-pose-fallback-card"
-                style={[
-                  styles.poseFallback,
-                  {
-                    borderColor: theme.colors.primary,
-                    backgroundColor: theme.colors.surface,
-                  },
-                ]}
+                testID={hasStaticShowcase ? 'exercise-rig-poses' : 'exercise-pose-fallback-card'}
+                style={styles.poseRowContainer}
               >
-                <Text style={[styles.poseCode, ts.accent]}>
-                  POSE // {specialist.callsign} · {detailExercise.equipment.toUpperCase()}
-                </Text>
-                <Text style={[styles.poseTitle, ts.text]}>{detailExercise.name}</Text>
-                <Text style={[styles.poseMeta, ts.textMuted]}>
-                  HD SPECIALIST SHOWCASE // Æ CYBERNETICS RIG
-                </Text>
+                <View style={styles.poseRow}>
+                  <View style={styles.poseCol}>
+                    <CyberRigView
+                      pose={rigKeyframes.start}
+                      skin={rigSkin}
+                      caption="START POSE"
+                      testID="exercise-rig-start"
+                    />
+                  </View>
+                  <View style={styles.poseCol}>
+                    <CyberRigView
+                      pose={rigKeyframes.end}
+                      skin={rigSkin}
+                      caption="END POSE"
+                      testID="exercise-rig-end"
+                    />
+                  </View>
+                </View>
+                <Text style={[styles.poseMeta, ts.textMuted]}>2D CYBER-RIG // {rigSkin.label}</Text>
               </View>
             )}
           </CyberpunkCard>
@@ -773,5 +806,21 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'monospace',
     letterSpacing: 0.5,
+  },
+  rigToggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 8,
+  },
+  rigToggleBtn: {
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  rigToggleText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
   },
 });
