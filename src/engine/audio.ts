@@ -23,8 +23,8 @@ const CUE_ASSETS: Record<CyberCueId, number> = {
 
 export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
   'drone-unit-0': {
-    pitch: 0.78,
-    rate: 1.05,
+    pitch: 0.72,
+    rate: 1.14,
     gender: 'male',
     quips: {
       rest_done: ['Rest cycle complete. Engage next set.', 'Biometrics nominal. Resume output.'],
@@ -34,8 +34,8 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'orc-merc': {
-    pitch: 0.56,
-    rate: 0.88,
+    pitch: 0.52,
+    rate: 0.85,
     gender: 'male',
     quips: {
       rest_done: ['Time is up, chummer. Back on the iron.', 'Rest over. Move that steel.'],
@@ -45,8 +45,8 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'human-decker': {
-    pitch: 1.1,
-    rate: 1.08,
+    pitch: 1.18,
+    rate: 1.1,
     gender: 'female',
     quips: {
       rest_done: ['Timer zeroed. Jack back in, partner.', 'Green light on the deck. Next set.'],
@@ -59,8 +59,8 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'human-soldier': {
-    pitch: 0.84,
-    rate: 1.0,
+    pitch: 0.66,
+    rate: 0.96,
     gender: 'male',
     quips: {
       rest_done: ['Rest expired. Back on station.', 'Clock hit zero. Next set, move.'],
@@ -73,8 +73,8 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'elf-wraith': {
-    pitch: 0.96,
-    rate: 1.02,
+    pitch: 0.76,
+    rate: 1.04,
     gender: 'male',
     quips: {
       rest_done: ['Silence ends. Strike the next set.', 'The clock is zero. Flow again.'],
@@ -84,8 +84,8 @@ export const TRAINER_VOICE_PROFILES: Record<TrainerId, TrainerVoiceProfile> = {
     },
   },
   'elf-mage': {
-    pitch: 1.12,
-    rate: 0.96,
+    pitch: 1.28,
+    rate: 0.92,
     gender: 'female',
     quips: {
       rest_done: ['Mana recharged. Channel the next set.', 'The weave is ready. Begin.'],
@@ -154,12 +154,18 @@ function pickVoiceForGender(
 ): string | undefined {
   const enVoices = voices.filter((v) => v.language?.toLowerCase().startsWith('en'));
   const pool = enVoices.length > 0 ? enVoices : voices;
+  if (pool.length === 0) return undefined;
   const hints = gender === 'male' ? MALE_VOICE_HINTS : FEMALE_VOICE_HINTS;
   const match = pool.find((v) => {
     const haystack = `${v.identifier} ${v.name ?? ''}`.toLowerCase();
     return hints.some((h) => haystack.includes(h));
   });
-  return match?.identifier;
+  if (match) return match.identifier;
+  // Fallback when OS voice names don't include gender hints: split pool by index
+  if (pool.length > 1) {
+    return gender === 'male' ? pool[pool.length - 1].identifier : pool[0].identifier;
+  }
+  return pool[0].identifier;
 }
 
 export function registerRadioDuckHandler(handler: DuckHandler | null): void {
