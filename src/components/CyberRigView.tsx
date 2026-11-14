@@ -31,26 +31,51 @@ interface CyberRigViewProps {
 }
 
 const GRID_COORDS = [40, 80, 120, 160];
+const PROP_HIGHLIGHT = '#fde047';
 
-function renderProp(pose: RigPose, skin: RigSkin): React.ReactNode {
+function renderProp(pose: RigPose, skin: RigSkin, layer: 'back' | 'front'): React.ReactNode {
   const { prop, propPos } = pose;
+  if (layer === 'back') {
+    if (prop === 'wall') {
+      return (
+        <Line
+          x1={28}
+          y1={16}
+          x2={28}
+          y2={182}
+          stroke={skin.accentColor}
+          strokeWidth={3}
+          strokeOpacity={0.5}
+        />
+      );
+    }
+    return null;
+  }
+
   if (prop === 'kettlebell' && propPos) {
     return (
       <>
         <Path
           d={`M ${propPos.x - 5} ${propPos.y - 4} A 5 5 0 0 1 ${propPos.x + 5} ${propPos.y - 4}`}
-          stroke={skin.accentColor}
+          stroke="#0b1120"
+          strokeWidth={4.5}
+          fill="none"
+        />
+        <Path
+          d={`M ${propPos.x - 5} ${propPos.y - 4} A 5 5 0 0 1 ${propPos.x + 5} ${propPos.y - 4}`}
+          stroke={PROP_HIGHLIGHT}
           strokeWidth={2.5}
           fill="none"
         />
+        <Circle cx={propPos.x} cy={propPos.y + 5} r={9} fill="#0b1120" />
         <Circle
           cx={propPos.x}
           cy={propPos.y + 5}
           r={8}
-          fill={skin.accentColor}
-          fillOpacity={0.28}
-          stroke={skin.accentColor}
-          strokeWidth={2}
+          fill={PROP_HIGHLIGHT}
+          fillOpacity={0.32}
+          stroke={PROP_HIGHLIGHT}
+          strokeWidth={2.5}
         />
       </>
     );
@@ -63,7 +88,7 @@ function renderProp(pose: RigPose, skin: RigSkin): React.ReactNode {
           y1={0}
           x2={pose.wristL.x}
           y2={pose.wristL.y}
-          stroke="#475569"
+          stroke="#64748b"
           strokeWidth={2}
         />
         <Line
@@ -71,14 +96,22 @@ function renderProp(pose: RigPose, skin: RigSkin): React.ReactNode {
           y1={0}
           x2={pose.wristR.x}
           y2={pose.wristR.y}
-          stroke="#475569"
+          stroke="#64748b"
           strokeWidth={2}
         />
         <Circle
           cx={pose.wristL.x}
           cy={pose.wristL.y}
           r={6}
-          stroke={skin.accentColor}
+          stroke="#0b1120"
+          strokeWidth={4.5}
+          fill="none"
+        />
+        <Circle
+          cx={pose.wristL.x}
+          cy={pose.wristL.y}
+          r={6}
+          stroke={PROP_HIGHLIGHT}
           strokeWidth={2.5}
           fill="none"
         />
@@ -86,7 +119,15 @@ function renderProp(pose: RigPose, skin: RigSkin): React.ReactNode {
           cx={pose.wristR.x}
           cy={pose.wristR.y}
           r={6}
-          stroke={skin.accentColor}
+          stroke="#0b1120"
+          strokeWidth={4.5}
+          fill="none"
+        />
+        <Circle
+          cx={pose.wristR.x}
+          cy={pose.wristR.y}
+          r={6}
+          stroke={PROP_HIGHLIGHT}
           strokeWidth={2.5}
           fill="none"
         />
@@ -100,23 +141,10 @@ function renderProp(pose: RigPose, skin: RigSkin): React.ReactNode {
     return (
       <Path
         d={`M ${pose.wristL.x} ${pose.wristL.y} Q 100 ${ctrlY} ${pose.wristR.x} ${pose.wristR.y}`}
-        stroke={skin.accentColor}
-        strokeWidth={2}
+        stroke={PROP_HIGHLIGHT}
+        strokeWidth={2.5}
         strokeDasharray="4,3"
         fill="none"
-      />
-    );
-  }
-  if (prop === 'wall') {
-    return (
-      <Line
-        x1={28}
-        y1={16}
-        x2={28}
-        y2={182}
-        stroke={skin.accentColor}
-        strokeWidth={3}
-        strokeOpacity={0.5}
       />
     );
   }
@@ -275,7 +303,7 @@ export function CyberRigView({
           strokeWidth={2}
         />
 
-        {renderProp(pose, skin)}
+        {renderProp(pose, skin, 'back')}
 
         {/* Armored Cyber-Cuirass / Torso Silhouette with Carbon-Fiber Weave */}
         <Polygon
@@ -385,6 +413,7 @@ export function CyberRigView({
         ))}
 
         {renderHeadGlyph(pose, skin)}
+        {renderProp(pose, skin, 'front')}
       </Svg>
       {caption ? <Text style={styles.caption}>{caption}</Text> : null}
     </View>
