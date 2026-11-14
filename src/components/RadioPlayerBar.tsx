@@ -9,7 +9,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { RADIO_PRESETS, RadioStation, searchRadioStations } from '../engine/radio';
+import {
+  RADIO_PRESETS,
+  RadioPreset,
+  RadioStation,
+  resolvePresetStation,
+  searchRadioStations,
+} from '../engine/radio';
 import { useRadioStore } from '../stores/radioStore';
 import { useAppTheme } from '../theme/useTheme';
 import { useThemeStyles } from '../theme/useThemeStyles';
@@ -18,7 +24,7 @@ interface RadioPlayerBarProps {
   compact?: boolean;
 }
 
-export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
+export function RadioPlayerBar(_props: RadioPlayerBarProps) {
   const theme = useAppTheme();
   const ts = useThemeStyles();
 
@@ -27,6 +33,7 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
   const isLoading = useRadioStore((s) => s.isLoading);
   const radioVolume = useRadioStore((s) => s.radioVolume);
   const favorites = useRadioStore((s) => s.favorites);
+  const resolvedPresetCache = useRadioStore((s) => s.resolvedPresetCache);
   const customStreamUrl = useRadioStore((s) => s.customStreamUrl);
   const error = useRadioStore((s) => s.error);
 
@@ -83,6 +90,29 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
       tags: 'custom',
       streamUrl: uri,
     });
+  };
+
+  const handleTogglePresetFavorite = async (preset: RadioPreset) => {
+    const existingFav = favorites.find(
+      (f) =>
+        f.id === resolvedPresetCache[preset.id]?.id ||
+        f.name.toLowerCase().includes(preset.searchName.toLowerCase()),
+    );
+    if (existingFav) {
+      toggleFavorite(existingFav);
+      return;
+    }
+    const cached = resolvedPresetCache[preset.id];
+    if (cached) {
+      toggleFavorite(cached);
+      return;
+    }
+    try {
+      const resolved = await resolvePresetStation(preset);
+      if (resolved) toggleFavorite(resolved);
+    } catch {
+      // Ignore lookup failures when toggling favorite
+    }
   };
 
   return (
@@ -165,33 +195,19 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
 
       {error ? <Text style={[styles.errText, { color: theme.colors.danger }]}>{error}</Text> : null}
 
-      {/* Station Picker Trigger + Quick Favorite */}
-      <View style={styles.launcherRow}>
-        <TouchableOpacity
-          testID="radio-open-picker"
-          onPress={() => setPickerOpen(true)}
-          style={[
-            styles.pickerBtn,
-            { borderColor: theme.colors.primary, backgroundColor: theme.colors.checkedBg },
-          ]}
-        >
-          <Text style={[styles.pickerBtnText, ts.accent]}>
-            📻 STATIONS ({RADIO_PRESETS.length}) // SEARCH
-          </Text>
-        </TouchableOpacity>
-
-        {!compact && favorites.length > 0 ? (
-          <TouchableOpacity
-            testID="radio-quick-fav-0"
-            onPress={() => void playStation(favorites[0])}
-            style={[styles.quickFavBtn, { borderColor: theme.colors.border }]}
-          >
-            <Text style={[styles.quickFavText, ts.text]} numberOfLines={1}>
-              ★ {favorites[0].name}
-            </Text>
-          </TouchableOpacity>
-        ) : null}
-      </View>
+      {/* Station Picker Trigger */}
+      <TouchableOpacity
+        testID="radio-open-picker"
+        onPress={() => setPickerOpen(true)}
+        style={[
+          styles.pickerBtn,
+          { borderColor: theme.colors.primary, backgroundColor: theme.colors.checkedBg },
+        ]}
+      >
+        <Text style={[styles.pickerBtnText, ts.accent]}>
+          📻 STATIONS ({RADIO_PRESETS.length}) // SEARCH
+        </Text>
+      </TouchableOpacity>
 
       {/* Full-Screen Station Picker Modal */}
       <Modal visible={pickerOpen} animationType="slide" onRequestClose={() => setPickerOpen(false)}>
@@ -237,22 +253,43 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
               {searchResults.length > 0 ? (
                 <View style={styles.sectionBlock}>
                   <Text style={[styles.subLabel, ts.accent]}>LIVE SCAN RESULTS</Text>
-                  {searchResults.map((st) => (
-                    <TouchableOpacity
-                      key={st.id}
-                      testID={`radio-result-${st.id}`}
-                      onPress={() => {
-                        setPickerOpen(false);
-                        void playStation(st);
-                      }}
-                      style={[styles.resultRow, { borderColor: theme.colors.primary }]}
-                    >
-                      <Text style={[styles.resultName, ts.text]} numberOfLines={1}>
-                        [{st.countryCode || 'NET'}] {st.name}
-                      </Text>
-                      <Text style={[styles.resultMeta, ts.accent]}>▶ PLAY</Text>
-                    </TouchableOpacity>
-                  ))}
+                  {searchResults.map((st) => {
+                    const stFav = favorites.some((f) => f.id === st.id);
+                    return (
+                      <View
+                        key={st.id}
+                        style={[styles.resultRow, { borderColor: theme.colors.primary }]}
+                      >
+                        <TouchableOpacity
+                          testID={`radio-result-fav-${st.id}`}
+                          onPress={() => toggleFavorite(st)}
+                          style={styles.rowStarBtn}
+                        >
+                          <Text
+                            style={[
+                              styles.ctrlText,
+                              { color: stFav ? theme.colors.primary : theme.colors.textSecondary },
+                            ]}
+                          >
+                            {stFav ? '★' : '☆'}
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          testID={`radio-result-${st.id}`}
+                          onPress={() => {
+                            setPickerOpen(false);
+                            void playStation(st);
+                          }}
+                          style={styles.rowPlayArea}
+                        >
+                          <Text style={[styles.resultName, ts.text]} numberOfLines={1}>
+                            [{st.countryCode || 'NET'}] {st.name}
+                          </Text>
+                          <Text style={[styles.resultMeta, ts.accent]}>▶ PLAY</Text>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })}
                 </View>
               ) : null}
 
@@ -260,20 +297,31 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
                 <View style={styles.sectionBlock}>
                   <Text style={[styles.subLabel, ts.textMuted]}>★ FAVORITES</Text>
                   {favorites.map((fav) => (
-                    <TouchableOpacity
+                    <View
                       key={fav.id}
-                      testID={`radio-fav-${fav.id}`}
-                      onPress={() => {
-                        setPickerOpen(false);
-                        void playStation(fav);
-                      }}
                       style={[styles.resultRow, { borderColor: theme.colors.border }]}
                     >
-                      <Text style={[styles.resultName, ts.text]} numberOfLines={1}>
-                        ★ [{fav.countryCode || 'NET'}] {fav.name}
-                      </Text>
-                      <Text style={[styles.resultMeta, ts.accent]}>▶ PLAY</Text>
-                    </TouchableOpacity>
+                      <TouchableOpacity
+                        testID={`radio-fav-toggle-${fav.id}`}
+                        onPress={() => toggleFavorite(fav)}
+                        style={styles.rowStarBtn}
+                      >
+                        <Text style={[styles.ctrlText, { color: theme.colors.primary }]}>★</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        testID={`radio-fav-${fav.id}`}
+                        onPress={() => {
+                          setPickerOpen(false);
+                          void playStation(fav);
+                        }}
+                        style={styles.rowPlayArea}
+                      >
+                        <Text style={[styles.resultName, ts.text]} numberOfLines={1}>
+                          [{fav.countryCode || 'NET'}] {fav.name}
+                        </Text>
+                        <Text style={[styles.resultMeta, ts.accent]}>▶ PLAY</Text>
+                      </TouchableOpacity>
+                    </View>
                   ))}
                 </View>
               ) : null}
@@ -286,14 +334,14 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
                   const isSelected = activeStation?.name
                     .toLowerCase()
                     .includes(preset.searchName.toLowerCase());
+                  const isPresetFav = favorites.some(
+                    (f) =>
+                      f.id === resolvedPresetCache[preset.id]?.id ||
+                      f.name.toLowerCase().includes(preset.searchName.toLowerCase()),
+                  );
                   return (
-                    <TouchableOpacity
+                    <View
                       key={preset.id}
-                      testID={`radio-preset-${preset.id}`}
-                      onPress={() => {
-                        setPickerOpen(false);
-                        void playPreset(preset);
-                      }}
                       style={[
                         styles.resultRow,
                         {
@@ -302,11 +350,38 @@ export function RadioPlayerBar({ compact = false }: RadioPlayerBarProps) {
                         },
                       ]}
                     >
-                      <Text style={[styles.resultName, isSelected ? ts.accent : ts.text]}>
-                        [{preset.region}] {preset.label}
-                      </Text>
-                      <Text style={[styles.resultMeta, ts.accent]}>▶ TUNE</Text>
-                    </TouchableOpacity>
+                      <TouchableOpacity
+                        testID={`radio-preset-fav-${preset.id}`}
+                        onPress={() => void handleTogglePresetFavorite(preset)}
+                        style={styles.rowStarBtn}
+                      >
+                        <Text
+                          style={[
+                            styles.ctrlText,
+                            {
+                              color: isPresetFav
+                                ? theme.colors.primary
+                                : theme.colors.textSecondary,
+                            },
+                          ]}
+                        >
+                          {isPresetFav ? '★' : '☆'}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        testID={`radio-preset-${preset.id}`}
+                        onPress={() => {
+                          setPickerOpen(false);
+                          void playPreset(preset);
+                        }}
+                        style={styles.rowPlayArea}
+                      >
+                        <Text style={[styles.resultName, isSelected ? ts.accent : ts.text]}>
+                          [{preset.region}] {preset.label}
+                        </Text>
+                        <Text style={[styles.resultMeta, ts.accent]}>▶ TUNE</Text>
+                      </TouchableOpacity>
+                    </View>
                   );
                 })}
               </View>
@@ -396,32 +471,27 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'monospace',
   },
-  launcherRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   pickerBtn: {
     borderWidth: 1,
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 6,
+    alignItems: 'center',
   },
   pickerBtnText: {
     fontSize: 10,
     fontWeight: '700',
     fontFamily: 'monospace',
   },
-  quickFavBtn: {
-    flex: 1,
-    borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+  rowStarBtn: {
+    paddingRight: 8,
+    paddingVertical: 2,
   },
-  quickFavText: {
-    fontSize: 10,
-    fontFamily: 'monospace',
+  rowPlayArea: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   modalRoot: {
     flex: 1,

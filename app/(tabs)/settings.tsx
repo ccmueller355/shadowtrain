@@ -475,55 +475,6 @@ export default function SettingsScreen() {
         })}
       </View>
 
-      <Text style={[styles.section, ts.sectionHeader]}>DATA PORTABILITY (BACKUP & CSV)</Text>
-      <CyberpunkCard style={styles.portabilityCard}>
-        <View style={styles.portabilityBtnRow}>
-          <TouchableOpacity
-            testID="export-json-btn"
-            style={[styles.ioBtn, { borderColor: theme.colors.primary }]}
-            onPress={handleExportJson}
-          >
-            <Text style={[styles.ioBtnText, ts.accent]}>EXPORT .JSON</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            testID="import-json-btn"
-            style={[styles.ioBtn, { borderColor: theme.colors.primary }]}
-            onPress={handleImportJson}
-          >
-            <Text style={[styles.ioBtnText, ts.accent]}>IMPORT .JSON</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            testID="export-csv-btn"
-            style={[styles.ioBtn, { borderColor: theme.colors.primary }]}
-            onPress={handleExportCsv}
-          >
-            <Text style={[styles.ioBtnText, ts.accent]}>EXPORT .CSV</Text>
-          </TouchableOpacity>
-        </View>
-
-        {portabilityStatus && (
-          <Text style={[styles.statusText, ts.accent]} testID="portability-status">
-            {portabilityStatus}
-          </Text>
-        )}
-
-        <TextInput
-          testID="portability-payload-input"
-          style={[
-            styles.payloadInput,
-            ts.text,
-            { borderColor: theme.colors.border, backgroundColor: theme.colors.background },
-          ]}
-          multiline
-          placeholder="Exported JSON/CSV payload or paste shadowtrain-backup JSON here to restore..."
-          placeholderTextColor={theme.colors.textSecondary}
-          value={payloadText}
-          onChangeText={setPayloadText}
-        />
-      </CyberpunkCard>
-
       <Text style={[styles.section, ts.sectionHeader]}>CYBER-AUDIO &amp; WORKOUT RADIO</Text>
       <CyberpunkCard style={styles.portabilityCard}>
         <View style={styles.chipRow}>
@@ -589,6 +540,55 @@ export default function SettingsScreen() {
         </View>
 
         {radioEnabled ? <RadioPlayerBar /> : null}
+      </CyberpunkCard>
+
+      <Text style={[styles.section, ts.sectionHeader]}>DATA PORTABILITY (BACKUP & CSV)</Text>
+      <CyberpunkCard style={styles.portabilityCard}>
+        <View style={styles.portabilityBtnRow}>
+          <TouchableOpacity
+            testID="export-json-btn"
+            style={[styles.ioBtn, { borderColor: theme.colors.primary }]}
+            onPress={handleExportJson}
+          >
+            <Text style={[styles.ioBtnText, ts.accent]}>EXPORT .JSON</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="import-json-btn"
+            style={[styles.ioBtn, { borderColor: theme.colors.primary }]}
+            onPress={handleImportJson}
+          >
+            <Text style={[styles.ioBtnText, ts.accent]}>IMPORT .JSON</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            testID="export-csv-btn"
+            style={[styles.ioBtn, { borderColor: theme.colors.primary }]}
+            onPress={handleExportCsv}
+          >
+            <Text style={[styles.ioBtnText, ts.accent]}>EXPORT .CSV</Text>
+          </TouchableOpacity>
+        </View>
+
+        {portabilityStatus && (
+          <Text style={[styles.statusText, ts.accent]} testID="portability-status">
+            {portabilityStatus}
+          </Text>
+        )}
+
+        <TextInput
+          testID="portability-payload-input"
+          style={[
+            styles.payloadInput,
+            ts.text,
+            { borderColor: theme.colors.border, backgroundColor: theme.colors.background },
+          ]}
+          multiline
+          placeholder="Exported JSON/CSV payload or paste shadowtrain-backup JSON here to restore..."
+          placeholderTextColor={theme.colors.textSecondary}
+          value={payloadText}
+          onChangeText={setPayloadText}
+        />
       </CyberpunkCard>
 
       {/* Full-view modal for trainer portrait render */}

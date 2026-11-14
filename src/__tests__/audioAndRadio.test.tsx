@@ -349,6 +349,9 @@ describe('M14: Cyber-Audio Sound Pack & Workout Radio', () => {
       fireEvent.press(getByTestId('radio-stop-btn'));
 
       fireEvent.press(getByTestId('radio-open-picker'));
+      fireEvent.press(getByTestId(`radio-preset-fav-${RADIO_PRESETS[0].id}`));
+      expect(useRadioStore.getState().favorites).toHaveLength(0);
+
       fireEvent.changeText(getByTestId('radio-search-input'), 'synthwave');
       fireEvent.press(getByTestId('radio-search-submit'));
 
@@ -356,6 +359,10 @@ describe('M14: Cyber-Audio Sound Pack & Workout Radio', () => {
         expect(getByTestId('radio-result-res-1')).toBeTruthy();
       });
 
+      fireEvent.press(getByTestId('radio-result-fav-res-1'));
+      expect(useRadioStore.getState().favorites).toHaveLength(1);
+      fireEvent.press(getByTestId('radio-fav-toggle-res-1'));
+      expect(useRadioStore.getState().favorites).toHaveLength(0);
       fireEvent.press(getByTestId('radio-result-res-1'));
       await waitFor(() => {
         expect(useRadioStore.getState().activeStation?.id).toBe('res-1');
