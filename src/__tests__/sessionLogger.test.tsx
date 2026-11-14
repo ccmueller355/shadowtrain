@@ -263,6 +263,34 @@ describe('M3 Session Logger, Rest Timer, Home Resume & Session Store', () => {
 
       vibrateSpy.mockRestore();
     });
+
+    it('offers optional CULT cooldown blocks in session and allows adding or skipping', () => {
+      render(<SessionLoggerScreen sessionId="session-cooldown-test" />);
+
+      // Cooldown box is visible with both bio-hacker and full-body cooldown options
+      expect(screen.getByTestId('session-cooldown-box')).toBeTruthy();
+      expect(screen.getByTestId('add-cooldown-desk-posture-reset')).toBeTruthy();
+      expect(screen.getByTestId('add-cooldown-cooldown-express')).toBeTruthy();
+
+      // Tapping Express Cooldown appends its stretches and closes the cooldown box
+      fireEvent.press(screen.getByTestId('add-cooldown-cooldown-express'));
+      const entries = useSessionStore.getState().activeSession?.entries ?? [];
+      expect(entries.map((e) => e.exerciseId)).toEqual([
+        'stretch-cat-cow',
+        'stretch-downward-dog-calf',
+        'stretch-figure-four',
+        'stretch-doorway-pec',
+      ]);
+      expect(screen.queryByTestId('session-cooldown-box')).toBeNull();
+    });
+
+    it('allows skipping the optional CULT cooldown box', () => {
+      render(<SessionLoggerScreen sessionId="session-cooldown-skip" />);
+
+      expect(screen.getByTestId('session-cooldown-box')).toBeTruthy();
+      fireEvent.press(screen.getByTestId('skip-cooldown-btn'));
+      expect(screen.queryByTestId('session-cooldown-box')).toBeNull();
+    });
   });
 
   describe('HomeScreen Resume Banner & Recent Sessions List', () => {

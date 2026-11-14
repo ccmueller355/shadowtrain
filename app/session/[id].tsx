@@ -9,6 +9,7 @@ import { useProfileStore } from '../../src/stores/profileStore';
 import { useExerciseStore } from '../../src/stores/exerciseStore';
 import { formatSuggestionChip, suggestNext } from '../../src/engine/suggest';
 import { formatIntervalTime } from '../../src/engine/intervalTimer';
+import { COOLDOWN_CULT_PROGRAMS, ProgramWorkout } from '../../src/engine/programs';
 import {
   formatLastDoneSummary,
   getDefaultRestSeconds,
@@ -28,6 +29,7 @@ export default function SessionLoggerScreen({
   const theme = useAppTheme();
   const ts = useThemeStyles();
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [cooldownDismissed, setCooldownDismissed] = useState(false);
 
   const profile = useProfileStore((s) => s.profile);
   const exercises = useExerciseStore((s) => s.exercises);
@@ -106,6 +108,22 @@ export default function SessionLoggerScreen({
       repMin: profile.repRange.min,
     });
     setPickerOpen(false);
+  };
+
+  const handleAddCooldownWorkout = (workout: ProgramWorkout) => {
+    const existingIds = new Set((activeSession?.entries ?? []).map((e) => e.exerciseId));
+    const map = new Map(exercises.map((e) => [e.id, e]));
+    for (const target of workout.targets) {
+      if (existingIds.has(target.exerciseId)) continue;
+      const ex = map.get(target.exerciseId);
+      if (!ex) continue;
+      addExerciseEntry(ex, {
+        fixedKettlebellWeight: profile.fixedKettlebellWeight,
+        repMin: profile.repRange.min,
+      });
+      existingIds.add(target.exerciseId);
+    }
+    setCooldownDismissed(true);
   };
 
   if (pickerOpen) {
@@ -616,6 +634,52 @@ export default function SessionLoggerScreen({
             );
           })
         )}
+
+        {!cooldownDismissed && (
+          <View testID="session-cooldown-box">
+            <CyberpunkCard glow={false} style={styles.cooldownCard}>
+              <View style={styles.cooldownHeader}>
+                <Text style={[styles.cooldownTitle, ts.accent]}>
+                  OPTIONAL COOLDOWN // CULT MOBILITY
+                </Text>
+                <TouchableOpacity
+                  testID="skip-cooldown-btn"
+                  style={[styles.cooldownSkipBtn, { borderColor: theme.colors.border }]}
+                  onPress={() => setCooldownDismissed(true)}
+                >
+                  <Text style={[styles.cooldownSkipText, ts.textMuted]}>SKIP</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={[styles.cooldownHint, ts.textMuted]}>
+                Select a post-workout cooldown block below, tap + ADD EXERCISE for your own choice,
+                or skip.
+              </Text>
+              {COOLDOWN_CULT_PROGRAMS.flatMap((prog) =>
+                prog.workouts.map((workout) => (
+                  <TouchableOpacity
+                    key={workout.id}
+                    testID={`add-cooldown-${workout.id}`}
+                    style={[
+                      styles.cooldownOptionBtn,
+                      {
+                        borderColor: theme.colors.secondary,
+                        backgroundColor: theme.colors.background,
+                      },
+                    ]}
+                    onPress={() => handleAddCooldownWorkout(workout)}
+                  >
+                    <Text style={[styles.cooldownOptionTitle, { color: theme.colors.secondary }]}>
+                      + {workout.title}
+                    </Text>
+                    <Text style={[styles.cooldownOptionSub, ts.textMuted]} numberOfLines={2}>
+                      {workout.subtitle}
+                    </Text>
+                  </TouchableOpacity>
+                )),
+              )}
+            </CyberpunkCard>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -848,4 +912,28 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   addSetText: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
+  cooldownCard: { marginTop: 6, marginBottom: 16, padding: 12 },
+  cooldownHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  cooldownTitle: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
+  cooldownSkipBtn: {
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  cooldownSkipText: { fontSize: 10, fontWeight: 'bold', fontFamily: 'monospace' },
+  cooldownHint: { fontSize: 11, fontFamily: 'monospace', marginBottom: 8 },
+  cooldownOptionBtn: {
+    borderWidth: 1,
+    borderRadius: 6,
+    padding: 10,
+    marginBottom: 6,
+  },
+  cooldownOptionTitle: { fontSize: 11, fontWeight: 'bold', fontFamily: 'monospace' },
+  cooldownOptionSub: { fontSize: 10, fontFamily: 'monospace', marginTop: 2 },
 });

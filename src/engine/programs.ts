@@ -505,6 +505,14 @@ export const CULT_PROGRAMS: CultProgram[] = [
   },
 ];
 
+export const WORKOUT_CULT_PROGRAMS: CultProgram[] = CULT_PROGRAMS.filter(
+  (p) => p.category !== 'mobility',
+);
+
+export const COOLDOWN_CULT_PROGRAMS: CultProgram[] = CULT_PROGRAMS.filter(
+  (p) => p.category === 'mobility',
+);
+
 export function getCultProgramById(id: string): CultProgram | undefined {
   return CULT_PROGRAMS.find((p) => p.id === id);
 }
