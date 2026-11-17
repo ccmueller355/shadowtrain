@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
-    "@babel/eslint-parser": "^8.0.7",
+    "@babel/eslint-parser": "^8.1.2",
     "@eslint/js": "^10.0.1",
     "@react-native/jest-preset": "^0.88.1",
     "@testing-library/react-native": "^13.3.3",
