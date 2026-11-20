@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import {
   Image,
   ImageSourcePropType,
+  Linking,
   Modal,
   ScrollView,
   Share,
@@ -95,6 +96,7 @@ export default function SettingsScreen() {
   const [portabilityStatus, setPortabilityStatus] = useState<string | null>(null);
   const [fullViewImage, setFullViewImage] = useState<ImageSourcePropType | null>(null);
   const [fullViewTitle, setFullViewTitle] = useState('');
+  const [aboutExpanded, setAboutExpanded] = useState(false);
 
   const selectedTrainer = getTrainerById(selectedTrainerId);
   const selectedUnlocked = isTrainerUnlocked(profile, selectedTrainer.id);
@@ -601,6 +603,58 @@ export default function SettingsScreen() {
         />
       </CyberpunkCard>
 
+      <CyberpunkCard>
+        <TouchableOpacity
+          testID="about-toggle"
+          style={styles.aboutHeaderRow}
+          onPress={() => setAboutExpanded((prev) => !prev)}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: aboutExpanded }}
+        >
+          <Text style={[styles.section, ts.accent, styles.aboutHeaderTitle]}>
+            ABOUT SHADOWTRAIN
+          </Text>
+          <Text style={[styles.aboutChevron, ts.accent]}>{aboutExpanded ? '▾' : '▸'}</Text>
+        </TouchableOpacity>
+
+        {aboutExpanded && (
+          <View
+            testID="about-panel"
+            style={[styles.aboutPanel, { borderTopColor: theme.colors.border }]}
+          >
+            <Text style={[styles.aboutText, ts.text]}>
+              Version: v{appJson.expo.version} (build {appJson.expo.android.versionCode})
+            </Text>
+            <Text style={[styles.aboutText, ts.textMuted]}>
+              MIT License — © 2026 Carl Christian Mueller
+            </Text>
+            <Text style={[styles.aboutLabel, ts.textMuted]}>OPEN-SOURCE STACK</Text>
+            <Text style={[styles.aboutText, ts.textMuted]}>
+              React Native, Expo, Zustand, Expo SQLite, React Navigation, React Native Paper, React
+              Native SVG
+            </Text>
+            <View style={styles.aboutLinksRow}>
+              <TouchableOpacity
+                testID="about-source-link"
+                style={[styles.aboutLinkBtn, { borderColor: theme.colors.primary }]}
+                onPress={() => Linking.openURL('https://github.com/ccmueller355/shadowtrain')}
+                accessibilityRole="link"
+              >
+                <Text style={[styles.aboutLinkText, ts.accent]}>SOURCE CODE ↗</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="about-docs-link"
+                style={[styles.aboutLinkBtn, { borderColor: theme.colors.border }]}
+                onPress={() => Linking.openURL('https://ccmueller355.github.io/shadowtrain/')}
+                accessibilityRole="link"
+              >
+                <Text style={[styles.aboutLinkText, ts.text]}>DOCS & MANUAL ↗</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </CyberpunkCard>
+
       <Text style={[styles.footer, ts.textMuted]} testID="settings-version-footer">
         ShadowTrain v{appJson.expo.version}
       </Text>
@@ -856,5 +910,53 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
     marginTop: 8,
     marginBottom: 32,
+  },
+  aboutHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  aboutHeaderTitle: {
+    marginBottom: 0,
+  },
+  aboutChevron: {
+    fontSize: 14,
+    fontFamily: 'monospace',
+  },
+  aboutPanel: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    gap: 6,
+  },
+  aboutLabel: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
+    marginTop: 4,
+    letterSpacing: 0.5,
+  },
+  aboutText: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    lineHeight: 18,
+  },
+  aboutLinksRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  aboutLinkBtn: {
+    flex: 1,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+  },
+  aboutLinkText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    fontFamily: 'monospace',
   },
 });
