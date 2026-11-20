@@ -3,6 +3,11 @@ name: Android Build & Release
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - '**/*.md'
   push:
     tags: ['v*.*.*']
   workflow_dispatch:
