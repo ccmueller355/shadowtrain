@@ -18,7 +18,11 @@ Every build also generates a `.sha256` checksum and uploads both files as a GitH
 
 The `Android Build & Release` workflow (`.github/workflows/android-build.yml`) automates build execution and GitHub Releases:
 
-### A. Semantic Tag Triggers (Automated)
+### A. Pull Request Preview Builds (Automated)
+
+Every non-Dependabot Pull Request targeting `main` automatically builds a standalone preview APK (`shadowtrain-vX.Y.Z-prN-preview.apk`), uploads it as a workflow artifact, and posts a download link directly in a PR comment for device testing before merge.
+
+### B. Semantic Tag Triggers (Automated)
 
 Pushing a semantic Git tag to `main` automatically builds the Android artifact and publishes a GitHub Release with the APK/AAB and `.sha256` attached:
 
@@ -36,7 +40,7 @@ git tag -a v0.2.0-prod -m "Production bundle v0.2.0-prod"
 git push origin v0.2.0-prod
 ```
 
-### B. Manual Dispatch
+### C. Manual Dispatch
 
 In GitHub:
 

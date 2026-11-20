@@ -1,6 +1,8 @@
 name: Android Build & Release
 
 on:
+  pull_request:
+    branches: [main]
   push:
     tags: ['v*.*.*']
   workflow_dispatch:
@@ -17,6 +19,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,6 +28,7 @@ concurrency:
 jobs:
   build:
     name: Build Android (${{ github.event.inputs.profile || github.ref_name }})
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -60,6 +64,10 @@ jobs:
 
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             PROFILE="${{ github.event.inputs.profile }}"
+            SUFFIX="$PROFILE"
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            PROFILE="preview"
+            SUFFIX="pr${{ github.event.pull_request.number }}-preview"
           else
             TAG_NAME="${{ github.ref_name }}"
             if [[ "$TAG_NAME" == *-dev ]]; then
@@ -69,9 +77,11 @@ jobs:
             else
               PROFILE="preview"
             fi
+            SUFFIX="$PROFILE"
           fi
           echo "BUILD_PROFILE=$PROFILE" >> "$GITHUB_ENV"
-          echo "Building ShadowTrain v$VERSION ($PROFILE)"
+          echo "ARTIFACT_SUFFIX=$SUFFIX" >> "$GITHUB_ENV"
+          echo "Building ShadowTrain v$VERSION ($SUFFIX)"
 
       - name: Expo Prebuild (Android)
         run: npx expo prebuild --platform android --clean --non-interactive
@@ -85,15 +95,15 @@ jobs:
           if [ "$BUILD_PROFILE" = "development" ]; then
             ./gradlew assembleDebug --no-daemon
             ARTIFACT_SRC="app/build/outputs/apk/debug/app-debug.apk"
-            ARTIFACT_NAME="shadowtrain-v${VERSION}-dev.apk"
+            ARTIFACT_NAME="shadowtrain-v${VERSION}-${ARTIFACT_SUFFIX}.apk"
           elif [ "$BUILD_PROFILE" = "production" ]; then
             ./gradlew bundleRelease --no-daemon
             ARTIFACT_SRC="app/build/outputs/bundle/release/app-release.aab"
-            ARTIFACT_NAME="shadowtrain-v${VERSION}-prod.aab"
+            ARTIFACT_NAME="shadowtrain-v${VERSION}-${ARTIFACT_SUFFIX}.aab"
           else
             ./gradlew assembleRelease --no-daemon
             ARTIFACT_SRC="app/build/outputs/apk/release/app-release.apk"
-            ARTIFACT_NAME="shadowtrain-v${VERSION}-preview.apk"
+            ARTIFACT_NAME="shadowtrain-v${VERSION}-${ARTIFACT_SUFFIX}.apk"
           fi
 
           cp "$ARTIFACT_SRC" "$RUNNER_TEMP/release-assets/$ARTIFACT_NAME"
@@ -102,11 +112,35 @@ jobs:
           ls -lh "$RUNNER_TEMP/release-assets"
 
       - name: Upload Build Artifact
+        id: upload
         uses: actions/upload-artifact@v4
         with:
-          name: shadowtrain-v${{ env.VERSION }}-${{ env.BUILD_PROFILE }}
+          name: shadowtrain-v${{ env.VERSION }}-${{ env.ARTIFACT_SUFFIX }}
           path: ${{ runner.temp }}/release-assets/*
           retention-days: 30
+
+      - name: Comment APK Link on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const artifactUrl = "${{ steps.upload.outputs.artifact-url }}";
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const name = "${{ env.ARTIFACT_NAME }}";
+            const body = [
+              `### 📱 Android Preview APK Ready`,
+              ``,
+              `- **Artifact**: \`${name}\``,
+              `- **Download**: ${artifactUrl ? `[Download APK Artifact](${artifactUrl})` : `[Open Workflow Run](${runUrl})`}`,
+              `- **Workflow Run**: ${runUrl}`,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
 
       - name: Publish GitHub Release (on tag push)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
