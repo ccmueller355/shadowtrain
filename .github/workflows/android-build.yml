@@ -85,6 +85,9 @@ jobs:
       - name: Expo Prebuild (Android)
         run: npx expo prebuild --platform android --clean --non-interactive
 
+      - name: Setup Gradle Cache
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Build Android Artifact (Gradle)
         working-directory: android
         run: |
@@ -92,15 +95,15 @@ jobs:
           mkdir -p "$RUNNER_TEMP/release-assets"
 
           if [ "$BUILD_PROFILE" = "development" ]; then
-            ./gradlew assembleDebug --no-daemon
+            ./gradlew assembleDebug --no-daemon -PreactNativeArchitectures=arm64-v8a
             ARTIFACT_SRC="app/build/outputs/apk/debug/app-debug.apk"
             ARTIFACT_NAME="shadowtrain-v${VERSION}-${ARTIFACT_SUFFIX}.apk"
           elif [ "$BUILD_PROFILE" = "production" ]; then
-            ./gradlew bundleRelease --no-daemon
+            ./gradlew bundleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
             ARTIFACT_SRC="app/build/outputs/bundle/release/app-release.aab"
             ARTIFACT_NAME="shadowtrain-v${VERSION}-${ARTIFACT_SUFFIX}.aab"
           else
-            ./gradlew assembleRelease --no-daemon
+            ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
             ARTIFACT_SRC="app/build/outputs/apk/release/app-release.apk"
             ARTIFACT_NAME="shadowtrain-v${VERSION}-${ARTIFACT_SUFFIX}.apk"
           fi
