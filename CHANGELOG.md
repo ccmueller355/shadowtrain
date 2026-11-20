@@ -1,3 +1,13 @@
+## v0.1.2 — 2026-11-19
+
+### Changed
+
+- **Dependencies (Dependabot & Expo SDK 58)**:
+  - Bumped `expo/expo-github-action` from `v8` to `v9` in `.github/workflows/eas-build.yml` (#39, #45).
+  - Bumped `vue` (`3.5.44` → `3.5.45`), `react-native-paper` (`5.15.3` → `5.15.4`), `mermaid` (`12.2.0` → `12.3.0`), and `@babel/eslint-parser` (`8.0.7` → `8.1.2`) (#41, #42, #43, #44, #45).
+  - Applied Expo SDK 58 patch updates for `expo-dev-client` (`~58.0.21`), `expo-file-system` (`~58.0.14`), and `expo-sqlite` (`~58.0.18`) to satisfy `expo-doctor` (#45).
+  - Added `react-native-svg` to `.github/dependabot.yml` ignore list (pinned to `15.16.0` by Expo SDK 58; closed incompatible #40) (#45).
+
 ## v0.1.1 — 2026-11-03
 
 ### Added

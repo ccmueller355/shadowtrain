@@ -26,6 +26,7 @@ updates:
       - dependency-name: "@react-native/jest-preset"
       - dependency-name: "@react-native-async-storage/async-storage"
       - dependency-name: "react-native-reanimated"
+      - dependency-name: "react-native-svg"
       - dependency-name: "react-native-worklets"
       - dependency-name: "react-native-gesture-handler"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
