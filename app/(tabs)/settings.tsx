@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import appJson from '../../app.json';
 import { CyberpunkCard } from '../../src/components/CyberpunkCard';
 import { RadioPlayerBar } from '../../src/components/RadioPlayerBar';
 import { playCyberCue, speakTrainerCue } from '../../src/engine/audio';
@@ -600,6 +601,10 @@ export default function SettingsScreen() {
         />
       </CyberpunkCard>
 
+      <Text style={[styles.footer, ts.textMuted]} testID="settings-version-footer">
+        ShadowTrain v{appJson.expo.version}
+      </Text>
+
       {/* Full-view modal for trainer portrait render */}
       <Modal
         visible={!!fullViewImage}
@@ -844,5 +849,12 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
     fontFamily: 'monospace',
+  },
+  footer: {
+    textAlign: 'center',
+    fontSize: 12,
+    fontFamily: 'monospace',
+    marginTop: 8,
+    marginBottom: 32,
   },
 });

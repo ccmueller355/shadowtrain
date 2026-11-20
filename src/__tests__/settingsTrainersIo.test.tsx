@@ -2,6 +2,7 @@
 import React from 'react';
 import { Share } from 'react-native';
 import { render, screen, fireEvent, act } from '@testing-library/react-native';
+import appJson from '../../app.json';
 import SettingsScreen from '../../app/(tabs)/settings';
 import { DEFAULT_SEED_EXERCISES } from '../db';
 import {
@@ -319,6 +320,12 @@ describe('M7 Settings, 5 Shadow Trainers Dossier, Creds & Data Portability', () 
 
       fireEvent.press(screen.getByTestId('duration-btn-beast'));
       expect(useProfileStore.getState().profile.targetDuration).toBe('beast');
+    });
+
+    it('displays the current app version in the settings footer', () => {
+      render(<SettingsScreen />);
+      const footer = screen.getByTestId('settings-version-footer');
+      expect(footer.props.children.join('')).toBe(`ShadowTrain v${appJson.expo.version}`);
     });
   });
 });

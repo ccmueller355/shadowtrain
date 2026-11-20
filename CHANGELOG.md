@@ -1,3 +1,10 @@
+## v0.1.3 — 2026-11-20
+
+### Added
+
+- **Settings Version Footer**: Displays `ShadowTrain vX.Y.Z` at the bottom of the Settings screen (matching ShadowList).
+- **GitHub Actions Android APK & Release Pipeline**: Replaced EAS cloud workflow with native `ubuntu-latest` Gradle builds (`arm64-v8a` preview APKs with PR download comments + automated GitHub Releases on `v*.*.*` tags) (#51).
+
 ## v0.1.2 — 2026-11-19
 
 ### Changed
