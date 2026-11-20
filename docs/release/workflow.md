@@ -2,35 +2,37 @@
 
 ## 1. Build Profiles
 
-`shadowtrain` uses Expo Application Services (EAS) to build standalone Android binaries and development clients. The profiles configured in `eas.json` map directly to the release tiers:
+`shadowtrain` builds standalone Android binaries directly on GitHub Actions (`ubuntu-latest`) via `npx expo prebuild --platform android` and Gradle — no Expo EAS token or cloud queue required.
 
-| Build Type      | Profile       | Artifact                    | Purpose & Distribution                                                                                                                      |
-| :-------------- | :------------ | :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Development** | `development` | `.apk` (dev client)         | Install-once dev client with custom native modules. Connects to `npx expo start` for live hot reloading.                                    |
-| **Preview**     | `preview`     | `.apk` (standalone)         | Standalone release APK. Direct installation on test devices without needing Metro or a dev server. Ideal for GitHub Releases / IzzyOnDroid. |
-| **Production**  | `production`  | `.aab` (Android App Bundle) | Optimized, signed release bundle for Google Play Console submission.                                                                        |
+| Build Type      | Profile       | Gradle Task       | Artifact                         | Purpose & Distribution                                                                            |
+| :-------------- | :------------ | :---------------- | :------------------------------- | :------------------------------------------------------------------------------------------------ |
+| **Preview**     | `preview`     | `assembleRelease` | `shadowtrain-vX.Y.Z-preview.apk` | Standalone release APK (no Metro needed). Attached to GitHub Releases & ideal for direct install. |
+| **Development** | `development` | `assembleDebug`   | `shadowtrain-vX.Y.Z-dev.apk`     | Debug dev-client APK for connecting to `npx expo start` with live hot reloading.                  |
+| **Production**  | `production`  | `bundleRelease`   | `shadowtrain-vX.Y.Z-prod.aab`    | Android App Bundle for Google Play Console submission.                                            |
+
+Every build also generates a `.sha256` checksum and uploads both files as a GitHub Actions workflow artifact (retained for 30 days).
 
 ---
 
 ## 2. Triggering Builds via GitHub Actions
 
-The `EAS Build` workflow (`.github/workflows/eas-build.yml`) automates build execution:
+The `Android Build & Release` workflow (`.github/workflows/android-build.yml`) automates build execution and GitHub Releases:
 
 ### A. Semantic Tag Triggers (Automated)
 
-Pushing a semantic Git tag to `main` automatically fires the corresponding build:
+Pushing a semantic Git tag to `main` automatically builds the Android artifact and publishes a GitHub Release with the APK/AAB and `.sha256` attached:
 
 ```bash
 # 1. Preview Standalone APK (vX.Y.Z)
-git tag v0.2.0
+git tag -a v0.2.0 -m "Release v0.2.0"
 git push origin v0.2.0
 
-# 2. Development Client APK (vX.Y.Z-dev)
-git tag v0.2.0-dev
+# 2. Development Client APK (vX.Y.Z-dev, marked as pre-release)
+git tag -a v0.2.0-dev -m "Dev build v0.2.0-dev"
 git push origin v0.2.0-dev
 
 # 3. Production App Bundle (vX.Y.Z-prod)
-git tag v0.2.0-prod
+git tag -a v0.2.0-prod -m "Production bundle v0.2.0-prod"
 git push origin v0.2.0-prod
 ```
 
@@ -38,28 +40,22 @@ git push origin v0.2.0-prod
 
 In GitHub:
 
-1. Navigate to **Actions** → **EAS Build**.
+1. Navigate to **Actions** → **Android Build & Release**.
 2. Click **Run workflow**.
 3. Select the branch (`main`) and choose the profile (`preview`, `development`, or `production`).
+4. Download the APK/AAB from the workflow run's **Artifacts** section.
 
 ---
 
-## 3. Required Secrets & Configuration
+## 3. Local Build Commands
 
-To enable EAS cloud builds in GitHub Actions, configure the repository secret:
-
-- **`EXPO_TOKEN`**: Generate a Personal Access Token in your Expo Account Settings (`expo.dev` → Account Settings → Access Tokens) and add it to **GitHub Repository Settings → Secrets and variables → Actions**.
-
----
-
-## 4. Local Build Commands (CLI)
-
-With EAS CLI installed (`npm install -g eas-cli` or `npx eas-cli`):
+To build an Android APK locally (requires Android SDK & JDK 17):
 
 ```bash
-# Build standalone preview APK locally/via cloud
-eas build --platform android --profile preview
+# Generate native Android project
+npx expo prebuild --platform android --clean --non-interactive
 
-# Build development client APK
-eas build --platform android --profile development
+# Build standalone preview APK
+cd android && ./gradlew assembleRelease
+# Output: android/app/build/outputs/apk/release/app-release.apk
 ```
