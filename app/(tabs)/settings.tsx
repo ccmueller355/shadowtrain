@@ -626,7 +626,7 @@ export default function SettingsScreen() {
               Version: v{appJson.expo.version} (build {appJson.expo.android.versionCode})
             </Text>
             <Text style={[styles.aboutText, ts.textMuted]}>
-              MIT License — © 2026 Carl Christian Mueller
+              Aethelred Cybernetics · MIT License
             </Text>
             <Text style={[styles.aboutLabel, ts.textMuted]}>OPEN-SOURCE STACK</Text>
             <Text style={[styles.aboutText, ts.textMuted]}>
@@ -656,7 +656,7 @@ export default function SettingsScreen() {
       </CyberpunkCard>
 
       <Text style={[styles.footer, ts.textMuted]} testID="settings-version-footer">
-        ShadowTrain v{appJson.expo.version}
+        ShadowTrain v{appJson.expo.version} · Aethelred Cybernetics
       </Text>
 
       {/* Full-view modal for trainer portrait render */}

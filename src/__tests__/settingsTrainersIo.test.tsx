@@ -325,7 +325,9 @@ describe('M7 Settings, 5 Shadow Trainers Dossier, Creds & Data Portability', () 
     it('displays the current app version in the settings footer', () => {
       render(<SettingsScreen />);
       const footer = screen.getByTestId('settings-version-footer');
-      expect(footer.props.children.join('')).toBe(`ShadowTrain v${appJson.expo.version}`);
+      expect(footer.props.children.join('')).toBe(
+        `ShadowTrain v${appJson.expo.version} · Aethelred Cybernetics`,
+      );
     });
 
     it('toggles the About panel and opens source/docs links', () => {
@@ -336,7 +338,7 @@ describe('M7 Settings, 5 Shadow Trainers Dossier, Creds & Data Portability', () 
       fireEvent.press(screen.getByTestId('about-toggle'));
 
       expect(screen.getByTestId('about-panel')).toBeTruthy();
-      expect(screen.getByText(/MIT License/)).toBeTruthy();
+      expect(screen.getByText(/Aethelred Cybernetics · MIT License/)).toBeTruthy();
 
       fireEvent.press(screen.getByTestId('about-source-link'));
       expect(openUrlSpy).toHaveBeenCalledWith('https://github.com/ccmueller355/shadowtrain');
