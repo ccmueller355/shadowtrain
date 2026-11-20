@@ -1,0 +1,164 @@
+name: Android Build & Release
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Android Build Profile'
+        required: true
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - development
+          - production
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Android (${{ github.event.inputs.profile || github.ref_name }})
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: TypeScript strict check
+        run: npx tsc --noEmit
+
+      - name: Run Jest test suite
+        run: npm test
+
+      - name: Determine Build Profile & Version
+        id: meta
+        run: |
+          VERSION=$(tr -d '[:space:]' < VERSION)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            PROFILE="${{ github.event.inputs.profile }}"
+            SUFFIX="$PROFILE"
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            PROFILE="preview"
+            SUFFIX="pr${{ github.event.pull_request.number }}-preview"
+          else
+            TAG_NAME="${{ github.ref_name }}"
+            if [[ "$TAG_NAME" == *-dev ]]; then
+              PROFILE="development"
+            elif [[ "$TAG_NAME" == *-prod ]]; then
+              PROFILE="production"
+            else
+              PROFILE="preview"
+            fi
+            SUFFIX="$PROFILE"
+          fi
+          echo "BUILD_PROFILE=$PROFILE" >> "$GITHUB_ENV"
+          echo "ARTIFACT_SUFFIX=$SUFFIX" >> "$GITHUB_ENV"
+          echo "Building ShadowTrain v$VERSION ($SUFFIX)"
+
+      - name: Expo Prebuild (Android)
+        run: npx expo prebuild --platform android --clean --non-interactive
+
+      - name: Setup Gradle Cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Android Artifact (Gradle)
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          mkdir -p "$RUNNER_TEMP/release-assets"
+
+          if [ "$BUILD_PROFILE" = "development" ]; then
+            ./gradlew assembleDebug --no-daemon -PreactNativeArchitectures=arm64-v8a
+            ARTIFACT_SRC="app/build/outputs/apk/debug/app-debug.apk"
+            ARTIFACT_NAME="shadowtrain-v${VERSION}-${ARTIFACT_SUFFIX}.apk"
+          elif [ "$BUILD_PROFILE" = "production" ]; then
+            ./gradlew bundleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+            ARTIFACT_SRC="app/build/outputs/bundle/release/app-release.aab"
+            ARTIFACT_NAME="shadowtrain-v${VERSION}-${ARTIFACT_SUFFIX}.aab"
+          else
+            ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
+            ARTIFACT_SRC="app/build/outputs/apk/release/app-release.apk"
+            ARTIFACT_NAME="shadowtrain-v${VERSION}-${ARTIFACT_SUFFIX}.apk"
+          fi
+
+          cp "$ARTIFACT_SRC" "$RUNNER_TEMP/release-assets/$ARTIFACT_NAME"
+          (cd "$RUNNER_TEMP/release-assets" && sha256sum "$ARTIFACT_NAME" > "${ARTIFACT_NAME}.sha256")
+          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> "$GITHUB_ENV"
+          ls -lh "$RUNNER_TEMP/release-assets"
+
+      - name: Upload Build Artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: shadowtrain-v${{ env.VERSION }}-${{ env.ARTIFACT_SUFFIX }}
+          path: ${{ runner.temp }}/release-assets/*
+          retention-days: 30
+
+      - name: Comment APK Link on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const artifactUrl = "${{ steps.upload.outputs.artifact-url }}";
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const name = "${{ env.ARTIFACT_NAME }}";
+            const body = [
+              `### 📱 Android Preview APK Ready`,
+              ``,
+              `- **Artifact**: \`${name}\``,
+              `- **Download**: ${artifactUrl ? `[Download APK Artifact](${artifactUrl})` : `[Open Workflow Run](${runUrl})`}`,
+              `- **Workflow Run**: ${runUrl}`,
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+
+      - name: Publish GitHub Release (on tag push)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$RUNNER_TEMP/release-assets/"* --clobber
+          else
+            PRERELEASE_FLAG=""
+            if [[ "$TAG" == *-* ]]; then
+              PRERELEASE_FLAG="--prerelease"
+            fi
+            gh release create "$TAG" "$RUNNER_TEMP/release-assets/"* \
+              --title "ShadowTrain $TAG" \
+              --generate-notes \
+              $PRERELEASE_FLAG
+          fi
