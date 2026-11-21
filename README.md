@@ -1,6 +1,7 @@
 # ShadowTrain
 
 [![CI](https://github.com/ccmueller355/shadowtrain/actions/workflows/ci.yml/badge.svg)](https://github.com/ccmueller355/shadowtrain/actions/workflows/ci.yml)
+[![Latest Release](https://img.shields.io/github/v/release/ccmueller355/shadowtrain?label=APK%20Release&color=brightgreen)](https://github.com/ccmueller355/shadowtrain/releases/latest)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://ccmueller355.github.io/shadowtrain/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Version](https://img.shields.io/badge/version-0.1.3-blue)

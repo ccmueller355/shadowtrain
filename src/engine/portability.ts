@@ -1,4 +1,5 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
+import appJson from '../../app.json';
 import { Exercise, Profile, Session, ThemeName } from '../types';
 import { constantTimeEqual, hmacSha256Hex } from './vault';
 
@@ -46,7 +47,7 @@ export function serializeBackupJson(options: SerializeBackupOptions): string {
       format: 'shadowtrain-backup',
       version: 1,
       dbSchemaVersion: 1,
-      appVersion: options.appVersion ?? '0.1.1',
+      appVersion: options.appVersion ?? appJson.expo.version,
       exportedAt: options.exportedAt ?? new Date().toISOString(),
     },
     profile: options.profile,

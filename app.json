@@ -20,7 +20,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.aethelredcybernetics.shadowtrain",
       "softwareKeyboardLayoutMode": "resize",
-      "versionCode": 2
+      "versionCode": 3
     },
     "updates": {
       "enabled": false,
