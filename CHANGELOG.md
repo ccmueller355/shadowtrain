@@ -1,3 +1,13 @@
+## v0.1.4 — 2026-11-21
+
+### Changed
+
+- **Dependencies (Dependabot & Expo SDK 58)**:
+  - Bumped `expo` (`~58.0.23` → `~58.0.26`) (#48, #54).
+  - Bumped `@react-navigation/native` (`^7.5.1` → `^7.5.2`) and `@react-navigation/native-stack` (`^7.20.0` → `^7.21.1`) (#47, #50, #54).
+  - Bumped `@babel/core` (`^7.29.0` → `^7.29.13`) and `eslint` (`^10.14.0` → `^10.15.0`) (#46, #49, #54).
+  - Bumped Android `versionCode` to `4` (#54).
+
 ## v0.1.3 — 2026-11-20
 
 ### Added

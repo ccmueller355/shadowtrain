@@ -3,7 +3,7 @@
     "name": "shadowtrain",
     "slug": "shadowtrain",
     "owner": "aethelred-cybernetics",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -20,7 +20,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.aethelredcybernetics.shadowtrain",
       "softwareKeyboardLayoutMode": "resize",
-      "versionCode": 3
+      "versionCode": 4
     },
     "updates": {
       "enabled": false,
