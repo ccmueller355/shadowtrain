@@ -1,4 +1,5 @@
 // ─── [ NEURAL DECK v5.1 $ AI::GENERATED ] ───
+import appJson from '../../app.json';
 
 export interface RadioStation {
   id: string;
@@ -32,7 +33,7 @@ const RADIO_BROWSER_MIRRORS = [
   'https://at1.api.radio-browser.info',
 ];
 
-const USER_AGENT = 'Shadowtrain/0.1.1';
+const USER_AGENT = `Shadowtrain/${appJson.expo.version}`;
 
 /** Curated regional workout & electronic presets (resolved live via Radio Browser API). */
 export const RADIO_PRESETS: RadioPreset[] = [
